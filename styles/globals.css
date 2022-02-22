@@ -2,19 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
 body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  @apply bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-slate-300;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+  @apply mx-1 py-1 border-dashed border-b text-gray-500 border-gray-300 dark:text-slate-400 dark:border-slate-400;
 }
 
-* {
-  box-sizing: border-box;
+a:hover {
+  @apply border-solid border-b-2;
+}
+
+@layer components {
+  .main {
+    @apply my-8 text-center font-mono;
+  }
+
+  .content > * {
+    @apply mb-8;
+  }
+
+  .content h1 {
+    @apply py-8 font-bold text-xl sm:text-3xl;
+  }
+
+  .content pre {
+    @apply px-4 text-left text-xl;
+  }
+
+  .content ul li {
+    @apply pb-4 text-xl sm:text-2xl;
+  }
+
+  .social a:hover {
+    @apply text-lime-600 border-lime-600;
+  }
+
+  .heart a:hover {
+    @apply text-rose-400 border-rose-400;
+  }
+
+  .github a:hover {
+    @apply text-sky-400 border-sky-400;
+  }
+
+  .friend a:hover {
+    @apply text-amber-400 border-amber-400;
+  }
+
+  .tool a:hover {
+    @apply text-cyan-600 border-cyan-600;
+  }
+
+  .content .logo {
+    @apply py-7 text-4xl sm:text-5xl font-light font-sans;
+  }
+
+  .footer {
+    @apply py-2 text-sm sm:text-lg text-center;
+  }
+
+  .footer a:hover {
+    @apply border-b text-teal-500 border-teal-500;
+  }
 }

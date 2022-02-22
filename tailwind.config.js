@@ -4,9 +4,15 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
-  },
-  plugins: [
-    require('@tailwindcss/forms'),
-  ],
+    extend: {
+      fontFamily: {
+        mono: ["Consolas", "Liberation Mono", "Courier New", "monospace"],
+      },
+    },
+    plugins: [
+      require('@tailwindcss/forms')({
+        strategy: 'class',
+      }),
+    ],
+  }
 }
