@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { NextPage } from 'next';
 import Link from 'next/link';
@@ -6,6 +6,8 @@ import Link from 'next/link';
 import Main from '../components/Main';
 import Logo from '../components/Logo';
 import Footer from '../components/Footer';
+import { useRouter } from 'next/router';
+import { secureHeapUsed } from 'crypto';
 
 type List = {
   [key: string]: string[];
@@ -15,14 +17,30 @@ const Emoji: NextPage = () => {
   const [list, setList] = useState<List>({});
   const [query, setQuery] = useState('');
   const [allData, setAllData] = useState<List>({});
+  const router = useRouter();
+
   useEffect(() => {
-    const fetchData = async () => {
+    const initAllData = async () => {
       const res = await fetch('/emoji/all.json');
       const data = await res.json();
       setAllData(data);
     };
-    fetchData();
-  }, []);
+    initAllData();
+
+    const loadBy = async () => {
+      const { by } = router.query;
+      by && (await load(by as string));
+    };
+    loadBy();
+  }, [router]);
+
+  useEffect(() => {
+    const loadSearch = async () => {
+      const { q } = router.query;
+      q && (await search(q as string));
+    };
+    loadSearch();
+  }, [allData]);
 
   const load = async (by: string) => {
     const res = await fetch(`/emoji/${by}.json`);
@@ -46,11 +64,11 @@ const Emoji: NextPage = () => {
       <h1>Apple Emoji Dictionary</h1>
       <div>
         You can load the list by{' '}
-        <Link href='#key'>
+        <Link href='/emoji?by=key'>
           <a onClick={() => load('key')}>Key</a>
         </Link>{' '}
         or{' '}
-        <Link href='#emoji'>
+        <Link href='/emoji?by=emoji'>
           <a onClick={() => load('emoji')}>Emoji</a>
         </Link>
         .
@@ -62,7 +80,7 @@ const Emoji: NextPage = () => {
           placeholder='Search...'
           onChange={(evt) => setQuery(evt.target.value)}
           onKeyPress={({ code }) => {
-            code === 'Enter' && search(query);
+            code === 'Enter' && router.push(`/emoji?q=${query}`);
           }}
         />
       </div>
