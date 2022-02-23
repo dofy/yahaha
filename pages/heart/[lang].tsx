@@ -22,7 +22,7 @@ const Heart: NextPage = () => {
   }, [lang]);
 
   return (
-    <Main footer=''>
+    <Main title={data?.title}>
       <h1 className='px-4 text-left'>{data?.title}</h1>
       <pre>{data?.lines.join('\n')}</pre>
     </Main>

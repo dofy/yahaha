@@ -13,8 +13,6 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const resDomain = await fetch('/api/domains');
-      setDomains(await resDomain.json());
       const resLinks = await fetch('/api/links');
       setLinks(await resLinks.json());
     };
@@ -22,7 +20,7 @@ const Home: NextPage = () => {
   }, []);
 
   return (
-    <Main footer={<Footer domains={domains} />}>
+    <Main footer={<Footer />}>
       <h1>The answer exists only in the Tao.</h1>
       {links &&
         links.map((link, index) => (

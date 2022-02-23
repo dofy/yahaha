@@ -1,16 +1,26 @@
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import type { Domain } from '../types';
 
 export interface FooterProps {
-  domains?: Domain[];
+  children?: React.ReactNode;
 }
 
 const Footer = (props: FooterProps) => {
   const begin = 2007;
   const year = new Date().getFullYear();
 
-  const { domains } = props;
+  const { children } = props;
+
+  const [domains, setDomains] = useState<Domain[]>();
+  useEffect(() => {
+    const fetchData = async () => {
+      const resDomains = await fetch('/api/domains');
+      setDomains(await resDomains.json());
+    };
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -30,6 +40,7 @@ const Footer = (props: FooterProps) => {
           <a>冀ICP备18019086号-1</a>
         </Link>
       </div>
+      {children}
     </>
   );
 };

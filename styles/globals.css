@@ -7,11 +7,11 @@ body {
 }
 
 a {
-  @apply mx-1 py-1 border-dashed border-b text-gray-500 border-gray-300 dark:text-slate-400 dark:border-slate-400;
+  @apply mx-2 py-1 border-dashed border-b text-gray-500 border-gray-300 dark:text-slate-400 dark:border-slate-400;
 }
 
 a:hover {
-  @apply border-solid border-b-2;
+  @apply border-solid border-b-2 text-indigo-500 border-indigo-500;
 }
 
 @layer components {
@@ -31,7 +31,7 @@ a:hover {
     @apply px-4 text-left text-xl;
   }
 
-  .content ul li {
+  .content > ul > li {
     @apply pb-4 text-xl sm:text-2xl;
   }
 
@@ -66,4 +66,11 @@ a:hover {
   .footer a:hover {
     @apply border-b text-teal-500 border-teal-500;
   }
+
+  /* emoji */
+  .search-input {
+    @apply bg-gray-200 dark:bg-gray-900 p-2 rounded-lg;
+  }
+
+  /* emoticon */
 }

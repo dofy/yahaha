@@ -2,14 +2,17 @@ import Head from 'next/head';
 import type { ReactNode } from 'react';
 
 export interface MainProps {
-  footer: ReactNode;
+  title?: string;
+  footer?: ReactNode;
   children: ReactNode;
 }
 
 const Main = (props: MainProps) => {
-  const { footer, children } = props;
+  const { title, footer, children } = props;
 
-  const title = 'dofy.net & PHPz.xyz & PHPz.mobi & yahaha.net';
+  const newTitle = [title, 'dofy.net & PHPz.xyz & PHPz.mobi & yahaha.net']
+    .filter((item) => !!item)
+    .join(' - ');
   const keywords = [
     'dofy',
     'SevenYu',
@@ -27,9 +30,9 @@ const Main = (props: MainProps) => {
   return (
     <div className='main'>
       <Head>
-        <title>{title}</title>
+        <title>{newTitle}</title>
         <meta name='keywords' content={keywords.join()} />
-        <meta name='description' content={title} />
+        <meta name='description' content={newTitle} />
         <link rel='icon' href='/favicon.ico' />
         <base target='_blank' />
       </Head>
