@@ -34,6 +34,7 @@ const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink) => {
           <Image
             width={60}
             height={20}
+            alt={link.name}
             src={`https://img.shields.io/github/stars/dofy/${link.url}?style=flat`}
           />
           {cat.subfix}
