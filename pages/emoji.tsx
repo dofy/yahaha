@@ -16,8 +16,25 @@ type List = {
 const Emoji: NextPage = () => {
   const [list, setList] = useState<List>({});
   const [query, setQuery] = useState('');
-  const [allData, setAllData] = useState<List>({});
+  const [allData, setAllData] = useState<List>();
   const router = useRouter();
+
+  const load = async (by: string) => {
+    const res = await fetch(`/emoji/${by}.json`);
+    const data = await res.json();
+    setList(data);
+  };
+
+  const search = (query: string) => {
+    const data: List = {};
+    allData &&
+      Object.keys(allData)
+        .filter((key) => key.includes(query))
+        .map((key) => {
+          data[key] = allData[key];
+        });
+    setList(data);
+  };
 
   useEffect(() => {
     const initAllData = async () => {
@@ -27,37 +44,17 @@ const Emoji: NextPage = () => {
     };
     initAllData();
 
-    const loadBy = async () => {
-      const { by } = router.query;
-      by && (await load(by as string));
-    };
-    loadBy();
-  }, [router]);
+    // init list data
+    const { by } = router.query;
+    by && load(by as string);
+  }, [router.query]);
 
   useEffect(() => {
-    const loadSearch = async () => {
-      const { q } = router.query;
-      q && (await search(q as string));
-    };
-    loadSearch();
+    const { q } = router.query;
+    // init search data
+    setQuery(q as string);
+    q && search(q as string);
   }, [allData]);
-
-  const load = async (by: string) => {
-    const res = await fetch(`/emoji/${by}.json`);
-    const data = await res.json();
-    setList(data);
-  };
-
-  const search = async (query: string) => {
-    const data: List = {};
-    query &&
-      Object.keys(allData)
-        .filter((key) => key.includes(query))
-        .map((key) => {
-          data[key] = allData[key];
-        });
-    setList(data);
-  };
 
   return (
     <Main title='Emoji' footer={<Footer />}>
@@ -78,6 +75,7 @@ const Emoji: NextPage = () => {
           className='search-input'
           type='text'
           placeholder='Search...'
+          defaultValue={query}
           onChange={(evt) => setQuery(evt.target.value)}
           onKeyPress={({ code }) => {
             code === 'Enter' && router.push(`/emoji?q=${query}`);
