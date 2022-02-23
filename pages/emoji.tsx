@@ -46,11 +46,11 @@ const Emoji: NextPage = () => {
       <h1>Apple Emoji Dictionary</h1>
       <div>
         You can load the list by{' '}
-        <Link href='/emoji'>
+        <Link href='#key'>
           <a onClick={() => load('key')}>Key</a>
         </Link>{' '}
         or{' '}
-        <Link href='/emoji'>
+        <Link href='#emoji'>
           <a onClick={() => load('emoji')}>Emoji</a>
         </Link>
         .

@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
 import ReactGA from 'react-ga';
@@ -30,10 +31,14 @@ const Main = (props: MainProps) => {
     'csdn',
   ];
 
+  // get current page path
+  const router = useRouter();
   // init GA
   ReactGA.initialize('UA-88258326-1', {
     debug: process.env.NODE_ENV === 'development',
   });
+  // send page view
+  ReactGA.pageview(router.asPath);
 
   console.log('NODE_ENV:', process.env.NODE_ENV);
 
