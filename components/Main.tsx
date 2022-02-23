@@ -40,7 +40,7 @@ const Main = (props: MainProps) => {
   // send page view
   ReactGA.pageview(router.asPath);
 
-  console.log('NODE_ENV:', process.env.NODE_ENV);
+  // console.log('NODE_ENV:', process.env.NODE_ENV);
 
   return (
     <div className='main'>

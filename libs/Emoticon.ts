@@ -45,7 +45,6 @@ const debug = (msg: string) => {
   console.log(msg);
 };
 
-
 debug('--== ψ⊙ヘ⊙ Hello My Friend ⊙ヘ⊙ψ ==--');
 
 const eyeCount = assets.lEye.length;
