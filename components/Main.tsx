@@ -34,7 +34,6 @@ const Main = (props: MainProps) => {
         <meta name='keywords' content={keywords.join()} />
         <meta name='description' content={newTitle} />
         <link rel='icon' href='/favicon.ico' />
-        <base target='_blank' />
       </Head>
 
       <main className='content'>{children}</main>
