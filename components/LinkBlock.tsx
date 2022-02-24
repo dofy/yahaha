@@ -8,7 +8,7 @@ export interface LinkBlockProps {
 }
 
 const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink) => {
-  switch (cat.id) {
+  switch (cat.name) {
     case 'social':
       let socialLInk = link as SocialLink;
       return (
@@ -60,7 +60,7 @@ const LinkBlock = (props: LinkBlockProps) => {
   const { cat, links } = props;
 
   return (
-    <ul className={cat.id}>
+    <ul className={cat.name}>
       {links.map((link, index) => (
         <li key={index}>{WhichLink(cat, link)}</li>
       ))}

@@ -4,22 +4,20 @@ import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
 
 import type { Heart } from '../../types';
-
 import Main from '../../components/Main';
+
+const heart = require(`../../libs/data/heart.json`);
 
 const Heart: NextPage = () => {
   const router = useRouter();
   const { lang } = router.query;
+  const data = heart[lang as string];
+  // const [data, setData] = useState<Heart>();
 
-  const [data, setData] = useState<Heart>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch(`/api/heart/${lang}`);
-      setData(await res.json());
-    };
-    lang && fetchData();
-  }, [lang]);
+  // useEffect(() => {
+    // lang &&
+    // setData(heart[lang as string]);
+  // }, [lang]);
 
   return (
     <Main title={data?.title}>

@@ -4,7 +4,7 @@ export type Domain = {
 };
 
 export type LinkCategory = {
-  id: string;
+  name: string;
   prefix: string;
   subfix: string;
 };

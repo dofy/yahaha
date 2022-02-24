@@ -7,20 +7,12 @@ export interface FooterProps {
   children?: React.ReactNode;
 }
 
+const domains: Domain[] = require('../libs/data/domains.json');
+
 const Footer = (props: FooterProps) => {
   const begin = 2007;
   const year = new Date().getFullYear();
-
   const { children } = props;
-
-  const [domains, setDomains] = useState<Domain[]>();
-  useEffect(() => {
-    const fetchData = async () => {
-      const resDomains = await fetch('/api/domains');
-      setDomains(await resDomains.json());
-    };
-    fetchData();
-  }, []);
 
   return (
     <>
