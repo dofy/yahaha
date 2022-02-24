@@ -46,9 +46,10 @@ const Main = (props: MainProps) => {
     <div className='main'>
       <Head>
         <title>{newTitle}</title>
+        <link rel='icon' href='/favicon.ico' />
         <meta name='keywords' content={keywords.join()} />
         <meta name='description' content={newTitle} />
-        <link rel='icon' href='/favicon.ico' />
+        <meta name='theme-color' content='#ffffff' />
       </Head>
 
       <main className='content'>{children}</main>
