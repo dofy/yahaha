@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { LinkCategory, NormalLink, SocialLink } from '../types';
+import React from 'react';
 
 export interface LinkBlockProps {
   cat: LinkCategory;
@@ -12,7 +13,7 @@ const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink) => {
     case 'social':
       let socialLInk = link as SocialLink;
       return (
-        <>
+        <React.Fragment>
           {cat.prefix}
           <Link href={`${link.url}${socialLInk.userId}`}>
             <a>{socialLInk.userName}</a>
@@ -22,11 +23,11 @@ const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink) => {
             <a>{link.name}</a>
           </Link>
           {cat.subfix}
-        </>
+        </React.Fragment>
       );
     case 'github':
       return (
-        <>
+        <React.Fragment>
           {cat.prefix}
           <Link href={`https://github.com/dofy/${link.url}`}>
             <a>{link.name}</a>
@@ -38,20 +39,20 @@ const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink) => {
             src={`https://img.shields.io/github/stars/dofy/${link.url}?style=flat`}
           />
           {cat.subfix}
-        </>
+        </React.Fragment>
       );
     case 'heart':
     case 'friend':
     case 'tool':
     default:
       return (
-        <>
+        <React.Fragment>
           {cat.prefix}
           <Link href={link.url}>
             <a>{link.name}</a>
           </Link>
           {cat.subfix}
-        </>
+        </React.Fragment>
       );
   }
 };
