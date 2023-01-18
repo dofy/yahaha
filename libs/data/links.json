@@ -72,27 +72,33 @@
     "links": [
       {
         "name": "The 7th Vim",
-        "url": "7th-vim"
+        "url": "7th-vim",
+        "width": 60
       },
       {
         "name": "Learning Vim",
-        "url": "learn-vim"
+        "url": "learn-vim",
+        "width": 72
       },
       {
         "name": "Emoji Database",
-        "url": "emojidb"
+        "url": "emojidb",
+        "width": 60
       },
       {
         "name": "Apple Emoji Dict",
-        "url": "apple-emoji-dict"
+        "url": "apple-emoji-dict",
+        "width": 60
       },
       {
         "name": "My PopClip Extensions",
-        "url": "PopClip-Extensions"
+        "url": "PopClip-Extensions",
+        "width": 60
       },
       {
         "name": "My Alfred Workflows",
-        "url": "awf"
+        "url": "awf",
+        "width": 54
       }
     ]
   },

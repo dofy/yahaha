@@ -1,14 +1,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { LinkCategory, NormalLink, SocialLink } from '../types';
+import { GitHubLink, LinkCategory, NormalLink, SocialLink } from '../types';
 import React from 'react';
 
 export interface LinkBlockProps {
   cat: LinkCategory;
-  links: NormalLink[] | SocialLink[];
+  links: NormalLink[] | SocialLink[] | GitHubLink[];
 }
 
-const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink) => {
+const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink | GitHubLink) => {
   switch (cat.name) {
     case 'social':
       let socialLInk = link as SocialLink;
@@ -26,6 +26,7 @@ const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink) => {
         </React.Fragment>
       );
     case 'github':
+      let githubLink = link as GitHubLink;
       return (
         <React.Fragment>
           {cat.prefix}
@@ -33,7 +34,7 @@ const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink) => {
             <a>{link.name}</a>
           </Link>
           <Image
-            width={60}
+            width={githubLink.width}
             height={20}
             alt={link.name}
             src={`https://img.shields.io/github/stars/dofy/${link.url}?style=flat`}

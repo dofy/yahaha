@@ -67,6 +67,10 @@ a:hover {
     @apply border-b text-teal-500 border-teal-500;
   }
 
+  .img {
+    max-height: 20px;
+  }
+
   /* emoji */
   .search-input {
     @apply bg-gray-200 dark:bg-gray-900 p-2 rounded-lg;

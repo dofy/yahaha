@@ -9,6 +9,12 @@ export type LinkCategory = {
   subfix: string;
 };
 
+export type GitHubLink = {
+  name: string;
+  url: string;
+  width: number;
+}
+
 export type NormalLink = {
   name: string;
   url: string;
@@ -23,7 +29,7 @@ export type SocialLink = {
 
 export type Links = {
   cat: LinkCategory;
-  links: NormalLink[] | SocialLink[];
+  links: NormalLink[] | SocialLink[] | GitHubLink[];
 }[];
 
 export type Heart = {
