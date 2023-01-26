@@ -66,7 +66,7 @@ const Emoji: NextPage = () => {
           className='search-input'
           value={query}
           onChange={(evt) => setQuery(evt.target.value)}
-          onKeyPress={({ code }) => {
+          onKeyDown={({ code }) => {
             code === 'Enter' && router.push(`/emoji?q=${query}`);
           }}
         />
