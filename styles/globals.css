@@ -67,9 +67,30 @@ a:hover {
     @apply border-b text-teal-500 border-teal-500;
   }
 
-  /* emoji */
-  .search-input {
+  /* emoji & 24 points */
+  .search-input,
+  .number-input {
     @apply bg-gray-200 dark:bg-gray-900 p-2 rounded-lg;
+  }
+
+  .numbers {
+    @apply sm:max-w-lg max-w-full sm:mx-auto mx-4 grid sm:grid-cols-5 grid-cols-2 gap-4;
+  }
+
+  .number-input {
+    @apply text-right;
+  }
+
+  .btn-solver {
+    @apply sm:col-span-1 col-span-2 border-2 border-blue-300 bg-blue-200 dark:border-blue-900 dark:bg-blue-800 text-sm sm:text-xl px-4 py-2 font-medium rounded-lg text-center min-w-fit;
+  }
+
+  .result-list {
+    @apply md:max-w-2xl max-w-full md:mx-auto mx-4 grid md:grid-cols-3 grid-cols-2 gap-4 justify-between;
+  }
+
+  .no-result {
+    @apply text-xl sm:text-2xl text-red-500 dark:text-red-500 font-bold col-span-full;
   }
 
   /* emoticon */

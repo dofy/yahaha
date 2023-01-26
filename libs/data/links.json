@@ -123,6 +123,10 @@
     },
     "links": [
       {
+        "name": "24 Points",
+        "url": "/24points"
+      },
+      {
         "name": "Emoji",
         "url": "/emoji"
       },
