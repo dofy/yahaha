@@ -16,7 +16,7 @@ a:hover {
 
 @layer components {
   .main {
-    @apply my-8 text-center font-mono;
+    @apply my-8 mx-2 text-center font-mono;
   }
 
   .content > * {
