@@ -90,7 +90,7 @@ a:hover {
   }
 
   .no-result {
-    @apply text-xl sm:text-2xl text-red-500 dark:text-red-500 font-bold col-span-full;
+    @apply text-xl sm:text-2xl text-gray-500 dark:text-gray-500 font-bold col-span-full;
   }
 
   /* emoticon */
