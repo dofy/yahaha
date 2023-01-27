@@ -20,9 +20,13 @@ const Game: NextPage = () => {
     const { num } = router.query;
     let tNums = num as string[] || []
     tNums = tNums.concat(new Array(4 - tNums.length).fill(''));
-    // if (tNums.length !== 4) tNums = new Array(4).fill('');
     setNums(tNums);
-    setResults(Solver.methodA(...tNums))
+    // get result
+    let result = Solver.methodA(...tNums);
+    if (result.length === 0) result = Solver.methodB(...tNums);
+    // array unique
+    result = [...new Set(result)];
+    setResults(result)
   }, [router.query]);
 
   return (
@@ -46,7 +50,7 @@ const Game: NextPage = () => {
       <ul className='result-list'>
         {results.length
           ? results.map((r, i) => <li key={i}>{r}</li>)
-          : <li className='no-result'>No result</li>}
+          : <li className='no-result'>No result !!!</li>}
       </ul>
       <Logo />
     </Main>

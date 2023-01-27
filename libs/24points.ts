@@ -30,7 +30,6 @@ const methodA = (...numbers: string[]) => {
 
   let calc = [];
   let results = [];
-
   for (let n1 = 0; n1 < 4; n1++) {
     for (let o1 = 0; o1 < 4; o1++) {
       for (let n2 = 0; n2 < 4; n2++) {
@@ -41,7 +40,6 @@ const methodA = (...numbers: string[]) => {
             for (let o3 = 0; o3 < 4; o3++) {
               for (let n4 = 0; n4 < 4; n4++) {
                 if (n1 === n4 || n2 === n4 || n3 === n4) continue;
-
                 check2(o1, o2, o3) && calc.push('(');
                 check1(o1, o2) && calc.push('(');
                 calc.push(input[n1]);
@@ -99,11 +97,11 @@ const methodB = (...numbers: string[]) => {
                   if (result === RightValue) {
                     if (formula.name === 'formula1')
                       results.push(
-                        `((${a} ${op1.alias} ${b}) ${op2.alias} ${c}) ${op3.alias} ${d}`,
+                        `((${a}${op1.alias}${b})${op2.alias}${c})${op3.alias}${d}`,
                       );
                     else
                       results.push(
-                        `(${a} ${op1.alias} ${b}) ${op2.alias} (${c} ${op3.alias} ${d})`,
+                        `(${a}${op1.alias}${b})${op2.alias}(${c}${op3.alias}${d})`,
                       );
                   }
                 }
