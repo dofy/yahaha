@@ -35,6 +35,14 @@ a:hover {
     @apply pb-4 text-xl sm:text-2xl;
   }
 
+  .content > .desc {
+    @apply max-w-2xl mx-auto mb-2;
+  }
+
+  .content > form {
+    @apply mt-8;
+  }
+
   .social a:hover {
     @apply text-lime-600 border-lime-600;
   }

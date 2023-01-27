@@ -9,6 +9,7 @@ import Main from '../components/Main';
 import NumberInput from '../components/NumberInput';
 
 import Solver from '../libs/24points';
+import ReactMarkdown from 'react-markdown';
 
 const Game: NextPage = () => {
 
@@ -32,11 +33,15 @@ const Game: NextPage = () => {
   return (
     <Main title='24 Points Game' footer={<Footer />}>
       <h1>24 Points Game</h1>
-      <div>
-        Enter 4 numbers between 1 and 13<br />
-        (you know that 1 is A, 11 is J, 12 is Q, 13 is K),<br />
+      <ReactMarkdown className='desc'>
+        Enter 4 numbers between **1** and **13**
+      </ReactMarkdown>
+      <ReactMarkdown className='desc'>
+        (you know that **1** is **A**, **11** is **J**, **12** is **Q**, **13** is **K**),
+      </ReactMarkdown>
+      <ReactMarkdown className='desc'>
         and click the button to get the result.
-      </div>
+      </ReactMarkdown>
       <form className='numbers'>
         {nums.map((n, i) => (<NumberInput
           key={i}
