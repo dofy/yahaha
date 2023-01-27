@@ -33,7 +33,9 @@ const Game: NextPage = () => {
     <Main title='24 Points Game' footer={<Footer />}>
       <h1>24 Points Game</h1>
       <div>
-        Input 4 numbers, and click the button to get the result.
+        Enter 4 numbers between 1 and 13<br />
+        (you know that 1 is A, 11 is J, 12 is Q, 13 is K),<br />
+        and click the button to get the result.
       </div>
       <form className='numbers'>
         {nums.map((n, i) => (<NumberInput
