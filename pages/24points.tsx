@@ -47,7 +47,10 @@ const Game: NextPage = () => {
             setNums(tNums);
           }}
         />))}
-        <button type='submit' className='btn-solver'>Calculate</button>
+        <button type='submit' className='btn-solver' onClick={(evt) => {
+          evt.preventDefault();
+          router.push(`/24points?num=${nums.join('&num=')}`);
+        }}>Calculate</button>
       </form>
       <ul className='result-list'>
         {results.length
