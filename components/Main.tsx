@@ -50,11 +50,12 @@ const Main = (props: MainProps) => {
         <meta name='keywords' content={keywords.join()} />
         <meta name='description' content={newTitle} />
         <meta name='theme-color' content='gray' />
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:card" content="summary" />
         <meta name="twitter:site" content="@dofy" />
-        <meta name="twitter:image" content="https://dofy.net/logo.png" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={newTitle} />
+        <meta name="twitter:creator" content="@dofy" />
+        <meta name="og:title" content={title} />
+        <meta name="og:description" content={newTitle} />
+        <meta name="og:image" content="/logo.png" />
       </Head>
 
       <main className='content'>{children}</main>
