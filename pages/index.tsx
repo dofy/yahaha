@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
-
 import type { NextPage } from 'next';
-import Main from '../components/Main';
-import Logo from '../components/Logo';
 import Footer from '../components/Footer';
 import LinkBlock from '../components/LinkBlock';
-import { Links } from '../types';
+import Logo from '../components/Logo';
+import Main from '../components/Main';
+import type { Links } from '../types';
 
 const links: Links = require('../libs/data/links.json');
 

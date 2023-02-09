@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 
-import Main from '../components/Main';
-import Logo from '../components/Logo';
 import Footer from '../components/Footer';
+import Logo from '../components/Logo';
+import Main from '../components/Main';
 
 import EKit from '../libs/Emoticon';
 
@@ -25,7 +25,7 @@ const Emoticon: NextPage = () => {
           <div className='footer text-sm'>
             powered by Angela &amp;{' '}
             <Link href='https://twitter.com/dofy'>
-              <a>Seven</a>
+              <a>Seven Yu</a>
             </Link>
           </div>
           <div className='footer text-sm'>┻━┻︵╰(‵□′)╯︵┻━┻</div>

@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react';
-
-import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
+import { useRouter } from 'next/router';
 
-import type { Heart } from '../../types';
 import Main from '../../components/Main';
+import type { Heart } from '../../types';
 
 const heart = require(`../../libs/data/heart.json`);
 
@@ -12,12 +10,6 @@ const Heart: NextPage = () => {
   const router = useRouter();
   const { lang } = router.query;
   const data = heart[lang as string];
-  // const [data, setData] = useState<Heart>();
-
-  // useEffect(() => {
-    // lang &&
-    // setData(heart[lang as string]);
-  // }, [lang]);
 
   return (
     <Main title={data?.title}>

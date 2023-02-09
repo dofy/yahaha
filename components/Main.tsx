@@ -1,7 +1,6 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-
 import ReactGA from 'react-ga';
 
 export interface MainProps {
@@ -17,19 +16,7 @@ const Main = (props: MainProps) => {
     .filter((item) => !!item)
     .join(' - ');
 
-  const keywords = [
-    'dofy',
-    'SevenYu',
-    'PHPz',
-    'yahaha',
-    '心经',
-    '豆瓣',
-    'twitter',
-    'douban',
-    'github',
-    'plurk',
-    'csdn',
-  ];
+  const keywords: string[] = require('../libs/data/keywords.json');
 
   // get current page path
   const router = useRouter();

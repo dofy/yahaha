@@ -37,7 +37,7 @@ const Game: NextPage = () => {
         Enter 4 numbers between **1** and **13**
       </ReactMarkdown>
       <ReactMarkdown className='desc'>
-        (you know that **1** is **A**, **11** is **J**, **12** is **Q**, **13** is **K**),
+        (you know that **1** is **A**, **11** is **J**, **12** is **Q** and **13** is **K**),
       </ReactMarkdown>
       <ReactMarkdown className='desc'>
         and click the button to get the result.

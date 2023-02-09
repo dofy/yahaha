@@ -3,16 +3,15 @@ import { useEffect, useState } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 
-import Main from '../components/Main';
-import Logo from '../components/Logo';
-import Footer from '../components/Footer';
 import { useRouter } from 'next/router';
+import Footer from '../components/Footer';
+import Logo from '../components/Logo';
+import Main from '../components/Main';
 
 type List = {
   [key: string]: string[];
 };
 
-// const allData = require('../libs/data/emoji/all.json');
 const keyList = require('../libs/data/emoji/key.json');
 const emojiList = require('../libs/data/emoji/emoji.json');
 const allData = { ...keyList, ...emojiList };

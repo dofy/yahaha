@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import Image from 'next/image';
-import { GitHubLink, LinkCategory, NormalLink, SocialLink } from '../types';
+import Link from 'next/link';
 import React from 'react';
+import { GitHubLink, LinkCategory, NormalLink, SocialLink } from '../types';
 
 export interface LinkBlockProps {
   cat: LinkCategory;
