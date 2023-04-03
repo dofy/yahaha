@@ -4,7 +4,7 @@
   "icons": [
     {
       "src": "logo.png",
-      "sizes": "370x370",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ],
@@ -22,7 +22,7 @@
       "icons": [
         {
           "src": "logo.png",
-          "sizes": "370x370",
+          "sizes": "512x512",
           "type": "image/png"
         }
       ]
@@ -34,7 +34,7 @@
       "icons": [
         {
           "src": "logo.png",
-          "sizes": "370x370",
+          "sizes": "512x512",
           "type": "image/png"
         }
       ]
@@ -46,7 +46,7 @@
       "icons": [
         {
           "src": "logo.png",
-          "sizes": "370x370",
+          "sizes": "512x512",
           "type": "image/png"
         }
       ]
@@ -58,7 +58,7 @@
       "icons": [
         {
           "src": "logo.png",
-          "sizes": "370x370",
+          "sizes": "512x512",
           "type": "image/png"
         }
       ]
@@ -70,7 +70,7 @@
       "icons": [
         {
           "src": "logo.png",
-          "sizes": "370x370",
+          "sizes": "512x512",
           "type": "image/png"
         }
       ]
@@ -82,7 +82,7 @@
       "icons": [
         {
           "src": "logo.png",
-          "sizes": "370x370",
+          "sizes": "512x512",
           "type": "image/png"
         }
       ]
