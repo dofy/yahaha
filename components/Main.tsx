@@ -34,9 +34,10 @@ const Main = (props: MainProps) => {
       <Head>
         <title>{newTitle}</title>
         <link rel='icon' href='/favicon.ico' />
+        <link rel="apple-touch-icon" href="/logo.png" />
         <meta name='keywords' content={keywords.join()} />
         <meta name='description' content={newTitle} />
-        <meta name='theme-color' content='gray' />
+        <meta name="theme-color" content="#F3F4F6"/>
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:site" content="@dofy" />
         <meta name="twitter:creator" content="@dofy" />

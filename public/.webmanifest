@@ -1,0 +1,16 @@
+{
+  "name": "dofy.net & PHPz.xyz & PHPz.mobi & yahaha.net",
+  "short_name": "dofy-PHPz-yahaha",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "370x370",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F3F4F6",
+  "theme_color": "#F3F4F6",
+  "orientation": "portrait"
+}
