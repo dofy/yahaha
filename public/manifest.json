@@ -66,7 +66,7 @@
     {
       "name": "Apple Emoji Dictionary",
       "short_name": "Emoji",
-      "url": "/emoji",
+      "url": "./emoji",
       "icons": [
         {
           "src": "logo.png",
@@ -78,7 +78,7 @@
     {
       "name": "Emoticon Kit",
       "short_name": "Emoticon",
-      "url": "/emoticon",
+      "url": "./emoticon",
       "icons": [
         {
           "src": "logo.png",
