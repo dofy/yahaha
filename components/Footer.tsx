@@ -1,17 +1,22 @@
 import Link from 'next/link';
-
-import type { Domain } from '../types';
+import React, { useEffect, useState } from 'react';
 
 export interface FooterProps {
   children?: React.ReactNode;
 }
 
-const domains: Domain[] = require('../libs/data/domains.json');
+import domains from '../libs/data/domains.json';
 
 const Footer = (props: FooterProps) => {
   const begin = 2007;
   const year = new Date().getFullYear();
   const { children } = props;
+
+  const [domain, setDomain] = useState('');
+
+  useEffect(() => {
+    setDomain(window.location.hostname);
+  }, []);
 
   return (
     <>
@@ -20,11 +25,13 @@ const Footer = (props: FooterProps) => {
       </div>
       <div className='footer'>
         {domains &&
-          domains.map(({ name, url }) => (
-            <Link key={name} href={url}>
-              <a>{name}</a>
+          domains.map(({ name, url }) => {
+            const isCurrent = domain.toLowerCase() === name.toLowerCase();
+            return <Link key={name} href={url}>
+              {isCurrent ? <strong><a>{name}</a></strong> : <a>{name}</a>}
             </Link>
-          ))}
+          }
+          )}
       </div>
       <div className='footer'>
         <Link href='https://beian.miit.gov.cn/'>
