@@ -7,7 +7,7 @@ body {
 }
 
 a {
-  @apply mx-2 py-1 border-dashed border-b text-gray-500 border-gray-300 dark:text-slate-400 dark:border-slate-400;
+  @apply mx-2 py-1 border-dashed border-b text-gray-700 border-gray-300 dark:text-slate-400 dark:border-slate-400;
 }
 
 a:hover {
