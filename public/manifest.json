@@ -1,6 +1,6 @@
 {
   "name": "dofy.net & PHPz.xyz & PHPz.mobi & yahaha.net",
-  "short_name": "dofy-PHPz-yahaha",
+  "short_name": "PHPz",
   "icons": [
     {
       "src": "logo.png",
@@ -12,5 +12,79 @@
   "display": "standalone",
   "background_color": "#F3F4F6",
   "theme_color": "#F3F4F6",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "shortcuts": [
+    {
+      "name": "PHPz.xyz",
+      "short_name": "PHPz.xyz",
+      "url": "https://phpz.xyz/",
+      "icons": [
+        {
+          "src": "logo.png",
+          "sizes": "370x370",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "PHPz.mobi",
+      "short_name": "PHPz.mobi",
+      "url": "https://phpz.mobi/",
+      "icons": [
+        {
+          "src": "logo.png",
+          "sizes": "370x370",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "dofy.net",
+      "short_name": "dofy.net",
+      "url": "https://dofy.net/",
+      "icons": [
+        {
+          "src": "logo.png",
+          "sizes": "370x370",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "yahaha.net",
+      "short_name": "yahaha.net",
+      "url": "https://yahaha.net/",
+      "icons": [
+        {
+          "src": "logo.png",
+          "sizes": "370x370",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Apple Emoji Dictionary",
+      "short_name": "Emoji",
+      "url": "/emoji",
+      "icons": [
+        {
+          "src": "logo.png",
+          "sizes": "370x370",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Emoticon Kit",
+      "short_name": "Emoticon",
+      "url": "/emoticon",
+      "icons": [
+        {
+          "src": "logo.png",
+          "sizes": "370x370",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }
