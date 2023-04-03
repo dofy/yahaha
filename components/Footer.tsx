@@ -28,7 +28,7 @@ const Footer = (props: FooterProps) => {
           domains.map(({ name, url }) => {
             const isCurrent = domain.toLowerCase() === name.toLowerCase();
             return <Link key={name} href={url}>
-              {isCurrent ? <strong><a>{name}</a></strong> : <a>{name}</a>}
+              {isCurrent ? <a><strong>{name}</strong></a> : <a>{name}</a>}
             </Link>
           }
           )}
