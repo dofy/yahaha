@@ -24,9 +24,7 @@ const Emoticon: NextPage = () => {
         <Footer>
           <div className='footer text-sm'>
             powered by Angela &amp;{' '}
-            <Link href='https://twitter.com/dofy'>
-              <a>Seven Yu</a>
-            </Link>
+            <Link href='https://twitter.com/dofy'>Seven Yu</Link>
           </div>
           <div className='footer text-sm'>┻━┻︵╰(‵□′)╯︵┻━┻</div>
         </Footer>

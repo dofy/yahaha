@@ -1,4 +1,7 @@
 /** @type {import('next').NextConfig} */
+
+const withOffline = require('next-offline')
+
 const nextConfig = {
   i18n: {
     locales: ['zh-CN', 'en'],
@@ -6,8 +9,9 @@ const nextConfig = {
   },
   reactStrictMode: true,
   images: {
+    dangerouslyAllowSVG: true,
     domains: ['img.shields.io'],
   }
 }
 
-module.exports = nextConfig
+module.exports = withOffline(nextConfig)

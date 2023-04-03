@@ -49,13 +49,9 @@ const Emoji: NextPage = () => {
       <h1>Apple Emoji Dictionary</h1>
       <div>
         You can load the list by{' '}
-        <Link href='/emoji?by=key'>
-          <a>Key</a>
-        </Link>{' '}
-        or{' '}
-        <Link href='/emoji?by=emoji'>
-          <a>Emoji</a>
-        </Link>
+        <Link href='/emoji?by=key'>Key</Link>
+        {' '}or{' '}
+        <Link href='/emoji?by=emoji'>Emoji</Link>
         .
       </div>
       <div className='search'>
@@ -80,7 +76,7 @@ const Emoji: NextPage = () => {
       <ul className='github'>
         <li>
           <Link href='https://github.com/dofy/apple-emoji-dict'>
-            <a>~ GitHub Repo ~</a>
+            ~ GitHub Repo ~
           </Link>
         </li>
       </ul>

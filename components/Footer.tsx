@@ -28,15 +28,13 @@ const Footer = (props: FooterProps) => {
           domains.map(({ name, url }) => {
             const isCurrent = domain.toLowerCase() === name.toLowerCase();
             return <Link key={name} href={url}>
-              {isCurrent ? <a><strong>{name}</strong></a> : <a>{name}</a>}
+              {isCurrent ? <strong>{name}</strong> : name}
             </Link>
           }
           )}
       </div>
       <div className='footer'>
-        <Link href='https://beian.miit.gov.cn/'>
-          <a>冀ICP备18019086号-1</a>
-        </Link>
+        <Link href='https://beian.miit.gov.cn/'>冀ICP备18019086号-1</Link>
       </div>
       {children}
     </React.Fragment>

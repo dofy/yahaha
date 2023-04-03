@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import React from 'react';
 import { GitHubLink, LinkCategory, NormalLink, SocialLink } from '../types';
@@ -16,11 +16,11 @@ const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink | GitHubLink
         <React.Fragment>
           {cat.prefix}
           <Link href={`${link.url}${socialLInk.userId}`}>
-            <a>{socialLInk.userName}</a>
+            {socialLInk.userName}
           </Link>
           @
           <Link href={link.url}>
-            <a>{link.name}</a>
+            {link.name}
           </Link>
           {cat.subfix}
         </React.Fragment>
@@ -31,12 +31,13 @@ const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink | GitHubLink
         <React.Fragment>
           {cat.prefix}
           <Link href={`https://github.com/dofy/${link.url}`}>
-            <a>{link.name}</a>
+            {link.name}
           </Link>
           <Image
             width={githubLink.width}
             height={20}
             alt={link.name}
+            layout='fixed'
             src={`https://img.shields.io/github/stars/dofy/${link.url}?style=flat`}
           />
           {cat.subfix}
@@ -50,7 +51,7 @@ const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink | GitHubLink
         <React.Fragment>
           {cat.prefix}
           <Link href={link.url}>
-            <a>{link.name}</a>
+            {link.name}
           </Link>
           {cat.subfix}
         </React.Fragment>

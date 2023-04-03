@@ -35,15 +35,16 @@ const Main = (props: MainProps) => {
         <title>{newTitle}</title>
         <link rel='icon' href='/favicon.ico' />
         <link rel="apple-touch-icon" href="/logo.png" />
-        <meta name='keywords' content={keywords.join()} />
+        <link rel="manifest" href="/manifest.json" />
         <meta name='description' content={newTitle} />
-        <meta name="theme-color" content="#F3F4F6"/>
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:site" content="@dofy" />
-        <meta name="twitter:creator" content="@dofy" />
-        <meta name="og:title" content={title} />
+        <meta name='keywords' content={keywords.join()} />
         <meta name="og:description" content={newTitle} />
         <meta name="og:image" content="/logo.png" />
+        <meta name="og:title" content={title} />
+        <meta name="theme-color" content="#F3F4F6" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:creator" content="@dofy" />
+        <meta name="twitter:site" content="@dofy" />
       </Head>
 
       <main className='content'>{children}</main>
