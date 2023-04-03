@@ -19,7 +19,7 @@ const Footer = (props: FooterProps) => {
   }, []);
 
   return (
-    <>
+    <React.Fragment>
       <div className='footer'>
         copyright &copy; {begin}-{year}
       </div>
@@ -39,7 +39,7 @@ const Footer = (props: FooterProps) => {
         </Link>
       </div>
       {children}
-    </>
+    </React.Fragment>
   );
 };
 
