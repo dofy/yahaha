@@ -1,13 +1,13 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data = {
-  debug: boolean;
-};
+  debug: boolean
+}
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<Data>
 ) {
-  console.log(req);
-  res.status(200).json({ debug: true });
+  console.log(req)
+  res.status(200).json({ debug: true })
 }

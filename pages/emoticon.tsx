@@ -1,21 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 
-import type { NextPage } from 'next';
-import Link from 'next/link';
+import type { NextPage } from 'next'
+import Link from 'next/link'
 
-import Footer from '../components/Footer';
-import Logo from '../components/Logo';
-import Main from '../components/Main';
+import Footer from '../components/Footer'
+import Logo from '../components/Logo'
+import Main from '../components/Main'
 
-import EKit from '../libs/Emoticon';
+import EKit from '../libs/Emoticon'
 
 const Emoticon: NextPage = () => {
-  const [doit, setDoit] = useState<number>(0);
-  const [emoticon, setEmoticon] = useState<string>('');
+  const [doit, setDoit] = useState<number>(0)
+  const [emoticon, setEmoticon] = useState<string>('')
 
   useEffect(() => {
-    setEmoticon(EKit());
-  }, [doit]);
+    setEmoticon(EKit())
+  }, [doit])
 
   return (
     <Main
@@ -37,7 +37,7 @@ const Emoticon: NextPage = () => {
           readOnly={true}
           defaultValue={emoticon}
           onFocus={(evt) => {
-            evt.target.select();
+            evt.target.select()
           }}
           className='result-input'
         />
@@ -49,7 +49,7 @@ const Emoticon: NextPage = () => {
       </div>
       <Logo />
     </Main>
-  );
-};
+  )
+}
 
-export default Emoticon;
+export default Emoticon

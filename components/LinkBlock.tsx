@@ -1,38 +1,36 @@
-import Image from 'next/legacy/image';
-import Link from 'next/link';
-import React from 'react';
-import { GitHubLink, LinkCategory, NormalLink, SocialLink } from '../types';
+import Image from 'next/legacy/image'
+import Link from 'next/link'
+import React from 'react'
+import { GitHubLink, LinkCategory, NormalLink, SocialLink } from '../typings'
 
 export interface LinkBlockProps {
-  cat: LinkCategory;
-  links: NormalLink[] | SocialLink[] | GitHubLink[];
+  cat: LinkCategory
+  links: NormalLink[] | SocialLink[] | GitHubLink[]
 }
 
-const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink | GitHubLink) => {
+const WhichLink = (
+  cat: LinkCategory,
+  link: NormalLink | SocialLink | GitHubLink
+) => {
   switch (cat.name) {
     case 'social':
-      let socialLInk = link as SocialLink;
+      let socialLInk = link as SocialLink
       return (
         <React.Fragment>
           {cat.prefix}
           <Link href={`${link.url}${socialLInk.userId}`}>
             {socialLInk.userName}
           </Link>
-          @
-          <Link href={link.url}>
-            {link.name}
-          </Link>
+          @<Link href={link.url}>{link.name}</Link>
           {cat.subfix}
         </React.Fragment>
-      );
+      )
     case 'github':
-      let githubLink = link as GitHubLink;
+      let githubLink = link as GitHubLink
       return (
         <React.Fragment>
           {cat.prefix}
-          <Link href={`https://github.com/dofy/${link.url}`}>
-            {link.name}
-          </Link>
+          <Link href={`https://github.com/dofy/${link.url}`}>{link.name}</Link>
           <Image
             width={githubLink.width}
             height={20}
@@ -42,7 +40,7 @@ const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink | GitHubLink
           />
           {cat.subfix}
         </React.Fragment>
-      );
+      )
     case 'heart':
     case 'friend':
     case 'tool':
@@ -50,17 +48,15 @@ const WhichLink = (cat: LinkCategory, link: NormalLink | SocialLink | GitHubLink
       return (
         <React.Fragment>
           {cat.prefix}
-          <Link href={link.url}>
-            {link.name}
-          </Link>
+          <Link href={link.url}>{link.name}</Link>
           {cat.subfix}
         </React.Fragment>
-      );
+      )
   }
-};
+}
 
 const LinkBlock = (props: LinkBlockProps) => {
-  const { cat, links } = props;
+  const { cat, links } = props
 
   return (
     <ul className={cat.name}>
@@ -68,7 +64,7 @@ const LinkBlock = (props: LinkBlockProps) => {
         <li key={index}>{WhichLink(cat, link)}</li>
       ))}
     </ul>
-  );
-};
+  )
+}
 
-export default LinkBlock;
+export default LinkBlock

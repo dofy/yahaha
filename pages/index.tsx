@@ -1,13 +1,14 @@
-import type { NextPage } from 'next';
-import Footer from '../components/Footer';
-import LinkBlock from '../components/LinkBlock';
-import Logo from '../components/Logo';
-import Main from '../components/Main';
-import type { Links } from '../types';
+import type { NextPage } from 'next'
+import Footer from '../components/Footer'
+import LinkBlock from '../components/LinkBlock'
+import Logo from '../components/Logo'
+import Main from '../components/Main'
+import type { Links } from '../typings'
 
-const links: Links = require('../libs/data/links.json');
+import allLinks from '../libs/data/links.json'
 
 const Home: NextPage = () => {
+  const links = allLinks as Links
   return (
     <Main footer={<Footer />}>
       <h1>The answer exists only in the Tao.</h1>
@@ -17,7 +18,7 @@ const Home: NextPage = () => {
         ))}
       <Logo />
     </Main>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
