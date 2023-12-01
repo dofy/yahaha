@@ -113,4 +113,21 @@ a:hover {
   .create-button:hover {
     @apply border-blue-400 bg-blue-300 dark:border-blue-800 dark:bg-blue-700;
   }
+
+  /* morse */
+  .input-box {
+    @apply flex p-1 mx-auto sm:w-[50%] w-full items-center justify-center;
+  }
+  .text-input {
+    @apply font-sans font-light border-2 text-xl sm:text-2xl bg-transparent p-2 rounded-lg w-full;
+  }
+  .morse-code {
+    @apply font-light w-full sm:w-[80%] flex mx-auto flex-wrap justify-center whitespace-break-spaces cursor-pointer;
+  }
+  .morse-word {
+    @apply bg-slate-500 p-1 flex gap-1 rounded-md m-1 flex-wrap;
+  }
+  .morse-letter {
+    @apply bg-gray-300 p-1 rounded-md text-black;
+  }
 }

@@ -40,3 +40,11 @@ export type Heart = {
 export type HeartMap = {
   [key: string]: Heart
 }
+
+export type ArrayDict = {
+  [key: string]: string[]
+}
+
+export type Dict = {
+  [key: string]: string
+}

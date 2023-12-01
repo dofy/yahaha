@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import type { NextPage } from 'next'
 import Link from 'next/link'
@@ -8,19 +8,19 @@ import Footer from '../components/Footer'
 import Logo from '../components/Logo'
 import Main from '../components/Main'
 
-type List = {
-  [key: string]: string[]
-}
-
-const keyList = require('../libs/data/emoji/key.json')
-const emojiList = require('../libs/data/emoji/emoji.json')
-const allData = { ...keyList, ...emojiList }
+import keyListData from '../libs/data/emoji/key.json'
+import emojiListData from '../libs/data/emoji/emoji.json'
+import { ArrayDict } from '../typings'
 
 const Emoji: NextPage = () => {
-  const [list, setList] = useState<List>({})
+  const [list, setList] = useState<ArrayDict>({})
   const [query, setQuery] = useState('')
 
   const router = useRouter()
+
+  const keyList = keyListData as ArrayDict
+  const emojiList = emojiListData as ArrayDict
+  const allData = { ...keyList, ...emojiList }
 
   useEffect(() => {
     const load = async (by: string) => {
@@ -29,7 +29,7 @@ const Emoji: NextPage = () => {
     }
 
     const search = (query: string) => {
-      const data: List = {}
+      const data: ArrayDict = {}
       Object.keys(allData)
         .filter((key) => key.includes(query))
         .map((key) => {

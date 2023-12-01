@@ -22,12 +22,10 @@ const Main = (props: MainProps) => {
   const router = useRouter()
   // init GA
   ReactGA.initialize('UA-88258326-1', {
-    debug: process.env.NODE_ENV === 'development'
+    // debug: process.env.NODE_ENV === 'development'
   })
   // send page view
   ReactGA.pageview(router.asPath)
-
-  // console.log('NODE_ENV:', process.env.NODE_ENV);
 
   return (
     <div className='main'>
