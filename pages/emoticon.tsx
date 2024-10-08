@@ -1,13 +1,8 @@
-import { useEffect, useState } from 'react'
-
+import { Footer, Logo, Main } from '@/components'
+import EKit from '@/libs/Emoticon'
 import type { NextPage } from 'next'
 import Link from 'next/link'
-
-import Footer from '../components/Footer'
-import Logo from '../components/Logo'
-import Main from '../components/Main'
-
-import EKit from '../libs/Emoticon'
+import { useEffect, useState } from 'react'
 
 const Emoticon: NextPage = () => {
   const [doit, setDoit] = useState<number>(0)

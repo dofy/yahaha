@@ -3,13 +3,13 @@ import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import ReactGA from 'react-ga'
 
-export interface MainProps {
+interface MainProps {
   title?: string
   footer?: ReactNode
   children: ReactNode
 }
 
-const Main = (props: MainProps) => {
+export const Main = (props: MainProps) => {
   const { title, footer, children } = props
 
   const newTitle = [title, 'dofy.net & PHPz.xyz & PHPz.mobi & yahaha.net']
@@ -51,5 +51,3 @@ const Main = (props: MainProps) => {
     </div>
   )
 }
-
-export default Main

@@ -1,3 +1,1 @@
-const Logo = () => <div className='logo'>{`☉ゝ☉''`}</div>
-
-export default Logo
+export const Logo = () => <div className='logo'>{`☉ゝ☉''`}</div>

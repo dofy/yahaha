@@ -1,10 +1,11 @@
 import { ChangeEvent } from 'react'
 
-export interface NumberInputProps {
+interface NumberInputProps {
   value?: string
   onChange?: (value: ChangeEvent<HTMLInputElement>) => void
 }
-const NumberInput = (props: NumberInputProps) => {
+
+export const NumberInput = (props: NumberInputProps) => {
   const { value, onChange } = props
   return (
     <input
@@ -20,5 +21,3 @@ const NumberInput = (props: NumberInputProps) => {
     />
   )
 }
-
-export default NumberInput

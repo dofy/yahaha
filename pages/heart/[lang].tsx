@@ -1,10 +1,8 @@
+import { Main } from '@/components'
+import heart from '@/libs/data/heart.json'
+import type { Heart, HeartMap } from '@/types'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-
-import Main from '../../components/Main'
-import type { Heart, HeartMap } from '../../typings'
-
-import heart from '../../libs/data/heart.json'
 
 const Heart: NextPage = () => {
   const router = useRouter()

@@ -1,16 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
-
+import { Footer, Logo, Main } from '@/components'
+import emojiListData from '@/libs/data/emoji/emoji.json'
+import keyListData from '@/libs/data/emoji/key.json'
+import { ArrayDict } from '@/types'
 import type { NextPage } from 'next'
 import Link from 'next/link'
-
 import { useRouter } from 'next/router'
-import Footer from '../components/Footer'
-import Logo from '../components/Logo'
-import Main from '../components/Main'
-
-import keyListData from '../libs/data/emoji/key.json'
-import emojiListData from '../libs/data/emoji/emoji.json'
-import { ArrayDict } from '../typings'
+import { useEffect, useState } from 'react'
 
 const Emoji: NextPage = () => {
   const [list, setList] = useState<ArrayDict>({})

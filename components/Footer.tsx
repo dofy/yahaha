@@ -1,13 +1,12 @@
+import domains from '@/libs/data/domains.json'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
-export interface FooterProps {
+interface FooterProps {
   children?: React.ReactNode
 }
 
-import domains from '../libs/data/domains.json'
-
-const Footer = (props: FooterProps) => {
+export const Footer = (props: FooterProps) => {
   const begin = 2007
   const year = new Date().getFullYear()
   const { children } = props
@@ -41,5 +40,3 @@ const Footer = (props: FooterProps) => {
     </React.Fragment>
   )
 }
-
-export default Footer

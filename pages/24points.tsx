@@ -1,14 +1,8 @@
-import { useEffect, useState } from 'react'
-
+import { Footer, Logo, Main, NumberInput } from '@/components'
+import Solver from '@/libs/24points'
 import type { NextPage } from 'next'
-
 import { useRouter } from 'next/router'
-import Footer from '../components/Footer'
-import Logo from '../components/Logo'
-import Main from '../components/Main'
-import NumberInput from '../components/NumberInput'
-
-import Solver from '../libs/24points'
+import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 
 const Game: NextPage = () => {

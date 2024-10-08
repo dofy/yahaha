@@ -1,9 +1,9 @@
+import { GitHubLink, LinkCategory, NormalLink, SocialLink } from '@/types'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import React from 'react'
-import { GitHubLink, LinkCategory, NormalLink, SocialLink } from '../typings'
 
-export interface LinkBlockProps {
+interface LinkBlockProps {
   cat: LinkCategory
   links: NormalLink[] | SocialLink[] | GitHubLink[]
 }
@@ -55,7 +55,7 @@ const WhichLink = (
   }
 }
 
-const LinkBlock = (props: LinkBlockProps) => {
+export const LinkBlock = (props: LinkBlockProps) => {
   const { cat, links } = props
 
   return (
@@ -66,5 +66,3 @@ const LinkBlock = (props: LinkBlockProps) => {
     </ul>
   )
 }
-
-export default LinkBlock

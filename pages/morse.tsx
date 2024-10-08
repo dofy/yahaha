@@ -1,10 +1,9 @@
+import { Footer, Main } from '@/components'
+import MorseData from '@/libs/data/morse.json'
+import { Dict } from '@/types'
+import copy from 'clipboard-copy'
 import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
-import Footer from '../components/Footer'
-import Main from '../components/Main'
-import MorseData from '../libs/data/morse.json'
-import { Dict } from '../typings'
-import copy from 'clipboard-copy'
 
 interface MorseLetterProps {
   letter: string

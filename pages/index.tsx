@@ -1,11 +1,7 @@
+import { Footer, LinkBlock, Logo, Main } from '@/components'
+import allLinks from '@/libs/data/links.json'
+import type { Links } from '@/types'
 import type { NextPage } from 'next'
-import Footer from '../components/Footer'
-import LinkBlock from '../components/LinkBlock'
-import Logo from '../components/Logo'
-import Main from '../components/Main'
-import type { Links } from '../typings'
-
-import allLinks from '../libs/data/links.json'
 
 const Home: NextPage = () => {
   const links = allLinks as Links
