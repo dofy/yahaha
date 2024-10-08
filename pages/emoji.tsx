@@ -15,9 +15,9 @@ const Emoji: NextPage = () => {
 
   const keyList = keyListData as ArrayDict
   const emojiList = emojiListData as ArrayDict
-  const allData = { ...keyList, ...emojiList }
 
   useEffect(() => {
+    const allData = { ...keyList, ...emojiList }
     const load = async (by: string) => {
       setQuery('')
       setList(by === 'key' ? keyList : emojiList)
@@ -37,7 +37,7 @@ const Emoji: NextPage = () => {
     const { by, q } = router.query
     by && load(by as string)
     q && (setQuery(q as string), search(q as string))
-  }, [router.query])
+  }, [emojiList, keyList, router.query])
 
   return (
     <Main title='Emoji' footer={<Footer />}>
