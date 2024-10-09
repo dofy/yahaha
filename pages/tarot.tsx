@@ -57,14 +57,13 @@ const TarotCard: FC<TarotCardProps> = ({
       </div>
       {isShowDetail && (
         <div className='flex flex-col md:flex-row gap-2'>
-          <div
-            className={`flex-shrink-0 transition-all ease-in-out duration-500 ${
-              currentTab === 'down' ? 'rotate-180' : ''
-            }`}
-          >
+          <div className='flex-shrink-0'>
             <Image
               width={237}
               height={340}
+              className={`transition-all ease-in-out duration-500 ${
+                currentTab === 'down' ? 'rotate-180' : ''
+              }`}
               src={`/images/tarot/${tarot.index}.jpg`}
               alt={tarot.name}
             />
@@ -146,7 +145,7 @@ const Label: FC<LabelProps> = ({ children, hightlight, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className={`inline-block font-bold text-gray-700 bg-gray-200 px-4 py-1 rounded-sm mr-2 ${
+      className={`inline-block font-bold text-gray-700 bg-gray-200 px-6 py-1 rounded-sm mr-2 ${
         hightlight ? 'border-b-2 border-gray-500' : 'border-0'
       } ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
     >
