@@ -3,7 +3,6 @@ import tarotData from '@/libs/data/tarot.json'
 import type { Tarot as TarotType } from '@/types'
 import type { NextPage } from 'next'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
 
 const Tarot: NextPage = () => {
@@ -20,7 +19,10 @@ const Tarot: NextPage = () => {
             tarot={tarot as TarotType}
             currentTab={currentTab}
             isShowDetail={currentTarot?.index === tarot.index}
-            onSelected={setCurrentTarot}
+            onSelected={(tarot) => {
+              window.location.hash = tarot.index
+              setCurrentTarot(tarot)
+            }}
             onTabChange={setCurrentTab}
           />
         ))}
@@ -45,14 +47,21 @@ const TarotCard: FC<TarotCardProps> = ({
   onTabChange
 }) => {
   return (
-    <div className='text-left'>
-      <div className='flex justify-between' onClick={() => onSelected?.(tarot)}>
+    <div id={tarot.index} className='text-left'>
+      <div
+        className='flex justify-between cursor-pointer hover:bg-gray-200 px-4 py-2 rounded-md'
+        onClick={() => onSelected?.(tarot)}
+      >
         <div className='text-xl font-medium'>{tarot.name}</div>
         <div className='text-2xl uppercase text-gray-400'>{tarot.index}</div>
       </div>
       {isShowDetail && (
         <div className='flex flex-col md:flex-row gap-2'>
-          <div className='flex-shrink-0'>
+          <div
+            className={`flex-shrink-0 transition-all ease-in-out duration-500 ${
+              currentTab === 'down' ? 'rotate-180' : ''
+            }`}
+          >
             <Image
               width={237}
               height={340}
@@ -86,9 +95,11 @@ const TarotCard: FC<TarotCardProps> = ({
                   </Label>
                 ))}
               </div>
-              {currentTab === 'summary' && <div>{tarot.summary}</div>}
+              {currentTab === 'summary' && (
+                <div className='leading-8 text-lg'>{tarot.summary}</div>
+              )}
               {currentTab === 'up' && (
-                <div>
+                <div className='leading-8 text-lg'>
                   {Object.entries(tarot.up).map(([key, value]) => (
                     <div key={key}>
                       <span className='font-bold'>{key}</span>: {value}
@@ -97,7 +108,7 @@ const TarotCard: FC<TarotCardProps> = ({
                 </div>
               )}
               {currentTab === 'down' && (
-                <div>
+                <div className='leading-8 text-lg'>
                   {Object.entries(tarot.down).map(([key, value]) => (
                     <div key={key}>
                       <span className='font-bold'>{key}</span>: {value}
@@ -119,7 +130,7 @@ interface TagProps {
 
 const Tag: FC<TagProps> = ({ children }) => {
   return (
-    <span className='font-medium bg-gray-200 border border-gray-300 rounded-md px-4 py-1 text-gray-500'>
+    <span className='font-medium cursor-default bg-gray-200 border border-gray-300 rounded-md px-4 py-1 text-gray-500'>
       {children}
     </span>
   )
@@ -137,7 +148,7 @@ const Label: FC<LabelProps> = ({ children, hightlight, onClick }) => {
       onClick={onClick}
       className={`inline-block font-bold text-gray-700 bg-gray-200 px-4 py-1 rounded-sm mr-2 ${
         hightlight ? 'border-b-2 border-gray-500' : 'border-0'
-      }`}
+      } ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
     >
       {children}
     </div>
