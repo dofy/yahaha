@@ -56,7 +56,7 @@ const TarotCard: FC<TarotCardProps> = ({
         <div className='text-2xl uppercase text-gray-400'>{tarot.index}</div>
       </div>
       {isShowDetail && (
-        <div className='flex flex-col md:flex-row gap-2'>
+        <div className='flex flex-col md:flex-row gap-2 p-2'>
           <div className='flex-shrink-0'>
             <Image
               width={237}
