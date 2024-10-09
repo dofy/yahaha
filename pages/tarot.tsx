@@ -49,7 +49,7 @@ const TarotCard: FC<TarotCardProps> = ({
   return (
     <div id={tarot.index} className='text-left'>
       <div
-        className='flex justify-between cursor-pointer hover:bg-gray-200 px-4 py-2 rounded-md'
+        className='flex justify-between cursor-pointer dark:hover:bg-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md'
         onClick={() => onSelected?.(tarot)}
       >
         <div className='text-xl font-medium'>{tarot.name}</div>
@@ -146,7 +146,9 @@ const Label: FC<LabelProps> = ({ children, hightlight, onClick }) => {
     <div
       onClick={onClick}
       className={`inline-block font-bold text-gray-700 bg-gray-200 px-6 py-1 rounded-sm mr-2 ${
-        hightlight ? 'border-b-2 border-gray-500' : 'border-0'
+        hightlight
+          ? 'border-b-4 border-gray-500 dark:border-blue-500'
+          : 'border-0'
       } ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
     >
       {children}
