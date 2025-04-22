@@ -1,5 +1,5 @@
 {
-  "name": "dofy.net & PHPz.xyz & PHPz.mobi & yahaha.net",
+  "name": "dofy.net & PHPz.xyz & yahaha.net",
   "short_name": "PHPz",
   "icons": [
     {
@@ -19,18 +19,6 @@
       "name": "PHPz.xyz",
       "short_name": "PHPz.xyz",
       "url": "https://phpz.xyz/",
-      "icons": [
-        {
-          "src": "logo.png",
-          "sizes": "512x512",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "PHPz.mobi",
-      "short_name": "PHPz.mobi",
-      "url": "https://phpz.mobi/",
       "icons": [
         {
           "src": "logo.png",
