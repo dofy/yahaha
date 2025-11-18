@@ -26,16 +26,18 @@ const Game: NextPage = () => {
   return (
     <Main title='24 Points Game' footer={<Footer />}>
       <h1>24 Points Game</h1>
-      <ReactMarkdown className='desc'>
-        Enter 4 numbers between **1** and **13**
-      </ReactMarkdown>
-      <ReactMarkdown className='desc'>
-        and click the button to get the result.
-      </ReactMarkdown>
-      <ReactMarkdown className='desc'>
-        **Tips:** You know that **1** is **A**, **11** is **J**, **12** is **Q**
-        and **13** is **K**.
-      </ReactMarkdown>
+      <div className='desc'>
+        <ReactMarkdown>Enter 4 numbers between **1** and **13**</ReactMarkdown>
+      </div>
+      <div className='desc'>
+        <ReactMarkdown>and click the button to get the result.</ReactMarkdown>
+      </div>
+      <div className='desc'>
+        <ReactMarkdown>
+          **Tips:** You know that **1** is **A**, **11** is **J**, **12** is
+          **Q** and **13** is **K**.
+        </ReactMarkdown>
+      </div>
       <form className='numbers'>
         {nums.map((n, i) => (
           <NumberInput
