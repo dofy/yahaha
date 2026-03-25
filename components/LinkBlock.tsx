@@ -3,6 +3,14 @@ import Image from 'next/legacy/image'
 import Link from 'next/link'
 import React from 'react'
 
+const catLabels: Record<string, string> = {
+  social: 'social',
+  heart: 'dharma',
+  github: 'projects',
+  friend: 'friends',
+  tool: 'tools',
+}
+
 interface LinkBlockProps {
   cat: LinkCategory
   links: NormalLink[] | SocialLink[] | GitHubLink[]
@@ -59,10 +67,13 @@ export const LinkBlock = (props: LinkBlockProps) => {
   const { cat, links } = props
 
   return (
-    <ul className={cat.name}>
-      {links.map((link, index) => (
-        <li key={index}>{WhichLink(cat, link)}</li>
-      ))}
-    </ul>
+    <div>
+      <div className='section-label'>— {catLabels[cat.name] ?? cat.name} —</div>
+      <ul className={cat.name}>
+        {links.map((link, index) => (
+          <li key={index}>{WhichLink(cat, link)}</li>
+        ))}
+      </ul>
+    </div>
   )
 }

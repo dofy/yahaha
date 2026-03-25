@@ -13,7 +13,7 @@ body {
 }
 
 a {
-  @apply mx-2 py-1 border-dashed border-b text-gray-700 border-gray-300 dark:text-slate-400 dark:border-slate-400;
+  @apply mx-2 py-1 border-dashed border-b text-gray-700 border-gray-300 dark:text-slate-400 dark:border-slate-400 transition-colors duration-200;
 }
 
 a:hover {
@@ -22,7 +22,7 @@ a:hover {
 
 @layer components {
   .main {
-    @apply my-8 mx-0 sm:mx-2 text-center font-mono;
+    @apply my-10 mx-auto max-w-xl px-5 text-center font-mono;
   }
 
   .content > * {
@@ -30,14 +30,15 @@ a:hover {
   }
 
   .content h1 {
-    @apply py-8 font-bold text-2xl sm:text-3xl;
+    @apply py-10 font-bold text-2xl sm:text-3xl tracking-tight leading-relaxed;
   }
 
   .content pre {
     @apply px-4 text-left text-xl;
   }
 
-  .content > ul > li {
+  .content > ul > li,
+  .content > div > ul > li {
     @apply pb-4 text-xl sm:text-2xl;
   }
 
@@ -47,6 +48,10 @@ a:hover {
 
   .content > form {
     @apply mt-8;
+  }
+
+  .section-label {
+    @apply text-xs tracking-[0.2em] uppercase text-gray-400 dark:text-gray-600 mb-3 select-none;
   }
 
   .social a:hover {
@@ -65,16 +70,28 @@ a:hover {
     @apply text-amber-400 border-amber-400;
   }
 
+  .tool {
+    @apply flex flex-wrap justify-center gap-x-0 gap-y-2;
+  }
+
+  .tool li {
+    @apply !pb-0;
+  }
+
   .tool a:hover {
     @apply text-cyan-600 border-cyan-600;
   }
 
   .content .logo {
-    @apply py-7 text-4xl sm:text-5xl font-light font-sans;
+    @apply py-7 text-3xl sm:text-4xl font-light font-sans text-gray-400 dark:text-gray-600;
   }
 
   .footer {
-    @apply py-2 text-sm sm:text-lg text-center;
+    @apply py-2 text-sm sm:text-base text-center text-gray-400 dark:text-gray-600;
+  }
+
+  .footer a {
+    @apply text-gray-400 dark:text-gray-600 border-gray-300 dark:border-gray-700;
   }
 
   .footer a:hover {
