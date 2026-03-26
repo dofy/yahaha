@@ -7,7 +7,7 @@ module.exports = {
     extend: {
       fontFamily: {
         mono: [
-          'Open Sans',
+          'JetBrains Mono',
           'Consolas',
           'Liberation Mono',
           'Courier New',

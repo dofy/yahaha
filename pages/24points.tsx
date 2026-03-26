@@ -1,4 +1,4 @@
-import { Footer, Logo, Main, NumberInput } from '@/components'
+import { Main, NumberInput } from '@/components'
 import Solver from '@/libs/24points'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -24,7 +24,7 @@ const Game: NextPage = () => {
   }, [router.query])
 
   return (
-    <Main title='24 Points Game' footer={<Footer />}>
+    <Main title='24 Points Game'>
       <h1>24 Points Game</h1>
       <div className='desc'>
         <ReactMarkdown>Enter 4 numbers between **1** and **13**</ReactMarkdown>
@@ -68,7 +68,6 @@ const Game: NextPage = () => {
           <li className='no-result'>No result !!!</li>
         )}
       </ul>
-      <Logo />
     </Main>
   )
 }

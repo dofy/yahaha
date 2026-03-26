@@ -1,4 +1,4 @@
-import { Footer, Main } from '@/components'
+import { Main } from '@/components'
 import MorseData from '@/libs/data/morse.json'
 import { Dict } from '@/types'
 import copy from 'clipboard-copy'
@@ -46,7 +46,7 @@ const Morse: NextPage = () => {
   }, [text])
 
   return (
-    <Main title='Morse Code' footer={<Footer />}>
+    <Main title='Morse Code'>
       <h1>Morse Code</h1>
       <div className='input-box'>
         <input

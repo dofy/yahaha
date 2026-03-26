@@ -1,4 +1,4 @@
-import { Footer, Logo, Main } from '@/components'
+import { Main } from '@/components'
 import emojiListData from '@/libs/data/emoji/emoji.json'
 import keyListData from '@/libs/data/emoji/key.json'
 import { ArrayDict } from '@/types'
@@ -40,7 +40,7 @@ const Emoji: NextPage = () => {
   }, [emojiList, keyList, router.query])
 
   return (
-    <Main title='Emoji' footer={<Footer />}>
+    <Main title='Emoji'>
       <h1>Apple Emoji Dictionary</h1>
       <div>
         You can load the list by <Link href='/emoji?by=key'>Key</Link> or{' '}
@@ -72,7 +72,6 @@ const Emoji: NextPage = () => {
           </Link>
         </li>
       </ul>
-      <Logo />
     </Main>
   )
 }

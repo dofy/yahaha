@@ -2,15 +2,18 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import ReactGA from 'react-ga'
+import { Footer } from './Footer'
+import { Logo } from './Logo'
 
 interface MainProps {
   title?: string
   footer?: ReactNode
+  wide?: boolean
   children: ReactNode
 }
 
 export const Main = (props: MainProps) => {
-  const { title, footer, children } = props
+  const { title, footer, wide, children } = props
 
   const newTitle = [title, 'dofy.net & PHPz.xyz & yahaha.net']
     .filter((item) => !!item)
@@ -28,7 +31,7 @@ export const Main = (props: MainProps) => {
   ReactGA.pageview(router.asPath)
 
   return (
-    <div className='main'>
+    <div className={wide ? 'main-wide' : 'main'}>
       <Head>
         <title>{newTitle}</title>
         <link rel='icon' href='/favicon.ico' />
@@ -45,9 +48,12 @@ export const Main = (props: MainProps) => {
         <meta name='twitter:site' content='@dofy' />
       </Head>
 
-      <main className='content'>{children}</main>
+      <main className='content'>
+        {children}
+        <Logo />
+      </main>
 
-      {footer}
+      <Footer>{footer}</Footer>
     </div>
   )
 }

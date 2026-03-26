@@ -1,4 +1,4 @@
-import { Footer, Logo, Main } from '@/components'
+import { Main } from '@/components'
 import EKit from '@/libs/Emoticon'
 import type { NextPage } from 'next'
 import Link from 'next/link'
@@ -16,13 +16,13 @@ const Emoticon: NextPage = () => {
     <Main
       title='Emoticon Kit'
       footer={
-        <Footer>
+        <>
           <div className='footer text-sm'>
             powered by Angela &amp;{' '}
             <Link href='https://twitter.com/dofy'>Seven Yu</Link>
           </div>
           <div className='footer text-sm'>┻━┻︵╰(‵□′)╯︵┻━┻</div>
-        </Footer>
+        </>
       }
     >
       <h1>Emoticon Kit</h1>
@@ -42,7 +42,6 @@ const Emoticon: NextPage = () => {
           CREATE
         </button>
       </div>
-      <Logo />
     </Main>
   )
 }

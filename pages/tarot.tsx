@@ -1,159 +1,164 @@
-import { Footer, Main } from '@/components'
+import { Main } from '@/components'
 import tarotData from '@/libs/data/tarot.json'
 import type { Tarot as TarotType } from '@/types'
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import { FC, useState } from 'react'
 
+const TABS = [
+  { key: 'summary', label: '概述' },
+  { key: 'up', label: '正位' },
+  { key: 'down', label: '逆位' }
+] as const
+
+type TabKey = 'summary' | 'up' | 'down'
+
 const Tarot: NextPage = () => {
-  const [currentTarot, setCurrentTarot] = useState<TarotType | null>(null)
-  const [currentTab, setCurrentTab] = useState<string>('summary')
+  const [selected, setSelected] = useState<TarotType | null>(null)
+  const [tab, setTab] = useState<TabKey>('summary')
+
+  const handleSelect = (tarot: TarotType) => {
+    if (selected?.index === tarot.index) {
+      setSelected(null)
+    } else {
+      setSelected(tarot)
+      setTab('summary')
+      window.location.hash = tarot.index
+    }
+  }
 
   return (
-    <Main title='Tarot' footer={<Footer />}>
+    <Main title='Tarot' wide>
       <h1>Tarot</h1>
-      <div className='flex flex-col gap-2'>
-        {tarotData.map((tarot, index) => (
-          <TarotCard
-            key={index}
-            tarot={tarot as TarotType}
-            currentTab={currentTab}
-            isShowDetail={currentTarot?.index === tarot.index}
-            onSelected={(tarot) => {
-              window.location.hash = tarot.index
-              setCurrentTarot(tarot)
-            }}
-            onTabChange={setCurrentTab}
-          />
-        ))}
+
+      {/* 大屏：左列表 + 右 sticky 详情；小屏：纯列表，点击展开 */}
+      <div className='tarot-layout'>
+        {/* 左侧牌列表 */}
+        <div className='tarot-list'>
+          {tarotData.map((tarot) => (
+            <TarotRow
+              key={tarot.index}
+              tarot={tarot as TarotType}
+              isSelected={selected?.index === tarot.index}
+              onSelect={handleSelect}
+              /* 小屏内联详情 */
+              inlineDetail={
+                selected?.index === tarot.index ? (
+                  <TarotDetail tarot={selected} tab={tab} onTabChange={setTab} />
+                ) : null
+              }
+            />
+          ))}
+        </div>
+
+        {/* 右侧 sticky 详情（仅大屏显示） */}
+        <div className='tarot-panel'>
+          {selected ? (
+            <TarotDetail tarot={selected} tab={tab} onTabChange={setTab} sticky />
+          ) : (
+            <div className='tarot-panel-empty'>
+              <span className='tarot-panel-hint'>← 选择一张牌</span>
+            </div>
+          )}
+        </div>
       </div>
     </Main>
   )
 }
 
-interface TarotCardProps {
+/* ─── Row ─── */
+interface TarotRowProps {
   tarot: TarotType
-  currentTab?: string
-  isShowDetail?: boolean
-  onSelected?: (tarot: TarotType) => void
-  onTabChange?: (tab: string) => void
+  isSelected: boolean
+  onSelect: (t: TarotType) => void
+  inlineDetail: React.ReactNode
 }
 
-const TarotCard: FC<TarotCardProps> = ({
-  tarot,
-  currentTab,
-  isShowDetail,
-  onSelected,
-  onTabChange
-}) => {
+const TarotRow: FC<TarotRowProps> = ({ tarot, isSelected, onSelect, inlineDetail }) => {
+  const [zh, en] = tarot.name.split(' / ')
   return (
-    <div id={tarot.index} className='text-left'>
-      <div
-        className='flex justify-between cursor-pointer dark:hover:bg-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md'
-        onClick={() => onSelected?.(tarot)}
-      >
-        <div className='text-xl font-medium'>{tarot.name}</div>
-        <div className='text-2xl uppercase text-gray-400'>{tarot.index}</div>
+    <div id={tarot.index} className={`tarot-row ${isSelected ? 'tarot-row-active' : ''}`}>
+      <button className='tarot-row-btn' onClick={() => onSelect(tarot)} aria-expanded={isSelected}>
+        <span className='tarot-row-name'>
+          <span>{zh}</span>
+          {en && (
+            <>
+              <span className='hidden sm:inline text-gray-400'> / </span>
+              <span className='block sm:inline tarot-row-en'>{en}</span>
+            </>
+          )}
+        </span>
+        <span className='tarot-row-meta'>
+          <span className='tarot-row-element'>{tarot.element}</span>
+          <span className='tarot-row-index'>{tarot.index.toUpperCase()}</span>
+        </span>
+      </button>
+      {/* 仅小屏展示内联详情 */}
+      {inlineDetail && <div className='tarot-inline-detail'>{inlineDetail}</div>}
+    </div>
+  )
+}
+
+/* ─── Detail Panel ─── */
+interface TarotDetailProps {
+  tarot: TarotType
+  tab: TabKey
+  onTabChange: (t: TabKey) => void
+  sticky?: boolean
+}
+
+const TarotDetail: FC<TarotDetailProps> = ({ tarot, tab, onTabChange, sticky }) => (
+  <div className={`tarot-detail ${sticky ? 'tarot-detail-sticky' : ''}`}>
+    <div className='tarot-detail-img-wrap'>
+      <Image
+        width={237}
+        height={340}
+        className={`tarot-detail-img ${tab === 'down' ? 'tarot-img-reversed' : ''}`}
+        src={`/images/tarot/${tarot.index}.jpg`}
+        alt={tarot.name}
+        style={{ height: 'auto' }}
+        priority
+      />
+    </div>
+
+    <div className='tarot-detail-body'>
+      <div className='tarot-detail-title'>{tarot.name}</div>
+
+      <div className='tarot-detail-keywords'>
+        {tarot.keywords.map((kw) => (
+          <span key={kw} className='tarot-keyword'>{kw}</span>
+        ))}
       </div>
-      {isShowDetail && (
-        <div className='flex flex-col md:flex-row gap-2 p-2'>
-          <div className='flex-shrink-0'>
-            <Image
-              width={237}
-              height={340}
-              className={`transition-all ease-in-out duration-500 ${
-                currentTab === 'down' ? 'rotate-180' : ''
-              }`}
-              src={`/images/tarot/${tarot.index}.jpg`}
-              alt={tarot.name}
-            />
-          </div>
-          <div className='flex flex-col gap-2'>
-            <div>
-              <Label>属性</Label>
-              {tarot.element}
-            </div>
-            <div className='flex gap-2'>
-              {tarot.keywords.map((keyword) => (
-                <Tag key={keyword}>{keyword}</Tag>
-              ))}
-            </div>
-            <div className='flex flex-col flex-shrink gap-2'>
-              <div>
-                {Object.entries({
-                  summary: '概述',
-                  up: '正位',
-                  down: '逆位'
-                }).map(([key, value]) => (
-                  <Label
-                    key={key}
-                    hightlight={currentTab === key}
-                    onClick={() => onTabChange?.(key)}
-                  >
-                    {value}
-                  </Label>
-                ))}
+
+      <div className='tarot-detail-tabs'>
+        {TABS.map(({ key, label }) => (
+          <button
+            key={key}
+            className={`tarot-tab-btn ${tab === key ? 'tarot-tab-active' : ''}`}
+            onClick={() => onTabChange(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className='tarot-detail-content'>
+        {tab === 'summary' && (
+          <p className='tarot-summary'>{tarot.summary}</p>
+        )}
+        {tab !== 'summary' && (
+          <dl className='tarot-dict'>
+            {Object.entries(tarot[tab]).map(([key, value]) => (
+              <div key={key} className='tarot-dict-item'>
+                <dt className='tarot-dict-key'>{key}</dt>
+                <dd className='tarot-dict-val'>{value}</dd>
               </div>
-              {currentTab === 'summary' && (
-                <div className='leading-8 text-lg'>{tarot.summary}</div>
-              )}
-              {currentTab === 'up' && (
-                <div className='leading-8 text-lg'>
-                  {Object.entries(tarot.up).map(([key, value]) => (
-                    <div key={key}>
-                      <span className='font-bold'>{key}</span>: {value}
-                    </div>
-                  ))}
-                </div>
-              )}
-              {currentTab === 'down' && (
-                <div className='leading-8 text-lg'>
-                  {Object.entries(tarot.down).map(([key, value]) => (
-                    <div key={key}>
-                      <span className='font-bold'>{key}</span>: {value}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+            ))}
+          </dl>
+        )}
+      </div>
     </div>
-  )
-}
-
-interface TagProps {
-  children: string
-}
-
-const Tag: FC<TagProps> = ({ children }) => {
-  return (
-    <span className='font-medium cursor-default bg-gray-200 border border-gray-300 rounded-md px-4 py-1 text-gray-500'>
-      {children}
-    </span>
-  )
-}
-
-interface LabelProps {
-  children: string
-  hightlight?: boolean
-  onClick?: () => void
-}
-
-const Label: FC<LabelProps> = ({ children, hightlight, onClick }) => {
-  return (
-    <div
-      onClick={onClick}
-      className={`inline-block font-bold text-gray-700 bg-gray-200 px-6 py-1 rounded-sm mr-2 ${
-        hightlight
-          ? 'border-b-4 border-gray-500 dark:border-blue-500'
-          : 'border-0'
-      } ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
-    >
-      {children}
-    </div>
-  )
-}
+  </div>
+)
 
 export default Tarot
