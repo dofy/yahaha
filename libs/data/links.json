@@ -104,19 +104,6 @@
   },
   {
     "cat": {
-      "name": "friend",
-      "prefix": "~",
-      "subfix": "~"
-    },
-    "links": [
-      {
-        "name": "创造狮",
-        "url": "http://chuangzaoshi.com"
-      }
-    ]
-  },
-  {
-    "cat": {
       "name": "tool",
       "prefix": "#",
       "subfix": "#"

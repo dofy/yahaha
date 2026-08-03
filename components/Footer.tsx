@@ -33,9 +33,6 @@ export const Footer = (props: FooterProps) => {
             )
           })}
       </div>
-      <div className='footer'>
-        <Link href='https://beian.miit.gov.cn/'>冀ICP备18019086号-1</Link>
-      </div>
       {children}
     </React.Fragment>
   )

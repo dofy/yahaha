@@ -7,7 +7,6 @@ const catLabels: Record<string, string> = {
   social: 'social',
   heart: 'dharma',
   github: 'projects',
-  friend: 'friends',
   tool: 'tools',
 }
 
@@ -50,7 +49,6 @@ const WhichLink = (
         </React.Fragment>
       )
     case 'heart':
-    case 'friend':
     case 'tool':
     default:
       return (
