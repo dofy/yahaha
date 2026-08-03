@@ -15,7 +15,7 @@ interface MainProps {
 export const Main = (props: MainProps) => {
   const { title, footer, wide, children } = props
 
-  const newTitle = [title, 'dofy.net & PHPz.xyz & yahaha.net']
+  const newTitle = [title, 'dofy.net & PHPz.xyz & PHPz.org & yahaha.net']
     .filter((item) => !!item)
     .join(' - ')
 
