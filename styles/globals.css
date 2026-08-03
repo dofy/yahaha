@@ -9,7 +9,7 @@ html {
 }
 
 body {
-  @apply bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-slate-300;
+  @apply bg-gray-100 text-gray-700 dark:bg-[#232b3a] dark:text-slate-200;
 }
 
 a {
@@ -34,7 +34,7 @@ a:hover {
   }
 
   .content h1 {
-    @apply py-10 font-bold text-2xl sm:text-3xl tracking-tight leading-relaxed;
+    @apply py-10 font-bold text-2xl sm:text-3xl tracking-tight leading-relaxed md:whitespace-nowrap md:w-max md:max-w-none md:mx-auto;
   }
 
   .content pre {
