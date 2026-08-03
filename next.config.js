@@ -1,12 +1,10 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  i18n: {
-    locales: ['zh-CN', 'en'],
-    defaultLocale: 'zh-CN',
-  },
+  output: 'export',
   reactStrictMode: true,
   images: {
+    unoptimized: true,
     dangerouslyAllowSVG: true,
     remotePatterns: [
       {
