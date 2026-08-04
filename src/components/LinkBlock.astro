@@ -1,0 +1,64 @@
+---
+import type { LinkCategory, GitHubLink, SocialLink, NormalLink } from '@/types'
+
+interface Props {
+  cat: LinkCategory
+  links: (NormalLink | SocialLink | GitHubLink)[]
+}
+
+const { cat, links } = Astro.props
+
+const catLabels: Record<string, string> = {
+  social: 'social',
+  heart: 'dharma',
+  github: 'projects',
+  tool: 'tools',
+}
+const label = catLabels[cat.name] ?? cat.name
+---
+
+<section class="mt-10">
+  <h2 class="section-label mb-3">{label}</h2>
+  <ul class="flex flex-wrap gap-x-5 gap-y-2 text-[15px]">
+    {
+      links.map((link) => {
+        if (cat.name === 'social') {
+          const s = link as SocialLink
+          return (
+            <li>
+              <a href={`${s.url}${s.userId}`} class="link">
+                {s.name}
+              </a>
+            </li>
+          )
+        }
+        if (cat.name === 'github') {
+          const g = link as GitHubLink
+          return (
+            <li class="inline-flex items-center gap-2">
+              <a href={`https://github.com/dofy/${g.url}`} class="link">
+                {g.name}
+              </a>
+              <img
+                width={g.width}
+                height={20}
+                alt={`${g.name} stars`}
+                loading="lazy"
+                class="inline-block align-middle opacity-80"
+                src={`https://img.shields.io/github/stars/dofy/${g.url}?style=flat&color=f59e0b&labelColor=0a0a0a`}
+              />
+            </li>
+          )
+        }
+        const n = link as NormalLink
+        return (
+          <li>
+            <a href={n.url} class="link">
+              {n.name}
+            </a>
+          </li>
+        )
+      })
+    }
+  </ul>
+</section>

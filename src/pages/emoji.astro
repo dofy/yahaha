@@ -1,0 +1,18 @@
+---
+import Base from '@/layouts/Base.astro'
+import EmojiSearch from '@/components/islands/EmojiSearch'
+---
+
+<Base title="Emoji">
+  <header class="animate-fade-in-up">
+    <h1 class="page-title">Apple Emoji Dictionary</h1>
+    <p class="page-subtitle">
+      Search by keyword or emoji.
+      <a href="https://github.com/dofy/apple-emoji-dict" class="link ml-1">
+        GitHub Repo
+      </a>
+    </p>
+  </header>
+
+  <EmojiSearch client:load />
+</Base>

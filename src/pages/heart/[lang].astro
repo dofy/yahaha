@@ -1,0 +1,23 @@
+---
+import Base from '@/layouts/Base.astro'
+import heartData from '@/data/heart.json'
+import type { HeartMap } from '@/types'
+
+export function getStaticPaths() {
+  const heart = heartData as HeartMap
+  return Object.keys(heart).map((lang) => ({ params: { lang } }))
+}
+
+const { lang } = Astro.params
+const heart = heartData as HeartMap
+const data = heart[lang as string]
+---
+
+<Base title={data?.title}>
+  <header class="animate-fade-in-up">
+    <h1 class="page-title">{data?.title}</h1>
+  </header>
+
+  <pre
+    class="mt-8 whitespace-pre-wrap font-sans text-base leading-loose text-foreground">{data?.lines.join('\n')}</pre>
+</Base>

@@ -1,5 +1,0 @@
-export { Footer } from './Footer'
-export { LinkBlock } from './LinkBlock'
-export { Logo } from './Logo'
-export { Main } from './Main'
-export { NumberInput } from './NumberInput'

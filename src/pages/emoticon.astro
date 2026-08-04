@@ -1,0 +1,19 @@
+---
+import Base from '@/layouts/Base.astro'
+import EmoticonKit from '@/components/islands/EmoticonKit'
+---
+
+<Base title="Emoticon Kit">
+  <header class="animate-fade-in-up">
+    <h1 class="page-title">Emoticon Kit</h1>
+    <p class="page-subtitle">
+      Generate a random kaomoji, then copy it.
+    </p>
+  </header>
+
+  <EmoticonKit client:load />
+
+  <p class="mt-10 font-mono text-sm text-muted-foreground">
+    ┻━┻︵╰(‵□′)╯︵┻━┻
+  </p>
+</Base>
