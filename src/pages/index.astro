@@ -2,6 +2,7 @@
 import Base from '@/layouts/Base.astro'
 import LinkBlock from '@/components/LinkBlock.astro'
 import allLinks from '@/data/links.json'
+import { version } from '../../package.json'
 import type { Links } from '@/types'
 
 const links = allLinks as Links
@@ -13,6 +14,13 @@ const links = allLinks as Links
     <p class="page-subtitle">
       A small toolbox &mdash; math, morse, tarot, emoji, and more.
     </p>
+    <a
+      href="https://github.com/dofy/yahaha/releases"
+      class="mt-4 inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-0.5 font-mono text-xs text-muted-foreground transition-colors hover:border-accent/50 hover:text-accent"
+    >
+      <span class="size-1.5 rounded-full bg-accent"></span>
+      v{version}
+    </a>
   </header>
 
   {links.map((link) => <LinkBlock cat={link.cat} links={link.links} />)}
