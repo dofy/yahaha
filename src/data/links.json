@@ -111,23 +111,28 @@
     "links": [
       {
         "name": "24 Points",
-        "url": "/24points"
+        "url": "/24points",
+        "icon": "🔢"
       },
       {
         "name": "Tarot",
-        "url": "/tarot"
+        "url": "/tarot",
+        "icon": "🔮"
       },
       {
         "name": "Emoji",
-        "url": "/emoji"
+        "url": "/emoji",
+        "icon": "😀"
       },
       {
         "name": "Emoticon",
-        "url": "/emoticon"
+        "url": "/emoticon",
+        "icon": "🙃"
       },
       {
         "name": "Morse Code",
-        "url": "/morse"
+        "url": "/morse",
+        "icon": "📡"
       }
     ]
   }

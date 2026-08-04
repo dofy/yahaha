@@ -25,7 +25,7 @@ export default function EmoticonKit() {
   }
 
   return (
-    <div className="mt-8 flex flex-col items-start gap-4">
+    <div className="mt-8 flex flex-col items-center gap-4">
       <div
         onClick={doCopy}
         title="Click to copy"

@@ -18,6 +18,7 @@ export type GitHubLink = {
 export type NormalLink = {
   name: string
   url: string
+  icon?: string
 }
 
 export type SocialLink = {

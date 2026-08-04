@@ -16,9 +16,9 @@
     --muted-foreground: 0 0% 45%;
     --border: 0 0% 89%;
     --input: 0 0% 89%;
-    --accent: 38 92% 50%;
-    --accent-foreground: 0 0% 9%;
-    --ring: 38 92% 50%;
+    --accent: 158 64% 26%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 158 64% 26%;
     --radius: 0.625rem;
   }
 
@@ -32,9 +32,9 @@
     --muted-foreground: 0 0% 58%;
     --border: 0 0% 16%;
     --input: 0 0% 18%;
-    --accent: 38 95% 55%;
-    --accent-foreground: 0 0% 9%;
-    --ring: 38 95% 55%;
+    --accent: 158 52% 46%;
+    --accent-foreground: 0 0% 6%;
+    --ring: 158 52% 46%;
   }
 
   * {

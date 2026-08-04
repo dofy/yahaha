@@ -17,48 +17,69 @@ const catLabels: Record<string, string> = {
 const label = catLabels[cat.name] ?? cat.name
 ---
 
-<section class="mt-10">
-  <h2 class="section-label mb-3">{label}</h2>
-  <ul class="flex flex-wrap gap-x-5 gap-y-2 text-[15px]">
-    {
-      links.map((link) => {
-        if (cat.name === 'social') {
-          const s = link as SocialLink
+{
+  cat.name === 'github' ? (
+    <section class="mt-10">
+      <h2 class="section-label mb-4">{label}</h2>
+      <ul class="grid gap-x-8 gap-y-3 sm:grid-cols-2">
+        {(links as GitHubLink[]).map((g) => (
+          <li class="flex items-center justify-between gap-3">
+            <a
+              href={`https://github.com/dofy/${g.url}`}
+              class="link-muted truncate font-medium"
+            >
+              {g.name}
+            </a>
+            <img
+              width={g.width}
+              height={20}
+              alt={`${g.name} stars`}
+              loading="lazy"
+              class="shrink-0 opacity-90"
+              src={`https://img.shields.io/github/stars/dofy/${g.url}?style=flat&color=157a54&labelColor=0a0a0a`}
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
+  ) : (
+    <section class="mt-10">
+      <h2 class="section-label mb-3">{label}</h2>
+      <ul class="flex flex-wrap gap-x-5 gap-y-2 text-[15px]">
+        {links.map((link) => {
+          if (cat.name === 'social') {
+            const s = link as SocialLink
+            const host = new URL(s.url).hostname
+            return (
+              <li>
+                <a
+                  href={`${s.url}${s.userId}`}
+                  class="link inline-flex items-center gap-1.5"
+                >
+                  <img
+                    width={16}
+                    height={16}
+                    alt=""
+                    loading="lazy"
+                    class="size-4 rounded-sm"
+                    src={`https://www.google.com/s2/favicons?domain=${host}&sz=64`}
+                  />
+                  {s.name}
+                </a>
+              </li>
+            )
+          }
+          const n = link as NormalLink
           return (
             <li>
-              <a href={`${s.url}${s.userId}`} class="link">
-                {s.name}
+              <a href={n.url} class="link inline-flex items-center gap-1.5">
+                {n.icon && <span aria-hidden="true">{n.icon}</span>}
+                {n.name}
               </a>
             </li>
           )
-        }
-        if (cat.name === 'github') {
-          const g = link as GitHubLink
-          return (
-            <li class="inline-flex items-center gap-2">
-              <a href={`https://github.com/dofy/${g.url}`} class="link">
-                {g.name}
-              </a>
-              <img
-                width={g.width}
-                height={20}
-                alt={`${g.name} stars`}
-                loading="lazy"
-                class="inline-block align-middle opacity-80"
-                src={`https://img.shields.io/github/stars/dofy/${g.url}?style=flat&color=f59e0b&labelColor=0a0a0a`}
-              />
-            </li>
-          )
-        }
-        const n = link as NormalLink
-        return (
-          <li>
-            <a href={n.url} class="link">
-              {n.name}
-            </a>
-          </li>
-        )
-      })
-    }
-  </ul>
-</section>
+        })}
+      </ul>
+    </section>
+  )
+}
