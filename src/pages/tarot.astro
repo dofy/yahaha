@@ -1,0 +1,15 @@
+---
+import Base from '@/layouts/Base.astro'
+import TarotBrowser from '@/components/islands/TarotBrowser'
+---
+
+<Base title="Tarot" wide>
+  <header class="animate-fade-in-up">
+    <h1 class="page-title">Tarot</h1>
+    <p class="page-subtitle">
+      大阿尔卡纳 22 张牌 &mdash; 选一张查看正逆位释义。
+    </p>
+  </header>
+
+  <TarotBrowser client:load />
+</Base>

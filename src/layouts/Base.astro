@@ -1,0 +1,64 @@
+---
+import '@/styles/globals.css'
+import keywords from '@/data/keywords.json'
+import Footer from '@/components/Footer.astro'
+import Logo from '@/components/Logo.astro'
+import ThemeToggle from '@/components/islands/ThemeToggle'
+
+interface Props {
+  title?: string
+  wide?: boolean
+}
+
+const { title, wide = false } = Astro.props
+
+const suffix = 'dofy.net & PHPz.xyz & PHPz.org & yahaha.net'
+const fullTitle = title ? `${title} - ${suffix}` : suffix
+const containerClass = wide ? 'container-wide' : 'container-page'
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{fullTitle}</title>
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="description" content={fullTitle} />
+    <meta name="keywords" content={keywords.join()} />
+    <meta name="og:description" content={fullTitle} />
+    <meta name="og:image" content="/logo.png" />
+    <meta name="og:title" content={title ?? suffix} />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:creator" content="@dofy" />
+    <meta name="twitter:site" content="@dofy" />
+    <meta name="generator" content={Astro.generator} />
+    <!-- Set theme before paint to avoid FOUC -->
+    <script is:inline>
+      ;(() => {
+        const stored = localStorage.getItem('theme')
+        const prefersDark = window.matchMedia(
+          '(prefers-color-scheme: dark)',
+        ).matches
+        if (stored === 'dark' || (!stored && prefersDark)) {
+          document.documentElement.classList.add('dark')
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div class="fixed right-4 top-4 z-50">
+      <ThemeToggle client:load />
+    </div>
+    <div class={containerClass}>
+      <main class="animate-fade-in">
+        <slot />
+        <Logo />
+      </main>
+      <Footer />
+    </div>
+  </body>
+</html>

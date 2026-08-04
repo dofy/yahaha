@@ -1,0 +1,19 @@
+---
+import Base from '@/layouts/Base.astro'
+import LinkBlock from '@/components/LinkBlock.astro'
+import allLinks from '@/data/links.json'
+import type { Links } from '@/types'
+
+const links = allLinks as Links
+---
+
+<Base>
+  <header class="animate-fade-in-up">
+    <h1 class="page-title text-balance">The answer exists only in the Tao.</h1>
+    <p class="page-subtitle">
+      A small toolbox &mdash; math, morse, tarot, emoji, and more.
+    </p>
+  </header>
+
+  {links.map((link) => <LinkBlock cat={link.cat} links={link.links} />)}
+</Base>

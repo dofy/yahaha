@@ -1,0 +1,34 @@
+---
+import domains from '@/data/domains.json'
+
+const begin = 2007
+const year = new Date().getFullYear()
+---
+
+<footer class="mt-16 flex flex-col items-center gap-3 border-t border-border pt-8 text-center text-sm text-muted-foreground">
+  <div>copyright &copy; {begin}&ndash;{year}</div>
+  <nav class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1" data-domains>
+    {
+      domains.map(({ name, url }) => (
+        <a
+          href={url}
+          class="link-muted"
+          data-domain={name.toLowerCase()}
+        >
+          {name}
+        </a>
+      ))
+    }
+  </nav>
+  <slot />
+</footer>
+
+<script>
+  // Bold the domain matching the current host (static-safe, runs client-side).
+  const host = window.location.hostname.toLowerCase()
+  document.querySelectorAll<HTMLAnchorElement>('[data-domain]').forEach((el) => {
+    if (el.dataset.domain === host) {
+      el.classList.add('font-semibold', 'text-foreground')
+    }
+  })
+</script>
