@@ -118,12 +118,14 @@
   }
 
   /* ─── Inline links ─── */
+  /* Link: <a> carries color + hover; underline lives on .link-label only,
+     so leading emoji / favicon icons stay clean. */
   .link {
-    @apply text-foreground underline decoration-ink/40 decoration-2 underline-offset-4 transition-colors duration-150 hover:text-red hover:decoration-red;
+    @apply text-foreground transition-colors duration-150 hover:text-red;
   }
 
-  .link-muted {
-    @apply text-muted-foreground transition-colors duration-150 hover:text-red;
+  .link-label {
+    @apply underline decoration-ink/40 decoration-2 underline-offset-4 transition-colors duration-150 group-hover:decoration-red;
   }
 
   /* ─── Pixel primitives (ported from sync-text) ─── */

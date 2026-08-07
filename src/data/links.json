@@ -133,6 +133,11 @@
         "name": "Morse Code",
         "url": "/morse",
         "icon": "📡"
+      },
+      {
+        "name": "Sync Text",
+        "url": "https://sync-text.phpz.org/",
+        "icon": "🔗"
       }
     ]
   }
