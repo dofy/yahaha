@@ -14,13 +14,29 @@ const catLabels: Record<string, string> = {
   github: 'projects',
   tool: 'tools',
 }
+// Adventure-prop icon per section — ligne-claire decoration, not real chars.
+const catIcons: Record<string, string> = {
+  social: '🧭', // compass
+  heart: '🕯️', // candle
+  github: '🗺️', // map
+  tool: '🔍', // magnifier
+}
 const label = catLabels[cat.name] ?? cat.name
+const icon = catIcons[cat.name] ?? '✦'
+
+// shields.io badge tuned to the ink/blue palette.
+const badgeColor = '1d3557'
+const badgeLabelColor = '2b2320'
 ---
 
-{
-  cat.name === 'github' ? (
-    <section class="mt-10">
-      <h2 class="section-label mb-4">{label}</h2>
+<section class="ink-card mt-10 px-5 py-5 sm:px-6 sm:py-6">
+  <h2 class="section-label mb-4 flex items-center gap-2">
+    <span aria-hidden="true" class="text-base">{icon}</span>
+    {label}
+  </h2>
+
+  {
+    cat.name === 'github' ? (
       <ul class="grid gap-x-8 gap-y-3 sm:grid-cols-2">
         {(links as GitHubLink[]).map((g) => (
           <li class="flex items-center justify-between gap-3">
@@ -36,15 +52,12 @@ const label = catLabels[cat.name] ?? cat.name
               alt={`${g.name} stars`}
               loading="lazy"
               class="shrink-0 opacity-90"
-              src={`https://img.shields.io/github/stars/dofy/${g.url}?style=flat&color=157a54&labelColor=0a0a0a`}
+              src={`https://img.shields.io/github/stars/dofy/${g.url}?style=flat&color=${badgeColor}&labelColor=${badgeLabelColor}`}
             />
           </li>
         ))}
       </ul>
-    </section>
-  ) : (
-    <section class="mt-10">
-      <h2 class="section-label mb-3">{label}</h2>
+    ) : (
       <ul class="flex flex-wrap gap-x-5 gap-y-2 text-[15px]">
         {links.map((link) => {
           if (cat.name === 'social') {
@@ -61,7 +74,7 @@ const label = catLabels[cat.name] ?? cat.name
                     height={16}
                     alt=""
                     loading="lazy"
-                    class="size-4 rounded-sm"
+                    class="size-4"
                     src={`https://www.google.com/s2/favicons?domain=${host}&sz=64`}
                   />
                   {s.name}
@@ -80,6 +93,6 @@ const label = catLabels[cat.name] ?? cat.name
           )
         })}
       </ul>
-    </section>
-  )
-}
+    )
+  }
+</section>

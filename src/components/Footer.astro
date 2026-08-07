@@ -5,14 +5,16 @@ const begin = 2007
 const year = new Date().getFullYear()
 ---
 
-<footer class="mt-16 flex flex-col items-center gap-3 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-  <div>copyright &copy; {begin}&ndash;{year}</div>
+<footer class="ink-card mt-16 flex flex-col items-center gap-3 bg-blue px-5 py-8 text-center text-sm text-cream">
+  <div class="font-pixel text-[9px] uppercase tracking-wider">
+    copyright &copy; {begin}&ndash;{year}
+  </div>
   <nav class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1" data-domains>
     {
       domains.map(({ name, url }) => (
         <a
           href={url}
-          class="link-muted"
+          class="text-cream/75 underline decoration-cream/30 decoration-2 underline-offset-4 transition-colors hover:text-yellow hover:decoration-yellow"
           data-domain={name.toLowerCase()}
         >
           {name}
@@ -28,7 +30,7 @@ const year = new Date().getFullYear()
   const host = window.location.hostname.toLowerCase()
   document.querySelectorAll<HTMLAnchorElement>('[data-domain]').forEach((el) => {
     if (el.dataset.domain === host) {
-      el.classList.add('font-semibold', 'text-foreground')
+      el.classList.add('font-semibold', 'text-yellow', 'decoration-yellow')
     }
   })
 </script>

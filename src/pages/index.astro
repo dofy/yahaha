@@ -1,6 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro'
 import LinkBlock from '@/components/LinkBlock.astro'
+import Mascot from '@/components/islands/Mascot'
 import allLinks from '@/data/links.json'
 import { version } from '../../package.json'
 import type { Links } from '@/types'
@@ -10,17 +11,38 @@ const links = allLinks as Links
 
 <Base>
   <header class="animate-fade-in-up">
-    <h1 class="page-title text-balance">The answer exists only in the Tao.</h1>
-    <p class="page-subtitle">
-      A small toolbox &mdash; math, morse, tarot, emoji, and more.
-    </p>
-    <a
-      href="https://github.com/dofy/yahaha/releases"
-      class="mt-4 inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-0.5 font-mono text-xs text-muted-foreground transition-colors hover:border-accent/50 hover:text-accent"
-    >
-      <span class="size-1.5 rounded-full bg-accent"></span>
-      v{version}
-    </a>
+    <!-- Old-adventure-poster hero: thick ink frame, pixel title, explorer. -->
+    <div class="ink-card relative px-5 py-8 sm:px-8 sm:py-10">
+      <span
+        class="section-label absolute -top-3 left-4 bg-yellow px-2 py-1 text-ink"
+      >
+        yahaha
+      </span>
+
+      <div class="flex items-start gap-4 sm:gap-6">
+        <div class="min-w-0 flex-1">
+          <h1 class="page-title text-balance text-blue dark:text-blue">
+            The answer exists only in the Tao.
+          </h1>
+          <p class="page-subtitle">
+            A small toolbox &mdash; math, morse, tarot, emoji, and more.
+          </p>
+          <a
+            href="https://github.com/dofy/yahaha/releases"
+            class="pixel-press pixel-shadow-sm mt-5 inline-flex items-center gap-2 border-[3px] border-ink bg-yellow px-3 py-1.5 font-pixel text-[10px] text-ink transition-colors"
+          >
+            <span class="size-2 bg-red"></span>
+            v{version}
+          </a>
+        </div>
+
+        <Mascot
+          client:visible
+          size={112}
+          className="hidden shrink-0 drop-shadow-[3px_3px_0_hsl(var(--ink))] sm:block"
+        />
+      </div>
+    </div>
   </header>
 
   {links.map((link) => <LinkBlock cat={link.cat} links={link.links} />)}

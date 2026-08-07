@@ -31,7 +31,16 @@ const containerClass = wide ? 'container-wide' : 'container-page'
     <meta name="og:description" content={fullTitle} />
     <meta name="og:image" content="/logo.png" />
     <meta name="og:title" content={title ?? suffix} />
-    <meta name="theme-color" content="#ffffff" />
+    <meta
+      name="theme-color"
+      content="#e6d8ba"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#141d29"
+      media="(prefers-color-scheme: dark)"
+    />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:creator" content="@dofy" />
     <meta name="twitter:site" content="@dofy" />

@@ -5,8 +5,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        pixel: ['"Press Start 2P"', 'ui-monospace', 'monospace'],
         sans: [
-          'Inter',
+          '"Nunito Sans Variable"',
+          '"Nunito Sans"',
           'ui-sans-serif',
           'system-ui',
           '-apple-system',
@@ -44,6 +46,25 @@ export default {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        // ─── Ligne-claire adventure palette ───
+        ink: {
+          DEFAULT: 'hsl(var(--ink))',
+          soft: 'hsl(var(--ink-soft))',
+        },
+        paper: {
+          DEFAULT: 'hsl(var(--paper))',
+          2: 'hsl(var(--paper-2))',
+        },
+        blue: {
+          DEFAULT: 'hsl(var(--blue))',
+          hi: 'hsl(var(--blue-hi))',
+        },
+        red: {
+          DEFAULT: 'hsl(var(--red))',
+          hi: 'hsl(var(--red-hi))',
+        },
+        yellow: 'hsl(var(--yellow))',
+        cream: 'hsl(var(--cream))',
       },
       borderRadius: {
         lg: 'var(--radius)',

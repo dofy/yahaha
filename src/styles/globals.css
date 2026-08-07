@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+@import '@fontsource/press-start-2p/index.css';
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,35 +7,64 @@
 
 @layer base {
   :root {
-    /* Neutral gray scale + single amber accent */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
-    --surface: 0 0% 97%;
-    --card: 0 0% 98%;
-    --card-foreground: 0 0% 9%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --border: 0 0% 89%;
-    --input: 0 0% 89%;
-    --accent: 158 64% 26%;
-    --accent-foreground: 0 0% 98%;
-    --ring: 158 64% 26%;
-    --radius: 0.625rem;
+    /* ─── Ligne-claire adventure palette (light) ───
+       Aged paper, ink outlines, brick red, adventure blue, mustard. */
+    --paper: 42 47% 83%;
+    --paper-2: 41 44% 76%;
+    --ink: 16 15% 15%;
+    --ink-soft: 30 15% 36%;
+    --blue: 215 50% 23%;
+    --blue-hi: 214 52% 32%;
+    --red: 9 62% 47%;
+    --red-hi: 9 68% 38%;
+    --yellow: 39 79% 52%;
+    --cream: 42 77% 93%;
+
+    /* ─── Semantic tokens (mapped onto the palette) ─── */
+    --background: var(--paper);
+    --foreground: var(--ink);
+    --surface: var(--paper-2);
+    --card: var(--cream);
+    --card-foreground: var(--ink);
+    --muted: var(--paper-2);
+    --muted-foreground: var(--ink-soft);
+    --border: var(--ink);
+    --input: var(--ink);
+    --accent: var(--red);
+    --accent-foreground: var(--cream);
+    --ring: var(--blue);
+    --radius: 0rem;
+
+    --shadow: var(--ink);
   }
 
   .dark {
-    --background: 0 0% 4%;
-    --foreground: 0 0% 95%;
-    --surface: 0 0% 7%;
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 95%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 58%;
-    --border: 0 0% 16%;
-    --input: 0 0% 18%;
-    --accent: 158 52% 46%;
-    --accent-foreground: 0 0% 6%;
-    --ring: 158 52% 46%;
+    /* ─── Ligne-claire adventure palette (dark / night sky) ─── */
+    --paper: 212 39% 13%;
+    --paper-2: 213 38% 17%;
+    --ink: 39 57% 88%;
+    --ink-soft: 40 26% 63%;
+    --blue: 214 48% 53%;
+    --blue-hi: 213 56% 58%;
+    --red: 10 74% 61%;
+    --red-hi: 10 83% 66%;
+    --yellow: 40 85% 61%;
+    --cream: 210 37% 19%;
+
+    --background: var(--paper);
+    --foreground: var(--ink);
+    --surface: var(--paper-2);
+    --card: var(--cream);
+    --card-foreground: var(--ink);
+    --muted: var(--paper-2);
+    --muted-foreground: var(--ink-soft);
+    --border: var(--ink);
+    --input: var(--ink);
+    --accent: var(--red);
+    --accent-foreground: var(--cream);
+    --ring: var(--blue);
+
+    --shadow: 0 0% 0%;
   }
 
   * {
@@ -48,15 +78,23 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    /* Faint dot-grid — aged-paper pixel texture */
+    background-image:
+      radial-gradient(hsl(var(--paper-2)) 1px, transparent 1px),
+      radial-gradient(hsl(var(--paper-2)) 1px, transparent 1px);
+    background-size: 16px 16px;
+    background-position:
+      0 0,
+      8px 8px;
   }
 
   ::selection {
-    @apply bg-accent/25;
+    @apply bg-yellow text-ink;
   }
 }
 
 @layer components {
-  /* Page container */
+  /* ─── Page containers ─── */
   .container-page {
     @apply mx-auto w-full max-w-2xl px-5 py-14 sm:py-20;
   }
@@ -65,27 +103,52 @@
     @apply mx-auto w-full max-w-5xl px-5 py-14 sm:py-20;
   }
 
-  /* Prose-ish heading used across tool pages */
+  /* ─── Headings ─── */
   .page-title {
-    @apply text-3xl sm:text-4xl font-bold tracking-tight text-foreground;
+    @apply font-pixel text-2xl leading-[1.4] sm:text-3xl;
   }
 
   .page-subtitle {
-    @apply mt-3 text-base text-muted-foreground leading-relaxed;
+    @apply mt-4 text-base text-muted-foreground leading-relaxed;
   }
 
-  /* Section label (small caps tracking) */
+  /* ─── Section label — pixel small-caps ─── */
   .section-label {
-    @apply text-xs font-medium tracking-[0.18em] uppercase text-muted-foreground/70 select-none;
+    @apply font-pixel text-[10px] uppercase tracking-wider text-ink select-none;
   }
 
-  /* Inline text link */
+  /* ─── Inline links ─── */
   .link {
-    @apply text-foreground underline decoration-border underline-offset-4 transition-colors duration-200 hover:text-accent hover:decoration-accent;
+    @apply text-foreground underline decoration-ink/40 decoration-2 underline-offset-4 transition-colors duration-150 hover:text-red hover:decoration-red;
   }
 
   .link-muted {
-    @apply text-muted-foreground transition-colors duration-200 hover:text-accent;
+    @apply text-muted-foreground transition-colors duration-150 hover:text-red;
+  }
+
+  /* ─── Pixel primitives (ported from sync-text) ─── */
+  .pixel-shadow {
+    box-shadow: 4px 4px 0 0 hsl(var(--shadow));
+  }
+
+  .pixel-shadow-sm {
+    box-shadow: 3px 3px 0 0 hsl(var(--shadow));
+  }
+
+  .pixel-press {
+    transition:
+      transform 80ms steps(2),
+      box-shadow 80ms steps(2);
+  }
+
+  .pixel-press:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 0 hsl(var(--shadow));
+  }
+
+  /* ─── Ligne-claire card: thick ink border + hard offset shadow ─── */
+  .ink-card {
+    @apply border-[3px] border-ink bg-card pixel-shadow;
   }
 }
 
