@@ -40,13 +40,13 @@ export default function MorseCode() {
         <div
           onClick={doCopy}
           title="Click to copy"
-          className="group mt-6 cursor-pointer rounded-lg border border-border bg-card p-5 transition-colors hover:border-accent/50"
+          className="glass rounded-soft tx group mt-6 cursor-pointer p-5 hover:border-accent"
         >
           <div className="flex flex-wrap gap-x-6 gap-y-3 font-mono text-lg text-card-foreground">
             {words.map((word, wi) => (
               <span key={wi} className="flex flex-wrap gap-x-3">
                 {word.split('').map((letter, li) => (
-                  <span key={li} className="text-accent">
+                  <span key={li} className="text-accent-text">
                     {morseDict[letter.toUpperCase()] ?? '?'}
                   </span>
                 ))}

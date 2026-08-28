@@ -24,12 +24,13 @@ const catIcons: Record<string, string> = {
 const label = catLabels[cat.name] ?? cat.name
 const icon = catIcons[cat.name] ?? '✦'
 
-// shields.io badge tuned to the ink/blue palette.
-const badgeColor = '1d3557'
-const badgeLabelColor = '2b2320'
+// shields.io renders remotely, so these have to be literal hex — they cannot
+// read the CSS tokens. Tuned to mint-deep / ink.
+const badgeColor = '2f7d78'
+const badgeLabelColor = '2b3243'
 ---
 
-<section class="ink-card mt-10 px-5 py-5 sm:px-6 sm:py-6">
+<section class="glass rounded-blob mt-10 px-5 py-5 sm:px-6 sm:py-6" data-reveal>
   <h2 class="section-label mb-4 flex items-center gap-2">
     <span aria-hidden="true" class="text-base">{icon}</span>
     {label}

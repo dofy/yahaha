@@ -12,9 +12,18 @@ function systemDark() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches
 }
 
+// Must match the values in globals.css: --color-paper light / dark.
+const THEME_COLOR = { light: '#fcfaf1', dark: '#191f2b' } as const
+
 function apply(theme: Theme) {
   const dark = theme === 'dark' || (theme === 'auto' && systemDark())
   document.documentElement.classList.toggle('dark', dark)
+  // The media-scoped <meta name="theme-color"> tags in Base.astro key off the
+  // OS preference and so cannot see a manual override; this unconditional one
+  // can, and wins where runtime mutation is supported.
+  document
+    .querySelector('meta[data-theme-color]')
+    ?.setAttribute('content', THEME_COLOR[dark ? 'dark' : 'light'])
 }
 
 export default function ThemeToggle() {

@@ -1,74 +1,293 @@
-@import '@fontsource/press-start-2p/index.css';
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+/* Tailwind 4 must be the first statement; the font imports follow it.
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+   All three fonts are self-hosted via @fontsource rather than pulled from
+   Google Fonts. Not only for privacy/offline: a bundled `@import` gets INLINED
+   here, and its @font-face rules then sit above any later `@import url(...)`,
+   which stops being a leading at-rule and gets dropped by the CSS optimiser
+   entirely — the webfont would silently never load. Self-hosting removes the
+   ordering hazard and the render-blocking third-party request together.
+
+   Nunito, NOT Nunito Sans — two distinct families; Nunito is the rounded one. */
+@import 'tailwindcss';
+@import '@fontsource-variable/nunito';
+@import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource/press-start-2p/index.css';
+
+/* Replaces v3's `darkMode: 'class'`. The class is toggled on <html> by
+   ThemeToggle and by the anti-FOUC script in Base.astro. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Design tokens
+   Palette is shared verbatim with the sibling project `seven/ntp-gallery` so
+   tokens can be copied between the two. Both are on tailwindcss 4.3.x.
+   --------------------------------------------------------------------------- */
+@theme {
+  /* ─── Primitives (light values; .dark overrides them below) ─── */
+  --color-paper: oklch(0.985 0.012 95);
+  --color-paper-warm: oklch(0.96 0.02 90);
+  --color-ink: oklch(0.26 0.03 262);
+  --color-ink-soft: oklch(0.4 0.03 262);
+  --color-ink-faint: oklch(0.5 0.026 262);
+  --color-line: oklch(0.88 0.014 260);
+
+  --color-mint: oklch(0.66 0.13 178);
+  --color-mint-deep: oklch(0.47 0.11 180);
+  --color-mint-wash: oklch(0.66 0.13 178 / 0.16);
+  --color-peach: oklch(0.73 0.15 40);
+  --color-peach-deep: oklch(0.56 0.16 36);
+
+  /* ─── Semantic aliases ───
+     These resolve through var() at use time, so `.dark` only has to override
+     the primitives above — the semantic layer follows automatically and must
+     NOT be re-declared per theme. */
+  --color-background: var(--color-paper);
+  --color-foreground: var(--color-ink);
+  --color-surface: var(--color-paper-warm);
+  --color-card: var(--color-paper);
+  --color-card-foreground: var(--color-ink);
+  --color-muted: var(--color-paper-warm);
+  --color-muted-foreground: var(--color-ink-faint);
+  --color-border: var(--color-line);
+  --color-input: var(--color-line);
+  --color-ring: var(--color-mint);
+
+  /* Accent is split in two on purpose. mint/peach and their -deep variants
+     swap which one is legible as text depending on theme: against light paper
+     mint scores 2.77 (fails AA) while mint-deep scores 5.93; against dark
+     paper it is exactly inverted (5.69 vs 2.66).
+       accent / accent-foreground → solid fill + the text that sits on it
+       accent-text               → text, borders and underlines on the page bg
+     Never hardcode `text-mint-deep` in markup; use `text-accent-text`. */
+  --color-accent: var(--color-mint);
+  --color-accent-foreground: oklch(0.99 0 0);
+  --color-accent-text: var(--color-mint-deep);
+  --color-accent-2: var(--color-peach);
+  --color-accent-2-foreground: oklch(0.99 0 0);
+  --color-accent-2-text: var(--color-peach-deep);
+
+  /* ─── Pixel easter-egg palette ───
+     Only the Mascot SVG and the Logo use these. Kept as their own tokens
+     because the mascot is deliberately still crisp pixel art and needs colours
+     that stay legible on both papers, independent of the glass palette. */
+  --color-pixel-hat: oklch(0.8 0.13 85);
+  --color-pixel-band: oklch(0.56 0.16 36);
+  --color-pixel-coat: oklch(0.47 0.11 180);
+  --color-pixel-glass: oklch(0.96 0.02 90);
+  --color-pixel-skin: oklch(0.77 0.07 62);
+
+  /* ─── Radii ───
+     Tailwind's stock rounded-* scale is restored (v3 config used to collapse
+     lg/md/sm to 0 via --radius). These two are the panel radii. */
+  --radius-blob: 1.75rem;
+  --radius-soft: 1.25rem;
+
+  /* ─── Type ───
+     Deliberately a webfont rather than ntp-gallery's `ui-rounded` stack: that
+     is Apple-only and falls back to a non-rounded system-ui everywhere else,
+     which is fine for a local tool but not for a public site. */
+  --font-sans:
+    'Nunito Variable', 'Nunito', ui-rounded, 'SF Pro Rounded', system-ui,
+    -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-pixel: 'Press Start 2P', ui-monospace, monospace;
+  --font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular,
+    Consolas, 'Liberation Mono', monospace;
+
+  /* Single easing for the whole site. */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------------------------------------------------------------------------
+   Glass tokens
+   The reference implementation hardcodes `color-mix(in oklab, white N%, …)`.
+   Dark mode is NOT that scale at a lower percentage: a white mix over a dark
+   ground reads as fog, not glass. Two things change in kind, not degree —
+   the tint takes a low-alpha light blue-grey so the pane keeps a hue, and the
+   BOTTOM inset flips from a dimmed white highlight to a real black recess,
+   which is what carries depth against a dark backdrop.
+
+   Because that is a change of relationship and not of magnitude, each variable
+   holds a fully resolved colour. Nothing is spliced into another function as
+   an argument, so there is no dependence on var() being accepted in
+   color-mix()'s percentage slot.
+   --------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  --glass-tint-top: color-mix(in oklab, white 58%, transparent);
+  --glass-tint-bottom: color-mix(in oklab, white 34%, transparent);
+  --glass-border: oklch(0.26 0.03 262 / 0.1);
+  --glass-rim-top: color-mix(in oklab, white 80%, transparent);
+  --glass-rim-bottom: color-mix(in oklab, white 22%, transparent);
+  --glass-ambient: oklch(0.35 0.04 260 / 0.14);
+
+  --glass-strong-tint-top: color-mix(in oklab, white 78%, transparent);
+  --glass-strong-tint-bottom: color-mix(in oklab, white 62%, transparent);
+  --glass-strong-border: oklch(0.26 0.03 262 / 0.12);
+  --glass-strong-rim-top: color-mix(in oklab, white 88%, transparent);
+  --glass-strong-ambient: oklch(0.35 0.04 260 / 0.16);
+
+  /* Alpha written directly instead of color-mix(paper, transparent) — the two
+     are equivalent, but a color-mix() over a *theme-dependent* var makes
+     Lightning CSS emit a static fallback resolved from :root, which then bakes
+     the LIGHT paper into the .dark block. Browsers with oklch but no
+     color-mix() (Safari 15.4-16.1) would get a light panel in dark mode. */
+  --glass-solid-tint-top: oklch(0.985 0.012 95 / 0.95);
+  --glass-solid-tint-bottom: oklch(0.985 0.012 95 / 0.89);
+  --glass-solid-border: oklch(0.26 0.03 262 / 0.12);
+  --glass-solid-rim-top: color-mix(in oklab, white 90%, transparent);
+  --glass-solid-ambient: oklch(0.35 0.04 260 / 0.2);
+
+  --chip-bg: color-mix(in oklab, white 55%, transparent);
+  --chip-border: oklch(0.26 0.03 262 / 0.12);
+  --glass-chip-bg: color-mix(in oklab, white 52%, transparent);
+
+  /* Flat scrim over the gradient mesh — the legibility floor whichever blobs
+     happen to sit behind a panel. Literal alpha for the same reason as the
+     glass-solid tints. */
+  --mesh-scrim: oklch(0.985 0.012 95 / 0.68);
+}
+
+.dark {
+  /* Scoped to .dark rather than `light dark` on :root: the toggle is manual,
+     and `light dark` would let the UA pick scrollbar/form-control chrome from
+     the OS preference instead — so someone choosing Dark while their OS is in
+     Light would get mismatched native chrome. */
+  color-scheme: dark;
+
+  /* Contrast checked against the dark paper below, not eyeballed:
+     ink 13.46, ink-soft 8.24, ink-faint 4.55 — all pass AA. */
+  --color-paper: oklch(0.24 0.025 262);
+  --color-paper-warm: oklch(0.28 0.03 258);
+  --color-ink: oklch(0.93 0.014 95);
+  --color-ink-soft: oklch(0.78 0.02 90);
+  --color-ink-faint: oklch(0.62 0.02 90);
+  --color-line: oklch(0.36 0.02 262);
+  --color-mint-wash: oklch(0.66 0.13 178 / 0.22);
+
+  /* The legibility swap described in @theme. */
+  --color-accent-text: var(--color-mint);
+  --color-accent-2-text: var(--color-peach);
+  --color-accent-foreground: oklch(0.18 0.02 262);
+  --color-accent-2-foreground: oklch(0.18 0.02 262);
+
+  /* Pixel mascot needs lifting off the dark paper. */
+  --color-pixel-hat: oklch(0.85 0.14 85);
+  --color-pixel-coat: oklch(0.62 0.12 180);
+  --color-pixel-glass: oklch(0.88 0.03 90);
+
+  /* Same hierarchy as light (rim-top brightest, bottom darkest), whole scale
+     compressed into a low band. rim-bottom is black, not dim white. */
+  --glass-tint-top: color-mix(in oklab, white 14%, transparent);
+  --glass-tint-bottom: color-mix(in oklab, white 5%, transparent);
+  --glass-border: color-mix(in oklab, white 22%, transparent);
+  --glass-rim-top: color-mix(in oklab, white 30%, transparent);
+  --glass-rim-bottom: color-mix(in oklab, black 20%, transparent);
+  --glass-ambient: oklch(0 0 0 / 0.45);
+
+  --glass-strong-tint-top: color-mix(in oklab, white 20%, transparent);
+  --glass-strong-tint-bottom: color-mix(in oklab, white 10%, transparent);
+  --glass-strong-border: color-mix(in oklab, white 26%, transparent);
+  --glass-strong-rim-top: color-mix(in oklab, white 34%, transparent);
+  --glass-strong-ambient: oklch(0 0 0 / 0.5);
+
+  /* Literal alpha, same reason as the light block above. */
+  --glass-solid-tint-top: oklch(0.28 0.03 258 / 0.92);
+  --glass-solid-tint-bottom: oklch(0.24 0.025 262 / 0.88);
+  --glass-solid-border: color-mix(in oklab, white 20%, transparent);
+  --glass-solid-rim-top: color-mix(in oklab, white 24%, transparent);
+  --glass-solid-ambient: oklch(0 0 0 / 0.55);
+
+  --chip-bg: color-mix(in oklab, white 12%, transparent);
+  --chip-border: color-mix(in oklab, white 20%, transparent);
+  --glass-chip-bg: color-mix(in oklab, white 10%, transparent);
+
+  /* Lighter scrim than light mode: the dark blobs are already low-chroma, and
+     over-scrimming them flattens the page to a single dead navy. */
+  --mesh-scrim: oklch(0.24 0.025 262 / 0.55);
+}
+
+/* ---------------------------------------------------------------------------
+   Liquid glass
+   Deliberately UNLAYERED. Unlayered rules beat every layered rule regardless
+   of specificity or source order, so a stray `bg-*` utility can never clobber
+   a panel's tint, rim or shadow. It also keeps these bodies byte-for-byte
+   portable to/from ntp-gallery.
+
+   Three parts make it read as glass rather than flat translucency:
+   1. a vertical tint gradient, brighter at the top edge, so the pane has a lit
+      side and a shaded side;
+   2. `saturate()` in the backdrop filter, which makes the colour bleeding
+      through look refracted instead of merely washed out;
+   3. inset highlights top and bottom — the specular rim of a real bevel.
+   --------------------------------------------------------------------------- */
+.glass {
+  background-image: linear-gradient(
+    to bottom,
+    var(--glass-tint-top),
+    var(--glass-tint-bottom)
+  );
+  backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--glass-rim-top),
+    inset 0 -1px 0 var(--glass-rim-bottom),
+    0 6px 22px var(--glass-ambient);
+}
+
+.glass-strong {
+  background-image: linear-gradient(
+    to bottom,
+    var(--glass-strong-tint-top),
+    var(--glass-strong-tint-bottom)
+  );
+  backdrop-filter: blur(30px) saturate(200%);
+  border: 1px solid var(--glass-strong-border);
+  box-shadow:
+    inset 0 1px 0 var(--glass-strong-rim-top),
+    0 10px 34px var(--glass-strong-ambient);
+}
+
+/* Working surfaces — dense text needs a near-opaque backing; the glass reads
+   in the blur and the rim, not in how much of the page shows through. */
+.glass-solid {
+  background-image: linear-gradient(
+    to bottom,
+    var(--glass-solid-tint-top),
+    var(--glass-solid-tint-bottom)
+  );
+  backdrop-filter: blur(36px) saturate(190%);
+  border: 1px solid var(--glass-solid-border);
+  box-shadow:
+    inset 0 1px 0 var(--glass-solid-rim-top),
+    0 12px 40px var(--glass-solid-ambient);
+}
+
+/* Chip for controls that sit INSIDE an already-frosted surface.
+   Deliberately has no backdrop-filter: nesting one inside another makes the
+   parent a new backdrop root, and Chrome then paints the child's blur as a
+   hard-edged rectangle. A plain translucent fill reads the same and costs one
+   fewer compositing layer. */
+.chip {
+  background-color: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+}
+
+/* Same look, but for elements sitting directly on the page background with no
+   frosted ancestor — there the blur is doing real work. */
+.glass-chip {
+  background-color: var(--glass-chip-bg);
+  backdrop-filter: blur(12px) saturate(170%);
+}
 
 @layer base {
-  :root {
-    /* ─── Ligne-claire adventure palette (light) ───
-       Aged paper, ink outlines, brick red, adventure blue, mustard. */
-    --paper: 42 47% 83%;
-    --paper-2: 41 44% 76%;
-    --ink: 16 15% 15%;
-    --ink-soft: 30 15% 36%;
-    --blue: 215 50% 23%;
-    --blue-hi: 214 52% 32%;
-    --red: 9 62% 47%;
-    --red-hi: 9 68% 38%;
-    --yellow: 39 79% 52%;
-    --cream: 42 77% 93%;
-
-    /* ─── Semantic tokens (mapped onto the palette) ─── */
-    --background: var(--paper);
-    --foreground: var(--ink);
-    --surface: var(--paper-2);
-    --card: var(--cream);
-    --card-foreground: var(--ink);
-    --muted: var(--paper-2);
-    --muted-foreground: var(--ink-soft);
-    --border: var(--ink);
-    --input: var(--ink);
-    --accent: var(--red);
-    --accent-foreground: var(--cream);
-    --ring: var(--blue);
-    --radius: 0rem;
-
-    --shadow: var(--ink);
-  }
-
-  .dark {
-    /* ─── Ligne-claire adventure palette (dark / night sky) ─── */
-    --paper: 212 39% 13%;
-    --paper-2: 213 38% 17%;
-    --ink: 39 57% 88%;
-    --ink-soft: 40 26% 63%;
-    --blue: 214 48% 53%;
-    --blue-hi: 213 56% 58%;
-    --red: 10 74% 61%;
-    --red-hi: 10 83% 66%;
-    --yellow: 40 85% 61%;
-    --cream: 210 37% 19%;
-
-    --background: var(--paper);
-    --foreground: var(--ink);
-    --surface: var(--paper-2);
-    --card: var(--cream);
-    --card-foreground: var(--ink);
-    --muted: var(--paper-2);
-    --muted-foreground: var(--ink-soft);
-    --border: var(--ink);
-    --input: var(--ink);
-    --accent: var(--red);
-    --accent-foreground: var(--cream);
-    --ring: var(--blue);
-
-    --shadow: 0 0% 0%;
-  }
-
-  * {
-    @apply border-border;
+  /* v4's default border colour is `currentColor`; this keeps borders on the
+     token instead. */
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-border);
   }
 
   html {
@@ -78,18 +297,138 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    /* Faint dot-grid — aged-paper pixel texture */
+  }
+
+  /* ─── Ambient gradient mesh ───
+     A fixed pseudo-element, not `body { background-attachment: fixed }`:
+     that is unreliable on iOS Safari and forces a full-background repaint on
+     scroll, whereas a fixed element composites as its own layer. `inset: 0`
+     resolves against the fixed-positioning containing block, which tracks the
+     actual visible viewport — so no 100dvh gymnastics, and a very tall page
+     needs no fallback because the mesh was never document-sized to begin with.
+
+     No filter: blur() here on purpose. The stops are already soft, and every
+     glass panel blurs this layer again when it samples it — blurring twice is
+     wasted compositing for a static element. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: var(--color-paper);
+    background-repeat: no-repeat;
+    /* Painted top-to-bottom: vignette, then a flat scrim, then the blobs.
+       The scrim is the single legibility knob — without it the blobs read at
+       full chroma and the glass panels lose their edges against them. */
     background-image:
-      radial-gradient(hsl(var(--paper-2)) 1px, transparent 1px),
-      radial-gradient(hsl(var(--paper-2)) 1px, transparent 1px);
-    background-size: 16px 16px;
-    background-position:
-      0 0,
-      8px 8px;
+      radial-gradient(
+        ellipse 74% 58% at 50% 34%,
+        var(--mesh-scrim) 0%,
+        transparent 66%
+      ),
+      linear-gradient(var(--mesh-scrim), var(--mesh-scrim)),
+      radial-gradient(
+        38rem 38rem at 12% 8%,
+        color-mix(in oklab, var(--color-mint) 55%, transparent) 0%,
+        transparent 68%
+      ),
+      radial-gradient(
+        34rem 34rem at 88% 18%,
+        color-mix(in oklab, var(--color-peach) 50%, transparent) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        42rem 42rem at 20% 92%,
+        color-mix(in oklab, var(--color-peach) 38%, transparent) 0%,
+        transparent 72%
+      ),
+      radial-gradient(
+        36rem 36rem at 82% 88%,
+        color-mix(in oklab, var(--color-mint) 45%, transparent) 0%,
+        transparent 70%
+      );
+  }
+
+  /* Dark uses the -deep variants at low mix: a bright mint/peach on near-black
+     reads as neon glow rather than ambient light. */
+  .dark body::before {
+    background-image:
+      radial-gradient(
+        ellipse 74% 58% at 50% 34%,
+        var(--mesh-scrim) 0%,
+        transparent 66%
+      ),
+      linear-gradient(var(--mesh-scrim), var(--mesh-scrim)),
+      radial-gradient(
+        38rem 38rem at 12% 8%,
+        color-mix(in oklab, var(--color-mint-deep) 30%, transparent) 0%,
+        transparent 68%
+      ),
+      radial-gradient(
+        34rem 34rem at 88% 18%,
+        color-mix(in oklab, var(--color-peach-deep) 26%, transparent) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        42rem 42rem at 20% 92%,
+        color-mix(in oklab, var(--color-peach-deep) 20%, transparent) 0%,
+        transparent 72%
+      ),
+      radial-gradient(
+        36rem 36rem at 82% 88%,
+        color-mix(in oklab, var(--color-mint-deep) 24%, transparent) 0%,
+        transparent 70%
+      );
+  }
+
+  /* Four full-size blobs overlap almost completely on a narrow screen and
+     oversaturate it; thin them out. */
+  @media (max-width: 640px) {
+    body::before {
+      background-image:
+        radial-gradient(
+          ellipse 84% 62% at 50% 30%,
+          var(--mesh-scrim) 0%,
+          transparent 62%
+        ),
+        linear-gradient(var(--mesh-scrim), var(--mesh-scrim)),
+        radial-gradient(
+          24rem 24rem at 15% 10%,
+          color-mix(in oklab, var(--color-mint) 40%, transparent) 0%,
+          transparent 68%
+        ),
+        radial-gradient(
+          22rem 22rem at 85% 90%,
+          color-mix(in oklab, var(--color-peach) 34%, transparent) 0%,
+          transparent 70%
+        );
+    }
+
+    .dark body::before {
+      background-image:
+        radial-gradient(
+          ellipse 84% 62% at 50% 30%,
+          var(--mesh-scrim) 0%,
+          transparent 62%
+        ),
+        linear-gradient(var(--mesh-scrim), var(--mesh-scrim)),
+        radial-gradient(
+          24rem 24rem at 15% 10%,
+          color-mix(in oklab, var(--color-mint-deep) 22%, transparent) 0%,
+          transparent 68%
+        ),
+        radial-gradient(
+          22rem 22rem at 85% 90%,
+          color-mix(in oklab, var(--color-peach-deep) 18%, transparent) 0%,
+          transparent 70%
+        );
+    }
   }
 
   ::selection {
-    @apply bg-yellow text-ink;
+    background-color: var(--color-mint-wash);
+    color: var(--color-ink);
   }
 }
 
@@ -105,62 +444,173 @@
 
   /* ─── Headings ─── */
   .page-title {
-    @apply font-pixel text-2xl leading-[1.4] sm:text-3xl;
+    @apply text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl;
   }
 
   .page-subtitle {
-    @apply mt-4 text-base text-muted-foreground leading-relaxed;
+    @apply text-muted-foreground mt-4 text-base leading-relaxed;
   }
 
-  /* ─── Section label — pixel small-caps ─── */
+  /* ─── Section label ─── */
   .section-label {
-    @apply font-pixel text-[10px] uppercase tracking-wider text-ink select-none;
+    @apply text-ink-soft text-[11px] font-bold tracking-wider uppercase select-none;
   }
 
-  /* ─── Inline links ─── */
-  /* Link: <a> carries color + hover; underline lives on .link-label only,
-     so leading emoji / favicon icons stay clean. */
+  /* ─── Inline links ───
+     <a> carries colour + hover; the underline lives on .link-label only, so
+     leading emoji / favicon icons stay clean. */
   .link {
-    @apply text-foreground transition-colors duration-150 hover:text-red;
+    @apply text-foreground transition-colors duration-200;
+  }
+
+  .link:hover {
+    color: var(--color-accent-text);
   }
 
   .link-label {
-    @apply underline decoration-ink/40 decoration-2 underline-offset-4 transition-colors duration-150 group-hover:decoration-red;
+    @apply underline decoration-2 underline-offset-4 transition-colors duration-200;
+    text-decoration-color: color-mix(
+      in oklab,
+      var(--color-ink) 30%,
+      transparent
+    );
   }
 
-  /* ─── Pixel primitives (ported from sync-text) ─── */
-  .pixel-shadow {
-    box-shadow: 4px 4px 0 0 hsl(var(--shadow));
+  .group:hover .link-label {
+    text-decoration-color: var(--color-accent-text);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion — all of it gated on prefers-reduced-motion at the bottom.
+   --------------------------------------------------------------------------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s var(--ease-soft) both;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.45s var(--ease-soft) both;
+}
+
+.rise {
+  animation: rise 0.5s var(--ease-soft) both;
+}
+
+/* Scroll reveal. The transition lives on the element rather than an animation
+   so re-entering the viewport does not replay from a hard reset. Driven by the
+   single shared IntersectionObserver in Base.astro. */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px) scale(0.99);
+  transition:
+    opacity 0.55s var(--ease-soft),
+    transform 0.55s var(--ease-soft),
+    translate 0.4s var(--ease-soft),
+    scale 0.4s var(--ease-soft),
+    box-shadow 0.4s var(--ease-soft),
+    border-color 0.4s var(--ease-soft);
+}
+
+.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Shared transition shorthands, so no state change lands as a jump. */
+.tx {
+  transition-property: color, background-color, border-color, box-shadow,
+    opacity, transform, translate, scale, rotate, backdrop-filter,
+    text-decoration-color;
+  transition-duration: 280ms;
+  transition-timing-function: var(--ease-soft);
+}
+
+.tx-slow {
+  transition-property: color, background-color, border-color, box-shadow,
+    opacity, transform, translate, scale, rotate;
+  transition-duration: 480ms;
+  transition-timing-function: var(--ease-soft);
+}
+
+/* Print and forced-colors never scroll, so a reveal element that has not been
+   observed yet would come out blank. */
+@media print, (forced-colors: active) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+@media print {
+  body::before {
+    display: none;
   }
 
-  .pixel-shadow-sm {
-    box-shadow: 3px 3px 0 0 hsl(var(--shadow));
-  }
-
-  .pixel-press {
-    transition:
-      transform 80ms steps(2),
-      box-shadow 80ms steps(2);
-  }
-
-  .pixel-press:active:not(:disabled) {
-    transform: translate(3px, 3px);
-    box-shadow: 0 0 0 0 hsl(var(--shadow));
-  }
-
-  /* ─── Ligne-claire card: thick ink border + hard offset shadow ─── */
-  .ink-card {
-    @apply border-[3px] border-ink bg-card pixel-shadow;
+  .glass,
+  .glass-strong,
+  .glass-solid,
+  .chip,
+  .glass-chip {
+    backdrop-filter: none;
+    background-image: none;
+    box-shadow: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .reveal-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .tx,
+  .tx-slow {
+    transition: none;
+  }
+
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }

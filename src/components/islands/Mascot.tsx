@@ -5,17 +5,21 @@
 // *spirit* is borrowed, never a real design.
 
 const PALETTE: Record<string, string> = {
-  K: 'hsl(var(--ink))', // outline
-  H: 'hsl(var(--yellow))', // hat crown
-  B: 'hsl(var(--red))', // hat band
-  S: '#d8a878', // skin
-  E: 'hsl(var(--ink))', // eye
-  N: 'hsl(var(--red))', // neckerchief
-  C: 'hsl(var(--blue))', // coat
-  P: 'hsl(var(--red))', // strap
-  M: 'hsl(var(--ink))', // compass ring
-  G: 'hsl(var(--cream))', // compass glass
-  R: 'hsl(var(--red))', // compass needle
+  // Dedicated --color-pixel-* tokens rather than the glass palette: the mascot
+  // is deliberately still crisp pixel art and needs colours that hold up on
+  // both papers. NOTE: these must be bare var() — the tokens are full oklch()
+  // colours now, so the old hsl(var(--x)) form would be invalid CSS.
+  K: 'var(--color-ink)', // outline
+  H: 'var(--color-pixel-hat)', // hat crown
+  B: 'var(--color-pixel-band)', // hat band
+  S: 'var(--color-pixel-skin)', // skin
+  E: 'var(--color-ink)', // eye
+  N: 'var(--color-pixel-band)', // neckerchief
+  C: 'var(--color-pixel-coat)', // coat
+  P: 'var(--color-pixel-band)', // strap
+  M: 'var(--color-ink)', // compass ring
+  G: 'var(--color-pixel-glass)', // compass glass
+  R: 'var(--color-pixel-band)', // compass needle
 }
 
 // 14 cols x 15 rows. "." = transparent.

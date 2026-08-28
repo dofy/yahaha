@@ -65,7 +65,7 @@ function Detail({ tarot }: { tarot: Tarot }) {
             <dl className="space-y-3">
               {Object.entries(tarot[key]).map(([k, v]) => (
                 <div key={k}>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-accent">
+                  <dt className="text-xs font-medium uppercase tracking-wide text-accent-text">
                     {k}
                   </dt>
                   <dd className="mt-0.5 text-sm leading-relaxed text-muted-foreground">
@@ -103,7 +103,7 @@ export default function TarotBrowser() {
                 aria-expanded={active}
                 className={cn(
                   'flex w-full items-center justify-between gap-4 py-3 text-left transition-colors',
-                  active ? 'text-accent' : 'text-foreground hover:text-accent',
+                  active ? 'text-accent-text' : 'text-foreground hover:text-accent-text',
                 )}
               >
                 <span className="flex flex-wrap items-baseline gap-x-2">
@@ -131,7 +131,7 @@ export default function TarotBrowser() {
 
       {/* Sticky panel on desktop */}
       <aside className="hidden lg:block">
-        <div className="sticky top-8 rounded-lg border border-border bg-card p-6">
+        <div className="glass rounded-soft sticky top-8 p-6">
           {selected ? (
             <Detail key={selected.index} tarot={selected} />
           ) : (
