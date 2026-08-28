@@ -29,7 +29,7 @@ export default function EmoticonKit() {
       <div
         onClick={doCopy}
         title="Click to copy"
-        className="flex min-h-16 w-full cursor-pointer select-all items-center justify-center rounded-lg border border-border bg-card px-4 py-5 font-mono text-2xl text-card-foreground transition-colors hover:border-accent/50"
+        className="glass rounded-soft tx flex min-h-16 w-full cursor-pointer items-center justify-center px-4 py-5 font-mono text-2xl select-all hover:border-accent"
       >
         {emoticon || '…'}
       </div>

@@ -31,14 +31,21 @@ const containerClass = wide ? 'container-wide' : 'container-page'
     <meta name="og:description" content={fullTitle} />
     <meta name="og:image" content="/logo.png" />
     <meta name="og:title" content={title ?? suffix} />
+    <!--
+      Three tags on purpose. The two media-scoped ones key off the OS
+      preference, so they are only correct while the toggle is on `auto`; they
+      stay as the pre-JS fallback. The unconditional one is rewritten by the
+      script below and by ThemeToggle, so it tracks a manual override too.
+    -->
+    <meta name="theme-color" content="#fcfaf1" data-theme-color />
     <meta
       name="theme-color"
-      content="#e6d8ba"
+      content="#fcfaf1"
       media="(prefers-color-scheme: light)"
     />
     <meta
       name="theme-color"
-      content="#141d29"
+      content="#191f2b"
       media="(prefers-color-scheme: dark)"
     />
     <meta name="twitter:card" content="summary" />
@@ -52,9 +59,14 @@ const containerClass = wide ? 'container-wide' : 'container-page'
         const prefersDark = window.matchMedia(
           '(prefers-color-scheme: dark)',
         ).matches
-        if (stored === 'dark' || (!stored && prefersDark)) {
+        const dark = stored === 'dark' || (!stored && prefersDark)
+        if (dark) {
           document.documentElement.classList.add('dark')
         }
+        // Keep the unconditional theme-color tag in step with the class, since
+        // the media-scoped tags cannot see a manual override.
+        const tag = document.querySelector('meta[data-theme-color]')
+        if (tag) tag.setAttribute('content', dark ? '#191f2b' : '#fcfaf1')
       })()
     </script>
   </head>
@@ -69,5 +81,36 @@ const containerClass = wide ? 'container-wide' : 'container-page'
       </main>
       <Footer />
     </div>
+
+    <!--
+      Scroll reveal for [data-reveal]. Vanilla + inline rather than a React
+      island: the rest of this page is zero-JS static Astro and a fade-in does
+      not justify hydration.
+
+      One shared observer, not one per element. The bottom margin is NEGATIVE
+      on purpose — a positive margin fires while the element is still below the
+      fold, so the fade finishes before it scrolls into view and the motion is
+      never actually seen.
+    -->
+    <script is:inline>
+      ;(() => {
+        const nodes = document.querySelectorAll('[data-reveal]')
+        if (!nodes.length) return
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          nodes.forEach((node) => node.classList.add('reveal-in'))
+          return
+        }
+        nodes.forEach((node) => node.classList.add('reveal'))
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              entry.target.classList.toggle('reveal-in', entry.isIntersecting)
+            }
+          },
+          { rootMargin: '0px 0px -12% 0px', threshold: 0 },
+        )
+        nodes.forEach((node) => observer.observe(node))
+      })()
+    </script>
   </body>
 </html>

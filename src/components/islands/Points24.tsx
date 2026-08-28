@@ -51,7 +51,7 @@ export default function Points24() {
             {results.map((r, i) => (
               <li
                 key={i}
-                className="rounded-md border border-border bg-card px-3 py-2 font-mono text-sm text-card-foreground"
+                className="chip rounded-lg px-3 py-2 font-mono text-sm"
               >
                 {r} = 24
               </li>
