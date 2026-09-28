@@ -5,6 +5,7 @@
   "singleQuote": true,
   "trailingComma": "none",
   "bracketSpacing": true,
-  "jsxBracketSameLine": false,
-  "jsxSingleQuote": true
+  "bracketSameLine": false,
+  "jsxSingleQuote": true,
+  "plugins": ["prettier-plugin-astro"]
 }

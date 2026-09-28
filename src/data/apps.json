@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Cruft",
+    "url": "https://cruft.phpz.org/",
+    "icon": "/apps/cruft.png",
+    "platform": "macOS",
+    "description": "Reclaim space from developer caches, build files and app leftovers. See what will be cleaned before you run it."
+  },
+  {
+    "name": "WordClip",
+    "url": "https://wordclip.phpz.org/",
+    "icon": "/apps/wordclip.png",
+    "platform": "macOS, iOS & iPadOS",
+    "description": "Capture words as you read, look them up offline and remember them with spaced repetition."
+  },
+  {
+    "name": "LinguaDock",
+    "url": "https://linguadock.phpz.org/",
+    "icon": "/apps/linguadock.png",
+    "platform": "macOS",
+    "description": "Translate selected text from any app with a shortcut. Choose your own local or cloud AI model."
+  }
+]

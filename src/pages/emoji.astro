@@ -1,16 +1,26 @@
 ---
 import Base from '@/layouts/Base.astro'
 import EmojiSearch from '@/components/islands/EmojiSearch'
+import sources from '@/data/emoji/sources.json'
 ---
 
-<Base title="Emoji">
-  <header class="animate-fade-in-up">
-    <h1 class="page-title">Apple Emoji Dictionary</h1>
-    <p class="page-subtitle">
-      Search by keyword or emoji.
-      <a href="https://github.com/dofy/apple-emoji-dict" class="link ml-1">
-        GitHub Repo
+<Base title='Emoji'>
+  <header class='animate-fade-in-up'>
+    <h1 class='page-title'>Apple Emoji Dictionary</h1>
+    <p class='page-subtitle'>
+      Find an emoji with Chinese keywords, just like your input method.
+    </p>
+    <p class='mt-3 text-xs text-muted-foreground'>
+      Emoji {sources.emojiVersion} ·{' '}
+      {sources.emojiCount.toLocaleString('en-US')} emoji · 简体 / 繁體 /
+      English.
+      <a
+        href='https://cldr.unicode.org/translation/characters/short-names-and-keywords'
+        class='link link-label ml-1'
+      >
+        Unicode CLDR
       </a>
+      + Apple search keywords.
     </p>
   </header>
 

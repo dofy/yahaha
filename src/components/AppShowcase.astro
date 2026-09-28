@@ -1,0 +1,48 @@
+---
+import apps from '@/data/apps.json'
+---
+
+<section
+  aria-labelledby='apps-heading'
+  class='glass rounded-blob mt-10 px-5 py-5 sm:px-6 sm:py-6'
+  data-reveal
+>
+  <div class='mb-2 flex flex-wrap items-center justify-between gap-3'>
+    <h2 id='apps-heading' class='text-lg font-bold'>
+      Apps
+    </h2>
+    <span class='bg-mint-wash text-accent-text rounded-full px-3 py-1 text-xs font-semibold'>
+      Coming soon
+    </span>
+  </div>
+
+  <ul class='divide-border/60 divide-y'>
+    {apps.map((app) => (
+      <li class='py-3 first:pt-2 last:pb-0'>
+        <a
+          href={app.url}
+          class='tx group rounded-soft hover:bg-mint-wash focus-visible:outline-ring -mx-2 grid grid-cols-[3rem_minmax(0,1fr)] items-start gap-4 p-2 focus-visible:outline-2 focus-visible:outline-offset-4'
+        >
+          <img
+            src={app.icon}
+            alt=''
+            width={48}
+            height={48}
+            loading='lazy'
+            decoding='async'
+            class='size-12'
+          />
+          <div class='min-w-0'>
+            <h3 class='text-base font-bold group-hover:underline group-hover:underline-offset-4'>
+              {app.name}
+            </h3>
+            <p class='text-ink-soft mt-1 text-sm leading-relaxed'>
+              {app.description}
+            </p>
+            <p class='text-ink-faint mt-2 text-xs'>{app.platform}</p>
+          </div>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>

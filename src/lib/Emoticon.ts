@@ -226,7 +226,7 @@ const assets = {
 }
 
 const randInd = (count: number, probability: number) => {
-  var ind = Math.floor((count / probability) * Math.random())
+  const ind = Math.floor((count / probability) * Math.random())
   // debug([count, ind, probability]);
   return ind >= count ? -1 : ind
 }

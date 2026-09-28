@@ -4,6 +4,7 @@ import keywords from '@/data/keywords.json'
 import Footer from '@/components/Footer.astro'
 import Logo from '@/components/Logo.astro'
 import ThemeToggle from '@/components/islands/ThemeToggle'
+import { pageMetadata, canonicalPath } from '@/lib/site'
 
 interface Props {
   title?: string
@@ -15,51 +16,70 @@ const { title, wide = false } = Astro.props
 const suffix = 'dofy.net & PHPz.xyz & PHPz.org & yahaha.net'
 const fullTitle = title ? `${title} - ${suffix}` : suffix
 const containerClass = wide ? 'container-wide' : 'container-page'
+const pathname = Astro.url.pathname.replace(/\/+$/, '') || '/'
+const metadata = pageMetadata[pathname] ?? pageMetadata['/']
+const canonical = new URL(
+  canonicalPath(pathname),
+  Astro.site ?? 'https://yahaha.net'
+)
+const image = new URL('/logo.png', canonical)
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={metadata.lang}>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <title>{fullTitle}</title>
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/logo.png" />
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="description" content={fullTitle} />
-    <meta name="keywords" content={keywords.join()} />
-    <meta name="og:description" content={fullTitle} />
-    <meta name="og:image" content="/logo.png" />
-    <meta name="og:title" content={title ?? suffix} />
+    <link rel='icon' href='/favicon.ico' />
+    <link rel='apple-touch-icon' href='/logo.png' />
+    <link rel='manifest' href='/manifest.json' />
+    <meta name='description' content={metadata.description} />
+    <meta name='keywords' content={keywords.join()} />
+    <link rel='canonical' href={canonical.href} />
+    <meta property='og:type' content='website' />
+    <meta property='og:url' content={canonical.href} />
+    <meta property='og:description' content={metadata.description} />
+    <meta property='og:image' content={image.href} />
+    <meta property='og:title' content={title ?? suffix} />
+    <meta property='og:site_name' content='yahaha' />
     <!--
       Three tags on purpose. The two media-scoped ones key off the OS
       preference, so they are only correct while the toggle is on `auto`; they
       stay as the pre-JS fallback. The unconditional one is rewritten by the
       script below and by ThemeToggle, so it tracks a manual override too.
     -->
-    <meta name="theme-color" content="#fcfaf1" data-theme-color />
+    <meta name='theme-color' content='#fcfaf1' data-theme-color />
     <meta
-      name="theme-color"
-      content="#fcfaf1"
-      media="(prefers-color-scheme: light)"
+      name='theme-color'
+      content='#fcfaf1'
+      media='(prefers-color-scheme: light)'
     />
     <meta
-      name="theme-color"
-      content="#191f2b"
-      media="(prefers-color-scheme: dark)"
+      name='theme-color'
+      content='#191f2b'
+      media='(prefers-color-scheme: dark)'
     />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:creator" content="@dofy" />
-    <meta name="twitter:site" content="@dofy" />
-    <meta name="generator" content={Astro.generator} />
+    <meta name='twitter:card' content='summary' />
+    <meta name='twitter:title' content={title ?? suffix} />
+    <meta name='twitter:description' content={metadata.description} />
+    <meta name='twitter:image' content={image.href} />
+    <meta name='twitter:creator' content='@dofy' />
+    <meta name='twitter:site' content='@dofy' />
+    <meta name='generator' content={Astro.generator} />
     <!-- Set theme before paint to avoid FOUC -->
     <script is:inline>
       ;(() => {
-        const stored = localStorage.getItem('theme')
+        let stored = null
+        try {
+          stored = localStorage.getItem('theme')
+        } catch {
+          /* Storage may be disabled. */
+        }
         const prefersDark = window.matchMedia(
-          '(prefers-color-scheme: dark)',
+          '(prefers-color-scheme: dark)'
         ).matches
-        const dark = stored === 'dark' || (!stored && prefersDark)
+        const dark = stored === 'dark' || (stored !== 'light' && prefersDark)
         if (dark) {
           document.documentElement.classList.add('dark')
         }
@@ -71,11 +91,18 @@ const containerClass = wide ? 'container-wide' : 'container-page'
     </script>
   </head>
   <body>
-    <div class="fixed right-4 top-4 z-50">
+    <div class='fixed right-4 top-4 z-50'>
       <ThemeToggle client:load />
     </div>
     <div class={containerClass}>
-      <main class="animate-fade-in">
+      <main class='animate-fade-in'>
+        {pathname !== '/' && (
+          <nav aria-label='Main navigation' class='mb-6'>
+            <a href='/' class='link text-sm'>
+              ← Home
+            </a>
+          </nav>
+        )}
         <slot />
         <Logo />
       </main>
@@ -100,6 +127,7 @@ const containerClass = wide ? 'container-wide' : 'container-page'
           nodes.forEach((node) => node.classList.add('reveal-in'))
           return
         }
+        if (!('IntersectionObserver' in window)) return
         nodes.forEach((node) => node.classList.add('reveal'))
         const observer = new IntersectionObserver(
           (entries) => {
@@ -107,7 +135,7 @@ const containerClass = wide ? 'container-wide' : 'container-page'
               entry.target.classList.toggle('reveal-in', entry.isIntersecting)
             }
           },
-          { rootMargin: '0px 0px -12% 0px', threshold: 0 },
+          { rootMargin: '0px 0px -12% 0px', threshold: 0 }
         )
         nodes.forEach((node) => observer.observe(node))
       })()

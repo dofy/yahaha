@@ -1,6 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro'
 import LinkBlock from '@/components/LinkBlock.astro'
+import AppShowcase from '@/components/AppShowcase.astro'
 import Mascot from '@/components/islands/Mascot'
 import allLinks from '@/data/links.json'
 import { version } from '../../package.json'
@@ -10,39 +11,41 @@ const links = allLinks as Links
 ---
 
 <Base>
-  <header class="animate-fade-in-up">
+  <header class='animate-fade-in-up'>
     <!-- Glass hero. The pixel explorer stays pixel — it is the one sanctioned
          holdover from the old ligne-claire look. -->
-    <div class="glass rounded-blob relative px-5 py-8 sm:px-8 sm:py-10">
+    <div class='glass rounded-blob relative px-5 py-8 sm:px-8 sm:py-10'>
       <!-- Solid accent fill, not a chip: mint text on a light translucent chip
            is too faint to read in either theme. -->
-      <span
-        class="section-label bg-accent text-accent-foreground absolute -top-3 left-6 rounded-full px-3 py-1 shadow-sm"
-      >
+      <span class='section-label bg-accent text-accent-foreground absolute -top-3 left-6 rounded-full px-3 py-1 shadow-sm'>
         yahaha
       </span>
 
-      <div class="flex items-start gap-4 sm:gap-6">
-        <div class="min-w-0 flex-1">
-          <h1 class="page-title text-balance">
+      <div class='flex items-start gap-4 sm:gap-6'>
+        <div class='min-w-0 flex-1'>
+          <h1 class='page-title text-balance'>
             The answer exists only in the Tao.
           </h1>
-          <p class="page-subtitle">
+          <p class='page-subtitle'>
             A small toolbox &mdash; math, morse, tarot, emoji, and more.
           </p>
           <a
-            href="https://github.com/dofy/yahaha/releases"
-            class="tx bg-accent-2 text-accent-2-foreground mt-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold shadow-sm hover:scale-105 hover:shadow-md"
+            href='https://github.com/dofy/yahaha/releases'
+            class='tx bg-accent-2 text-accent-2-foreground mt-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold shadow-sm hover:scale-105 hover:shadow-md'
           >
-            <span class="size-1.5 rounded-full bg-current opacity-70"></span>
-            v{version}
+            <span class='size-1.5 rounded-full bg-current opacity-70'></span>v
+            {version}
           </a>
         </div>
 
-        <Mascot client:visible size={112} className="hidden shrink-0 sm:block" />
+        <Mascot size={112} className='hidden shrink-0 sm:block' />
       </div>
     </div>
   </header>
 
-  {links.map((link) => <LinkBlock cat={link.cat} links={link.links} />)}
+  <AppShowcase />
+
+  {links.map((link) => (
+    <LinkBlock cat={link.cat} links={link.links} />
+  ))}
 </Base>

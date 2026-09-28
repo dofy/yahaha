@@ -60,10 +60,10 @@
        accent-text               → text, borders and underlines on the page bg
      Never hardcode `text-mint-deep` in markup; use `text-accent-text`. */
   --color-accent: var(--color-mint);
-  --color-accent-foreground: oklch(0.99 0 0);
+  --color-accent-foreground: oklch(0.18 0.02 262);
   --color-accent-text: var(--color-mint-deep);
   --color-accent-2: var(--color-peach);
-  --color-accent-2-foreground: oklch(0.99 0 0);
+  --color-accent-2-foreground: oklch(0.18 0.02 262);
   --color-accent-2-text: var(--color-peach-deep);
 
   /* ─── Pixel easter-egg palette ───
@@ -156,19 +156,19 @@
      Light would get mismatched native chrome. */
   color-scheme: dark;
 
-  /* Contrast checked against the dark paper below, not eyeballed:
-     ink 13.46, ink-soft 8.24, ink-faint 4.55 — all pass AA. */
+  /* Secondary text must also stay legible on glass and chips, whose white
+     tint raises the background luminance above the bare dark paper. */
   --color-paper: oklch(0.24 0.025 262);
   --color-paper-warm: oklch(0.28 0.03 258);
   --color-ink: oklch(0.93 0.014 95);
-  --color-ink-soft: oklch(0.78 0.02 90);
-  --color-ink-faint: oklch(0.62 0.02 90);
+  --color-ink-soft: oklch(0.82 0.02 90);
+  --color-ink-faint: oklch(0.8 0.02 90);
   --color-line: oklch(0.36 0.02 262);
   --color-mint-wash: oklch(0.66 0.13 178 / 0.22);
 
-  /* The legibility swap described in @theme. */
-  --color-accent-text: var(--color-mint);
-  --color-accent-2-text: var(--color-peach);
+  /* Lift text accents above the solid-fill palette for glass contrast. */
+  --color-accent-text: oklch(0.8 0.13 178);
+  --color-accent-2-text: oklch(0.84 0.13 40);
   --color-accent-foreground: oklch(0.18 0.02 262);
   --color-accent-2-foreground: oklch(0.18 0.02 262);
 
@@ -549,18 +549,60 @@
 
 /* Shared transition shorthands, so no state change lands as a jump. */
 .tx {
-  transition-property: color, background-color, border-color, box-shadow,
-    opacity, transform, translate, scale, rotate, backdrop-filter,
-    text-decoration-color;
+  transition-property:
+    color, background-color, border-color, box-shadow, opacity, transform,
+    translate, scale, rotate, backdrop-filter, text-decoration-color;
   transition-duration: 280ms;
   transition-timing-function: var(--ease-soft);
 }
 
 .tx-slow {
-  transition-property: color, background-color, border-color, box-shadow,
-    opacity, transform, translate, scale, rotate;
+  transition-property:
+    color, background-color, border-color, box-shadow, opacity, transform,
+    translate, scale, rotate;
   transition-duration: 480ms;
   transition-timing-function: var(--ease-soft);
+}
+
+/* Polygon masks adapted from react-theme-switch-animation (MIT).
+   See /theme-animation-license.txt for the original copyright and license.
+   Static CSS keeps the animation independent of three-state theme persistence.
+   SVG masks also render on WebKit's view-transition snapshots. */
+html[data-theme-transition] * {
+  /* Capture the target colors immediately instead of an in-flight .tx fade. */
+  transition: none !important;
+}
+
+html[data-theme-transition]::view-transition-group(root) {
+  animation-duration: 750ms;
+}
+
+html[data-theme-transition]::view-transition-old(root),
+html[data-theme-transition]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html[data-theme-transition]::view-transition-new(root) {
+  mask-repeat: no-repeat;
+  mask-size: 0 0;
+  animation: theme-polygon-reveal 750ms var(--ease-soft) both;
+}
+
+html[data-theme-transition='dark']::view-transition-new(root) {
+  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><path d="M0 0H40L0 40V0Z" fill="white"/></svg>');
+  mask-position: top left;
+}
+
+html[data-theme-transition='light']::view-transition-new(root) {
+  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><path d="M40 40H0L40 0V40Z" fill="white"/></svg>');
+  mask-position: bottom right;
+}
+
+@keyframes theme-polygon-reveal {
+  to {
+    mask-size: 200vmax 200vmax;
+  }
 }
 
 /* Print and forced-colors never scroll, so a reveal element that has not been
@@ -590,6 +632,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html[data-theme-transition]::view-transition-group(root),
+  html[data-theme-transition]::view-transition-new(root) {
+    animation: none;
+    mask: none;
+  }
+
   html {
     scroll-behavior: auto;
   }

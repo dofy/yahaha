@@ -11,41 +11,27 @@
   "scope": "/",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F3F4F6",
-  "theme_color": "#F3F4F6",
+  "background_color": "#fcfaf1",
+  "theme_color": "#fcfaf1",
   "orientation": "portrait",
   "shortcuts": [
     {
-      "name": "PHPz.xyz",
-      "short_name": "PHPz.xyz",
-      "url": "https://phpz.xyz/",
+      "name": "24 Points",
+      "url": "/24points",
       "icons": [
         {
-          "src": "logo.png",
+          "src": "/logo.png",
           "sizes": "512x512",
           "type": "image/png"
         }
       ]
     },
     {
-      "name": "dofy.net",
-      "short_name": "dofy.net",
-      "url": "https://dofy.net/",
+      "name": "Tarot",
+      "url": "/tarot",
       "icons": [
         {
-          "src": "logo.png",
-          "sizes": "512x512",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "yahaha.net",
-      "short_name": "yahaha.net",
-      "url": "https://yahaha.net/",
-      "icons": [
-        {
-          "src": "logo.png",
+          "src": "/logo.png",
           "sizes": "512x512",
           "type": "image/png"
         }
@@ -53,11 +39,10 @@
     },
     {
       "name": "Apple Emoji Dictionary",
-      "short_name": "Emoji",
-      "url": "./emoji",
+      "url": "/emoji",
       "icons": [
         {
-          "src": "logo.png",
+          "src": "/logo.png",
           "sizes": "512x512",
           "type": "image/png"
         }
@@ -65,11 +50,21 @@
     },
     {
       "name": "Emoticon Kit",
-      "short_name": "Emoticon",
-      "url": "./emoticon",
+      "url": "/emoticon",
       "icons": [
         {
-          "src": "logo.png",
+          "src": "/logo.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Morse Code",
+      "url": "/morse",
+      "icons": [
+        {
+          "src": "/logo.png",
           "sizes": "512x512",
           "type": "image/png"
         }

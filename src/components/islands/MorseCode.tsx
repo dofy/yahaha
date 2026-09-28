@@ -1,64 +1,94 @@
 import * as React from 'react'
-import { Check, Copy } from 'lucide-react'
-import copy from 'clipboard-copy'
-import MorseData from '@/data/morse.json'
-import type { Dict } from '@/types'
+import { Check, ChevronDown, Copy } from 'lucide-react'
+import { encodeMorse, decodeMorse } from '@/lib/morse'
+import { useClipboard } from '@/lib/useClipboard'
 import { Input } from '@/components/ui/input'
-
-const morseDict = MorseData as Dict
+import { Button } from '@/components/ui/button'
 
 export default function MorseCode() {
   const [text, setText] = React.useState('')
-  const [copied, setCopied] = React.useState(false)
-
-  const words = text.trim() ? text.trim().split(/\s+/) : []
-
-  const flatCode = text
-    .replace(/\s+/g, ' ')
-    .split('')
-    .map((l) => morseDict[l.toUpperCase()] ?? '')
-    .join(' ')
-    .trim()
-
-  const doCopy = async () => {
-    if (!flatCode) return
-    await copy(flatCode)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
-  }
+  const [mode, setMode] = React.useState<'encode' | 'decode'>('encode')
+  const result = mode === 'encode' ? encodeMorse(text) : decodeMorse(text)
+  const { copied, error, doCopy, reset } = useClipboard(result.output)
 
   return (
-    <div className="mt-8">
-      <Input
-        placeholder="Enter text here…"
-        autoFocus
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-
-      {words.length > 0 && (
-        <div
-          onClick={doCopy}
-          title="Click to copy"
-          className="glass rounded-soft tx group mt-6 cursor-pointer p-5 hover:border-accent"
+    <div className='mt-8'>
+      <label htmlFor='morse-mode' className='mb-2 block text-sm font-medium'>
+        Conversion
+      </label>
+      <div className='relative mb-5 w-fit'>
+        <select
+          id='morse-mode'
+          value={mode}
+          onChange={(e) => {
+            setMode(e.target.value as 'encode' | 'decode')
+            setText('')
+            reset()
+          }}
+          className='chip block appearance-none rounded-full py-2 pl-4 pr-10 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-ring'
         >
-          <div className="flex flex-wrap gap-x-6 gap-y-3 font-mono text-lg text-card-foreground">
-            {words.map((word, wi) => (
-              <span key={wi} className="flex flex-wrap gap-x-3">
-                {word.split('').map((letter, li) => (
-                  <span key={li} className="text-accent-text">
-                    {morseDict[letter.toUpperCase()] ?? '?'}
-                  </span>
-                ))}
-              </span>
-            ))}
-          </div>
-          <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-            {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-            {copied ? 'Copied' : 'Click to copy'}
-          </div>
+          <option value='encode'>Text → Morse</option>
+          <option value='decode'>Morse → Text</option>
+        </select>
+        <ChevronDown
+          aria-hidden='true'
+          className='pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-foreground'
+        />
+      </div>
+      <label htmlFor='morse-input' className='mb-2 block text-sm font-medium'>
+        {mode === 'encode' ? 'Text to encode' : 'Morse code to decode'}
+      </label>
+      <Input
+        id='morse-input'
+        placeholder={
+          mode === 'encode' ? 'Enter text here…' : '... --- ... / .- -...'
+        }
+        aria-describedby='morse-help'
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value)
+          reset()
+        }}
+      />
+      <p id='morse-help' className='mt-2 text-xs text-muted-foreground'>
+        {mode === 'encode'
+          ? 'Supports Latin letters, numbers and punctuation.'
+          : 'Separate letters with spaces and words with / or three spaces.'}
+      </p>
+      {result.output && (
+        <div className='mt-6'>
+          <button
+            type='button'
+            onClick={doCopy}
+            aria-label='Copy result'
+            title='Click to copy'
+            className='glass rounded-soft tx w-full cursor-pointer p-5 text-left hover:border-accent focus-visible:outline-2 focus-visible:outline-ring'
+          >
+            <span
+              className='block whitespace-pre-wrap break-words font-mono text-lg text-accent-text'
+              data-morse-output
+            >
+              {result.output}
+            </span>
+          </button>
+          <Button variant='outline' onClick={doCopy} className='mt-3'>
+            {copied ? <Check /> : <Copy />}
+            {copied ? 'Copied' : 'Copy'}
+          </Button>
         </div>
       )}
+      <div aria-live='polite' className='mt-3 text-sm text-muted-foreground'>
+        {result.unsupported.length > 0 && (
+          <p>
+            Unsupported {mode === 'encode' ? 'characters' : 'codes'}:{' '}
+            {result.unsupported.join(', ')}. Marked as ? in the result.
+          </p>
+        )}
+        {copied && <p>Copied to clipboard.</p>}
+        {error && (
+          <p>Could not copy. Select the result and copy it manually.</p>
+        )}
+      </div>
     </div>
   )
 }

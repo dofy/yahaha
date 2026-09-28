@@ -1,168 +1,173 @@
-/**
- * 24 Points Game
- * Author: Seven Yu
- * Version: 1.0.0
- * URL: https://phpz.xyz/24points/
- */
+const TARGET = 24n
 
-const RightValue = 24
-
-// --------
-// method A
-// --------
-const op = ['+', '-', '*', '/']
-
-const check1 = (o1: number, o2: number) => {
-  return '+-'.includes(op[o1]) && '*/'.includes(op[o2])
+type Rational = {
+  numerator: bigint
+  denominator: bigint
 }
 
-const check2 = (o1: number, o2: number, o3: number) => {
-  const ops = [op[o1], op[o2], op[o3]]
-  return !(
-    ops.every((op) => '+-'.includes(op)) ||
-    ops.every((op) => '*/'.includes(op)) ||
-    (!check1(o1, o2) && '+-'.includes(op[o3]))
+type Term = {
+  value: Rational
+  expression: string
+}
+
+function greatestCommonDivisor(a: bigint, b: bigint): bigint {
+  let left = a < 0n ? -a : a
+  let right = b < 0n ? -b : b
+
+  while (right !== 0n) {
+    const remainder = left % right
+    left = right
+    right = remainder
+  }
+
+  return left
+}
+
+function rational(numerator: bigint, denominator = 1n): Rational {
+  if (denominator === 0n) {
+    throw new RangeError('Cannot divide by zero')
+  }
+
+  const sign = denominator < 0n ? -1n : 1n
+  const divisor = greatestCommonDivisor(numerator, denominator)
+
+  return {
+    numerator: (numerator / divisor) * sign,
+    denominator: (denominator / divisor) * sign
+  }
+}
+
+function add(left: Rational, right: Rational): Rational {
+  return rational(
+    left.numerator * right.denominator + right.numerator * left.denominator,
+    left.denominator * right.denominator
   )
 }
 
-const methodA = (...numbers: string[]) => {
-  let input = numbers
+function subtract(left: Rational, right: Rational): Rational {
+  return rational(
+    left.numerator * right.denominator - right.numerator * left.denominator,
+    left.denominator * right.denominator
+  )
+}
 
-  let calc = []
-  let results = []
-  for (let n1 = 0; n1 < 4; n1++) {
-    for (let o1 = 0; o1 < 4; o1++) {
-      for (let n2 = 0; n2 < 4; n2++) {
-        if (n1 === n2) continue
-        for (let o2 = 0; o2 < 4; o2++) {
-          for (let n3 = 0; n3 < 4; n3++) {
-            if (n1 === n3 || n2 === n3) continue
-            for (let o3 = 0; o3 < 4; o3++) {
-              for (let n4 = 0; n4 < 4; n4++) {
-                if (n1 === n4 || n2 === n4 || n3 === n4) continue
-                check2(o1, o2, o3) && calc.push('(')
-                check1(o1, o2) && calc.push('(')
-                calc.push(input[n1])
-                calc.push(op[o1])
-                calc.push(input[n2])
-                check1(o1, o2) && calc.push(')')
-                calc.push(op[o2])
-                calc.push(input[n3])
-                check2(o1, o2, o3) && calc.push(')')
-                calc.push(op[o3])
-                calc.push(input[n4])
-                let eq = calc.join('')
-                try {
-                  let res = eval('(' + eq + ')')
-                  if (res == RightValue) results.push(eq)
-                } catch (e) {
-                  // console.error(e);
-                } finally {
-                  calc = []
-                }
-              }
-            }
-          }
-        }
+function multiply(left: Rational, right: Rational): Rational {
+  return rational(
+    left.numerator * right.numerator,
+    left.denominator * right.denominator
+  )
+}
+
+function divide(left: Rational, right: Rational): Rational {
+  return rational(
+    left.numerator * right.denominator,
+    left.denominator * right.numerator
+  )
+}
+
+function isZero(value: Rational): boolean {
+  return value.numerator === 0n
+}
+
+function combine(left: Term, right: Term): Term[] {
+  const [commutativeLeft, commutativeRight] =
+    left.expression <= right.expression ? [left, right] : [right, left]
+
+  const candidates: Term[] = [
+    {
+      value: add(left.value, right.value),
+      expression: `(${commutativeLeft.expression}+${commutativeRight.expression})`
+    },
+    {
+      value: multiply(left.value, right.value),
+      expression: `(${commutativeLeft.expression}*${commutativeRight.expression})`
+    },
+    {
+      value: subtract(left.value, right.value),
+      expression: `(${left.expression}-${right.expression})`
+    },
+    {
+      value: subtract(right.value, left.value),
+      expression: `(${right.expression}-${left.expression})`
+    }
+  ]
+
+  if (!isZero(right.value)) {
+    candidates.push({
+      value: divide(left.value, right.value),
+      expression: `(${left.expression}/${right.expression})`
+    })
+  }
+
+  if (!isZero(left.value)) {
+    candidates.push({
+      value: divide(right.value, left.value),
+      expression: `(${right.expression}/${left.expression})`
+    })
+  }
+
+  const unique = new Map<string, Term>()
+  for (const candidate of candidates) {
+    unique.set(candidate.expression, candidate)
+  }
+  return [...unique.values()]
+}
+
+function collectSolutions(
+  terms: readonly Term[],
+  solutions: Set<string>
+): void {
+  if (terms.length === 1) {
+    const [{ value, expression }] = terms
+    if (value.numerator === TARGET * value.denominator) {
+      solutions.add(expression)
+    }
+    return
+  }
+
+  for (let leftIndex = 0; leftIndex < terms.length - 1; leftIndex += 1) {
+    for (
+      let rightIndex = leftIndex + 1;
+      rightIndex < terms.length;
+      rightIndex += 1
+    ) {
+      const remaining = terms.filter(
+        (_, index) => index !== leftIndex && index !== rightIndex
+      )
+
+      for (const candidate of combine(terms[leftIndex], terms[rightIndex])) {
+        collectSolutions([...remaining, candidate], solutions)
       }
     }
   }
-
-  return results
 }
 
-// --------
-// method B
-// --------
+/**
+ * Finds every distinct fully-parenthesized expression that evaluates to 24.
+ * Addition and multiplication operands are canonicalized to remove their
+ * mirrored duplicates; subtraction and division keep both operand orders.
+ */
+export function solve24(numbers: readonly number[]): string[] {
+  if (numbers.length !== 4) {
+    throw new RangeError('Exactly four numbers are required')
+  }
 
-const methodB = (...numbers: string[]) => {
-  const results = []
-  for (let formula of formulas) {
-    for (let op1 of ops) {
-      for (let op2 of ops) {
-        for (let op3 of ops) {
-          for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 4; j++) {
-              if (j == i) continue
-              for (let k = 0; k < 4; k++) {
-                if (k == j || k == i) continue
-                for (let l = 0; l < 4; l++) {
-                  if (l == k || l == j || l == i) continue
-
-                  let a = parseInt(numbers[i], 10),
-                    b = parseInt(numbers[j], 10),
-                    c = parseInt(numbers[k], 10),
-                    d = parseInt(numbers[l], 10)
-                  let result = formula(a, b, c, d, op1, op2, op3)
-                  if (result === RightValue) {
-                    if (formula.name === 'formula1')
-                      results.push(
-                        `((${a}${op1.alias}${b})${op2.alias}${c})${op3.alias}${d}`
-                      )
-                    else
-                      results.push(
-                        `(${a}${op1.alias}${b})${op2.alias}(${c}${op3.alias}${d})`
-                      )
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+  for (const number of numbers) {
+    if (!Number.isInteger(number)) {
+      throw new TypeError('Every number must be an integer')
+    }
+    if (number < 1 || number > 13) {
+      throw new RangeError('Every number must be between 1 and 13')
     }
   }
-  return results
+
+  const terms = numbers.map((number) => ({
+    value: rational(BigInt(number)),
+    expression: String(number)
+  }))
+  const solutions = new Set<string>()
+
+  collectSolutions(terms, solutions)
+
+  return [...solutions].sort()
 }
-
-type NumberWithAlias = {
-  op: (a: number, b: number) => number
-  alias: string
-}
-
-const ops: NumberWithAlias[] = [
-  {
-    op: (a, b) => a + b,
-    alias: '+'
-  },
-  {
-    op: (a: number, b: number) => a - b,
-    alias: '-'
-  },
-  {
-    op: (a: number, b: number) => a * b,
-    alias: '*'
-  },
-  {
-    op: (a: number, b: number) => a / b,
-    alias: '/'
-  }
-]
-
-type FormulaType = {
-  (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    op1: NumberWithAlias,
-    op2: NumberWithAlias,
-    op3: NumberWithAlias
-  ): number
-}
-
-const formulas: FormulaType[] = [
-  function formula1(a, b, c, d, op1, op2, op3) {
-    return op3.op(op2.op(op1.op(a, b), c), d)
-  },
-  function formula2(a, b, c, d, op1, op2, op3) {
-    return op2.op(op1.op(a, b), op3.op(c, d))
-  }
-]
-
-const Solver = {
-  methodA,
-  methodB
-}
-
-export default Solver

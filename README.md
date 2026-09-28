@@ -4,7 +4,7 @@
 
 **A small toolbox — math, morse, tarot, emoji, and more.**
 
-*The answer exists only in the Tao.*
+_The answer exists only in the Tao._
 
 [![Astro](https://img.shields.io/badge/Astro-7-BC52EE?logo=astro&logoColor=white)](https://astro.build)
 [![React](https://img.shields.io/badge/React-19-087EA4?logo=react&logoColor=white)](https://react.dev)
@@ -20,17 +20,33 @@
 
 ## Tools
 
-| Route | What it does |
-| --- | --- |
-| [`/`](https://yahaha.net/) | Home — links, projects, and the pixel explorer |
-| [`/24points`](https://yahaha.net/24points) | Solves the 24-points card game for any four numbers |
-| [`/tarot`](https://yahaha.net/tarot) | All 22 Major Arcana, with upright and reversed readings |
-| [`/emoji`](https://yahaha.net/emoji) | Searches Apple's emoji dictionary by name or keyword |
-| [`/emoticon`](https://yahaha.net/emoticon) | Generates kaomoji — click to copy |
-| [`/morse`](https://yahaha.net/morse) | Text ⇄ morse code, click the result to copy |
-| [`/heart/{hans,hant,en,original}`](https://yahaha.net/heart/hans) | Heart Sutra in Simplified, Traditional, English, and Sanskrit |
+| Route                                                             | What it does                                                                |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| [`/`](https://yahaha.net/)                                        | Home — upcoming apps, links, projects, and the pixel explorer               |
+| [`/24points`](https://yahaha.net/24points)                        | Solves the 24-points card game for any four numbers                         |
+| [`/tarot`](https://yahaha.net/tarot)                              | All 22 Major Arcana, with upright and reversed readings                     |
+| [`/emoji`](https://yahaha.net/emoji)                              | Finds and copies Emoji 17.0 with Chinese, English and Apple search keywords |
+| [`/emoticon`](https://yahaha.net/emoticon)                        | Generates kaomoji — click to copy                                           |
+| [`/morse`](https://yahaha.net/morse)                              | Text ⇄ morse code, click the result to copy                                 |
+| [`/heart/{hans,hant,en,original}`](https://yahaha.net/heart/hans) | Heart Sutra in Simplified, Traditional, English, and Sanskrit               |
 
-Everything runs client-side. No API, no database, no tracking.
+Tools run entirely in the browser. There is no API, database or analytics. The homepage loads public favicons and GitHub star badges from Google and shields.io.
+
+The homepage also introduces [Cruft](https://cruft.phpz.org/),
+[WordClip](https://wordclip.phpz.org/) and [LinguaDock](https://linguadock.phpz.org/)
+as upcoming apps. Their descriptions, platforms and website links live in
+`src/data/apps.json`; `AppShowcase.astro` renders them with local app icons and
+no client-side hydration.
+
+Emoji search covers 3,944 fully-qualified Emoji 17.0 sequences with CLDR 48.2
+Simplified Chinese, Traditional Chinese and English annotations, modern macOS
+Apple search terms, and the original input-method aliases. Results are ranked,
+deduplicated and selectable for copying. The catalogue loads as a cached static
+asset rather than a large JavaScript module.
+
+Run `pnpm emoji:update` with Python 3 to rebuild the data; use
+`pnpm emoji:update --refresh-apple` on macOS to refresh the Apple snapshot.
+See [data provenance, update instructions and search behavior](docs/emoji-data.md).
 
 ## Design
 
@@ -49,13 +65,13 @@ a physical pane:
 
 Five tiers cover every surface, picked by content density:
 
-| Class | Use |
-| --- | --- |
-| `.glass` | cards and page panels |
-| `.glass-strong` | sticky chrome |
-| `.glass-solid` | dense text, tooltips |
-| `.chip` | controls **inside** an already-frosted parent — deliberately no blur |
-| `.glass-chip` | controls sitting directly on the page background |
+| Class           | Use                                                                  |
+| --------------- | -------------------------------------------------------------------- |
+| `.glass`        | cards and page panels                                                |
+| `.glass-strong` | sticky chrome                                                        |
+| `.glass-solid`  | dense text, tooltips                                                 |
+| `.chip`         | controls **inside** an already-frosted parent — deliberately no blur |
+| `.glass-chip`   | controls sitting directly on the page background                     |
 
 The palette is shared verbatim with its sibling project
 [chrome-ntp-wallpapers](https://github.com/dofy/chrome-ntp-wallpapers), so tokens
@@ -63,25 +79,38 @@ can be copied between the two.
 
 One thing stays resolutely un-glassy: the **pixel explorer** in the hero and the
 kaomoji sign-off in the footer are holdovers from the site's previous
-*ligne claire + pixel* design, kept as easter eggs with their own colour tokens.
+_ligne claire + pixel_ design, kept as easter eggs with their own colour tokens.
 The mascot is hand-authored original art — a 14×15 dot grid rendered as SVG with
 `shapeRendering="crispEdges"`.
 
 ## Quick start
 
 ```bash
-pnpm install
+# Node 22.22.3 or newer in the Node 22 release line (.nvmrc)
+pnpm install --frozen-lockfile
 pnpm dev        # → http://localhost:4321
 ```
 
-| Script | Does |
-| --- | --- |
-| `pnpm dev` | Dev server with HMR |
-| `pnpm build` | Static production build → `dist/` |
-| `pnpm preview` | Serve the built `dist/` locally |
+| Script         | Does                                                         |
+| -------------- | ------------------------------------------------------------ |
+| `pnpm dev`     | Dev server with HMR                                          |
+| `pnpm build`   | Static production build → `dist/`                            |
+| `pnpm preview` | Serve the built `dist/` locally                              |
+| `pnpm check`   | Type-check Astro, React and TypeScript                       |
+| `pnpm lint`    | ESLint, including Astro and JSX accessibility rules          |
+| `pnpm test`    | Node regression tests, including all 1,820 card combinations |
+| `pnpm verify`  | Lint → type check → tests → build → static-output checks     |
+| `pnpm audit`   | Check installed dependencies for published advisories        |
 
-Output is fully static, so `dist/` can be served from anywhere. There is no test
-suite; `pnpm build` is the gate.
+Output is fully static, so `dist/` can be served from anywhere. `pnpm verify` is
+the local gate. GitHub Actions runs the same checks plus a dependency audit.
+Static-output checks cover all ten pages, language and sharing metadata, internal
+links and assets, sitemap entries, manifest shortcuts, and the static mascot.
+
+The 24-points solver uses exact fractions and all binary expression shapes. Its
+tests compare every unordered input against an independent five-shape oracle and
+validate each returned expression. Morse supports both encoding and decoding;
+letters use spaces, words use `/`, and unsupported input stays visible as `?`.
 
 ## Structure
 
@@ -116,7 +145,9 @@ src/
     └── globals.css          # @theme tokens, glass tiers, motion
 ```
 
-Islands are hydrated individually; everything else ships zero JavaScript.
+Interactive islands are hydrated individually. The pixel mascot is rendered as
+static SVG. Every page includes the shared theme control and small reveal/footer
+scripts; static text and link sections do not hydrate.
 
 ## Implementation notes
 
@@ -139,7 +170,7 @@ mint-deep is exactly inverted. So `bg-accent` + `text-accent-foreground` is for 
 solid fill, and `text-accent-text` is for text and borders on the page background.
 
 **No theme-dependent `var()` inside `color-mix()`.** Lightning CSS emits a static
-fallback for `color-mix()` resolved from `:root`, which bakes the *light* value
+fallback for `color-mix()` resolved from `:root`, which bakes the _light_ value
 into the `.dark` block; browsers with `oklch()` but no `color-mix()` then get a
 light panel in dark mode. Write the alpha directly instead — `oklch(L C H / a)` is
 equivalent to `color-mix(in oklab, X a%, transparent)`.
@@ -147,11 +178,11 @@ equivalent to `color-mix(in oklab, X a%, transparent)`.
 **Fonts are self-hosted.** A bundled `@import` gets inlined, and its `@font-face`
 rules then sit above any later `@import url(...)`, which stops being a leading
 at-rule and is dropped outright — the webfont silently never loads. The body face
-is **Nunito** (rounded terminals), *not* Nunito Sans; they are different families.
+is **Nunito** (rounded terminals), _not_ Nunito Sans; they are different families.
 
 **Scroll reveal is ~20 lines of inline vanilla JS**, not an island — a fade-in
 does not justify hydration. One shared `IntersectionObserver` serves every
-element, and its bottom `rootMargin` is *negative*: a positive margin fires while
+element, and its bottom `rootMargin` is _negative_: a positive margin fires while
 the element is still below the fold, so the animation finishes before anyone sees
 it. All motion is gated behind `prefers-reduced-motion`.
 
