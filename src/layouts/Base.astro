@@ -2,6 +2,7 @@
 import '@/styles/globals.css'
 import keywords from '@/data/keywords.json'
 import Footer from '@/components/Footer.astro'
+import Header from '@/components/Header.astro'
 import Logo from '@/components/Logo.astro'
 import ThemeToggle from '@/components/islands/ThemeToggle'
 import { pageMetadata, canonicalPath } from '@/lib/site'
@@ -13,10 +14,15 @@ interface Props {
 
 const { title, wide = false } = Astro.props
 
-const suffix = 'dofy.net & PHPz.xyz & PHPz.org & yahaha.net'
+const suffix = 'Seven'
 const fullTitle = title ? `${title} - ${suffix}` : suffix
-const containerClass = wide ? 'container-wide' : 'container-page'
 const pathname = Astro.url.pathname.replace(/\/+$/, '') || '/'
+const containerClass =
+  pathname === '/'
+    ? 'container-home'
+    : wide
+      ? 'container-wide'
+      : 'container-page'
 const metadata = pageMetadata[pathname] ?? pageMetadata['/']
 const canonical = new URL(
   canonicalPath(pathname),
@@ -30,7 +36,7 @@ const image = new URL('/logo.png', canonical)
   <head>
     <meta charset='UTF-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-    <title>{fullTitle}</title>
+    <title data-page-title={title ?? ''}>{fullTitle}</title>
     <link rel='icon' href='/favicon.ico' />
     <link rel='apple-touch-icon' href='/logo.png' />
     <link rel='manifest' href='/manifest.json' />
@@ -42,22 +48,22 @@ const image = new URL('/logo.png', canonical)
     <meta property='og:description' content={metadata.description} />
     <meta property='og:image' content={image.href} />
     <meta property='og:title' content={title ?? suffix} />
-    <meta property='og:site_name' content='yahaha' />
+    <meta property='og:site_name' content={suffix} />
     <!--
       Three tags on purpose. The two media-scoped ones key off the OS
       preference, so they are only correct while the toggle is on `auto`; they
       stay as the pre-JS fallback. The unconditional one is rewritten by the
       script below and by ThemeToggle, so it tracks a manual override too.
     -->
-    <meta name='theme-color' content='#fcfaf1' data-theme-color />
+    <meta name='theme-color' content='#fffdfc' data-theme-color />
     <meta
       name='theme-color'
-      content='#fcfaf1'
+      content='#fffdfc'
       media='(prefers-color-scheme: light)'
     />
     <meta
       name='theme-color'
-      content='#191f2b'
+      content='#1b1a18'
       media='(prefers-color-scheme: dark)'
     />
     <meta name='twitter:card' content='summary' />
@@ -86,16 +92,16 @@ const image = new URL('/logo.png', canonical)
         // Keep the unconditional theme-color tag in step with the class, since
         // the media-scoped tags cannot see a manual override.
         const tag = document.querySelector('meta[data-theme-color]')
-        if (tag) tag.setAttribute('content', dark ? '#191f2b' : '#fcfaf1')
+        if (tag) tag.setAttribute('content', dark ? '#1b1a18' : '#fffdfc')
       })()
     </script>
   </head>
   <body>
-    <div class='fixed right-4 top-4 z-50'>
+    <Header>
       <ThemeToggle client:load />
-    </div>
+    </Header>
     <div class={containerClass}>
-      <main class='animate-fade-in'>
+      <main id='main' tabindex='-1' class='animate-fade-in'>
         {pathname !== '/' && (
           <nav aria-label='Main navigation' class='mb-6'>
             <a href='/' class='link text-sm'>
@@ -106,39 +112,28 @@ const image = new URL('/logo.png', canonical)
         <slot />
         <Logo />
       </main>
-      <Footer />
     </div>
+    <Footer />
+    <script>
+      import { siteIdentity } from '@/lib/identity'
 
-    <!--
-      Scroll reveal for [data-reveal]. Vanilla + inline rather than a React
-      island: the rest of this page is zero-JS static Astro and a fade-in does
-      not justify hydration.
-
-      One shared observer, not one per element. The bottom margin is NEGATIVE
-      on purpose — a positive margin fires while the element is still below the
-      fold, so the fade finishes before it scrolls into view and the motion is
-      never actually seen.
-    -->
-    <script is:inline>
-      ;(() => {
-        const nodes = document.querySelectorAll('[data-reveal]')
-        if (!nodes.length) return
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          nodes.forEach((node) => node.classList.add('reveal-in'))
-          return
-        }
-        if (!('IntersectionObserver' in window)) return
-        nodes.forEach((node) => node.classList.add('reveal'))
-        const observer = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) {
-              entry.target.classList.toggle('reveal-in', entry.isIntersecting)
-            }
-          },
-          { rootMargin: '0px 0px -12% 0px', threshold: 0 }
-        )
-        nodes.forEach((node) => observer.observe(node))
-      })()
+      const { name, domain } = siteIdentity(window.location.hostname)
+      document
+        .querySelectorAll<HTMLAnchorElement>('[data-site-brand]')
+        .forEach((brand) => {
+          const label = brand.querySelector('[data-site-name]')
+          if (label) label.textContent = name
+          brand.setAttribute('aria-label', `${name} home`)
+        })
+      document
+        .querySelectorAll<HTMLAnchorElement>('[data-domain]')
+        .forEach((link) => {
+          if (link.dataset.domain === domain) {
+            link.setAttribute('aria-current', 'page')
+          }
+        })
+      const pageTitle = document.querySelector('title')?.dataset.pageTitle
+      document.title = pageTitle ? `${pageTitle} - ${name}` : name
     </script>
   </body>
 </html>

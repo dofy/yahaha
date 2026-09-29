@@ -14,10 +14,9 @@ const data = heart[lang as string]
 ---
 
 <Base title={data?.title}>
-  <header class="animate-fade-in-up">
-    <h1 class="page-title">{data?.title}</h1>
+  <header>
+    <h1 class='page-title'>{data?.title}</h1>
   </header>
 
-  <pre
-    class="mt-8 whitespace-pre-wrap font-sans text-base leading-loose text-foreground">{data?.lines.join('\n')}</pre>
+  <pre class='mt-8 whitespace-pre-wrap font-sans text-base leading-loose text-foreground'>{data?.lines.join('\n')}</pre>
 </Base>

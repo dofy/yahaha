@@ -25,7 +25,7 @@ export default function EmoticonKit() {
         aria-label='Copy emoticon'
         disabled={!emoticon}
         title='Click to copy'
-        className='glass rounded-soft tx flex min-h-16 w-full cursor-pointer items-center justify-center px-4 py-5 font-mono text-2xl select-all hover:border-accent focus-visible:outline-2 focus-visible:outline-ring'
+        className='panel rounded-soft tx flex min-h-16 w-full cursor-pointer items-center justify-center px-4 py-5 font-mono text-2xl select-all hover:border-accent focus-visible:outline-2 focus-visible:outline-ring'
       >
         {emoticon || '…'}
       </button>

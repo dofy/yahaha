@@ -2,50 +2,92 @@
 import Base from '@/layouts/Base.astro'
 import LinkBlock from '@/components/LinkBlock.astro'
 import AppShowcase from '@/components/AppShowcase.astro'
-import Mascot from '@/components/islands/Mascot'
 import allLinks from '@/data/links.json'
 import { version } from '../../package.json'
 import type { Links } from '@/types'
 
 const links = allLinks as Links
+const tools = links.find(({ cat }) => cat.name === 'tool')!
+const projects = links.find(({ cat }) => cat.name === 'github')!
 ---
 
 <Base>
-  <header class='animate-fade-in-up'>
-    <!-- Glass hero. The pixel explorer stays pixel — it is the one sanctioned
-         holdover from the old ligne-claire look. -->
-    <div class='glass rounded-blob relative px-5 py-8 sm:px-8 sm:py-10'>
-      <!-- Solid accent fill, not a chip: mint text on a light translucent chip
-           is too faint to read in either theme. -->
-      <span class='section-label bg-accent text-accent-foreground absolute -top-3 left-6 rounded-full px-3 py-1 shadow-sm'>
-        yahaha
-      </span>
-
-      <div class='flex items-start gap-4 sm:gap-6'>
-        <div class='min-w-0 flex-1'>
-          <h1 class='page-title text-balance'>
-            The answer exists only in the Tao.
-          </h1>
-          <p class='page-subtitle'>
-            A small toolbox &mdash; math, morse, tarot, emoji, and more.
-          </p>
-          <a
-            href='https://github.com/dofy/yahaha/releases'
-            class='tx bg-accent-2 text-accent-2-foreground mt-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold shadow-sm hover:scale-105 hover:shadow-md'
-          >
-            <span class='size-1.5 rounded-full bg-current opacity-70'></span>v
-            {version}
-          </a>
-        </div>
-
-        <Mascot size={112} className='hidden shrink-0 sm:block' />
+  <section class='home-hero' aria-labelledby='hero-heading'>
+    <div class='hero-copy'>
+      <p class='product-note'>Small apps. Everyday tools.</p>
+      <h1 id='hero-heading'>The answer exists only in the Tao.</h1>
+      <p class='hero-description'>
+        A few things I make, and a few things I find useful. Apps for your daily
+        routine. A toolbox for everything in between.
+      </p>
+      <div class='hero-actions'>
+        <a href='#apps' class='site-button site-button-primary'>
+          Explore the apps
+        </a>
+        <a href='#tools' class='site-button site-button-secondary'>
+          Open the toolbox
+        </a>
       </div>
+      <a href='https://github.com/dofy/yahaha/releases' class='hero-version'>
+        v{version}
+      </a>
     </div>
-  </header>
-
+    <div class='hero-demo'>
+      <a
+        href='/24points'
+        class='demo-window points-preview'
+        aria-label='Open 24 Points'
+      >
+        <div class='mock-toolbar'>
+          <span class='traffic-lights' aria-hidden='true'>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+          <span>24 Points</span>
+          <span aria-hidden='true'>＋</span>
+        </div>
+        <p class='preview-intro'>Four numbers. One answer.</p>
+        <div class='number-hand' aria-hidden='true'>
+          <span>3</span>
+          <span>3</span>
+          <span>8</span>
+          <span>8</span>
+        </div>
+        <p class='preview-answer'>
+          8 ÷ (3 − 8 ÷ 3) = <strong>24</strong>
+        </p>
+        <div class='preview-footer'>
+          <span>A little puzzle for your day.</span>
+          <span class='preview-action'>Try it</span>
+        </div>
+      </a>
+      <a
+        href='/emoji'
+        class='demo-window emoji-preview'
+        aria-label='Open Apple Emoji Dictionary'
+      >
+        <div class='emoji-preview-heading'>
+          <span>Apple Emoji Dictionary</span>
+          <span class='platform-label'>简 / 繁 / EN</span>
+        </div>
+        <p class='emoji-preview-query'>
+          <span aria-hidden='true'>⌕</span> Find the right feeling.
+        </p>
+        <div class='emoji-preview-results' aria-hidden='true'>
+          🫡 🩷 🫩 🐦‍🔥
+        </div>
+      </a>
+    </div>
+  </section>
   <AppShowcase />
-
-  {links.map((link) => (
-    <LinkBlock cat={link.cat} links={link.links} />
-  ))}
+  <LinkBlock cat={tools.cat} links={tools.links} />
+  <LinkBlock cat={projects.cat} links={projects.links} />
+  <div class='personal-links'>
+    {links
+      .filter(({ cat }) => ['social', 'heart'].includes(cat.name))
+      .map((link) => (
+        <LinkBlock cat={link.cat} links={link.links} />
+      ))}
+  </div>
 </Base>

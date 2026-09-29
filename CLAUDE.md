@@ -33,7 +33,7 @@ Each page in `src/pages/` is a self-contained route with its own data + UI.
 ```
 src/
 ├── pages/          # Astro routes — each .astro file is a page
-│   ├── index.astro       # Homepage: hero + LinkBlock sections
+│   ├── index.astro       # Homepage: hero + app showcase + toolbox + LinkBlock sections
 │   ├── 24points.astro    # 24-points solver
 │   ├── emoji.astro       # Emoji search (EmojiSearch island)
 │   ├── emoticon.astro    # Emoticon generator
@@ -41,11 +41,13 @@ src/
 │   ├── tarot.astro       # Tarot (TarotBrowser island)
 │   └── heart/[lang].astro# Heart Sutra, dynamic lang param
 ├── layouts/
-│   └── Base.astro        # Universal wrapper: <head> meta, theme FOUC guard, ThemeToggle, Footer, Logo
+│   └── Base.astro        # Universal wrapper: <head> meta, theme FOUC guard, Header, ThemeToggle, Footer
 ├── components/
-│   ├── LinkBlock.astro   # Homepage link sections (glass panel + section-label)
+│   ├── LinkBlock.astro   # Homepage toolbox, projects and personal links
+│   ├── Header.astro      # Shared navigation and theme control slot
+│   ├── SiteBrand.astro   # Original favicon + current domain label
 │   ├── Footer.astro      # domains.json nav + copyright
-│   ├── Logo.astro        # kaomoji sign-off
+│   ├── Logo.astro        # original kaomoji image above the footer
 │   ├── islands/          # React islands (client:* hydration)
 │   │   ├── ThemeToggle.tsx   # 3-state light→dark→auto cycle + theme-color meta
 │   │   └── Mascot.tsx        # Original pixel explorer (grid SVG) — pixel easter egg
@@ -53,87 +55,48 @@ src/
 ├── data/           # Static JSON: links, domains, keywords, heart, morse, tarot, emoji/
 ├── lib/            # Pure logic (solvers, generators)
 └── styles/
-    └── globals.css # @theme tokens + glass tiers + motion (liquid-glass palette)
+    └── globals.css # @theme tokens + shared app-site layout + motion
 ```
 
 ## Architecture Notes
 
 - **`src/lib/site.ts`** defines page descriptions and language tags and drives
   canonical URLs and `sitemap.xml`. Keep it aligned with all page routes.
-- **`Base.astro`** is the universal page wrapper — `<head>` meta tags, anti-FOUC
-  theme script (reads `localStorage.theme`, applies `.dark` before paint), fixed
-  `ThemeToggle` island, `Footer`, `Logo`, and the scroll-reveal script. Pass
-  `title` and `wide` props.
-- **Path alias `@/`** maps to `./src/*` (configured in `tsconfig.json`).
-- **Visual style is _liquid glass_** — translucent frosted panels over an ambient
-  CSS gradient mesh. Palette is shared **verbatim** with the sibling project
-  `seven/ntp-gallery` (both on tailwindcss 4.3.x) so tokens can be copied between
-  them. Mint is the accent, peach the secondary; panel radii are `rounded-blob`
-  (1.75rem) and `rounded-soft` (1.25rem); one easing everywhere,
-  `cubic-bezier(0.22, 1, 0.36, 1)` (`--ease-soft`).
-  **This diverged from `seven/sync-text`**, which is still the old
-  ligne-claire/pixel design on Tailwind 3.
+- **`src/lib/identity.ts`** resolves the current hostname against `domains.json`.
+  Base applies the domain name to both SiteBrand instances and the browser title;
+  static share metadata and the manifest identify Seven's personal website.
+- **`Base.astro`** wraps every route with metadata, the theme FOUC guard,
+  `Header` (with `ThemeToggle`), the original `Logo` image and `Footer`. Pass `title` and `wide` props.
+  The homepage uses a 1180px container; tool pages use narrower working areas.
+- **Path alias `@/`** maps to `./src/*` in `tsconfig.json`.
+- **Visual style matches the app websites** in `../Cruft/website/styles.css`,
+  `../wordclip/website/styles.css` and `../LinguaDock/website/styles.css`:
+  `#fffdfc` paper, `#171614` ink, `#ff6554` coral, `#eaf1f4` blue wash,
+  rounded system fonts, subtle horizontal rules and generous spacing.
+- **Surfaces are solid.** `.panel`, `.panel-strong`, `.panel-solid` and `.chip`
+  share theme-aware backgrounds and fine borders. Shadows are reserved for
+  the homepage tool previews. Use rounded rectangular controls.
 
-### Glass tiers
+### Tokens and typography
 
-Pick by content density. All five are defined **unlayered** (not inside
-`@layer components`) so no stray `bg-*` utility can clobber a panel's tint.
-
-| class           | use                                                     |
-| --------------- | ------------------------------------------------------- |
-| `.glass`        | cards, page panels                                      |
-| `.glass-strong` | sticky chrome                                           |
-| `.glass-solid`  | dense text, tooltips                                    |
-| `.chip`         | controls **inside** an already-frosted parent — no blur |
-| `.glass-chip`   | controls sitting directly on the page background        |
-
-`.chip` has no `backdrop-filter` **on purpose**: nesting one inside another makes
-the parent a new backdrop root and Chrome paints the child's blur as a hard-edged
-rectangle. Never nest `.glass*` inside `.glass*`.
-
-### Token gotchas
-
-- **Semantic aliases resolve through `var()`**, so `.dark` overrides only the
-  primitives (`--color-paper`, `--color-ink`, …) — never re-declare the semantic
-  layer per theme.
-- **`accent` vs `accent-text`.** mint and mint-deep swap which one is legible as
-  text between themes (mint scores 2.77 on light paper but 5.69 on dark;
-  mint-deep is exactly inverted). Use `bg-accent` + `text-accent-foreground` for
-  a solid fill, and `text-accent-text` for text/borders on the page background.
-  Never hardcode `text-mint-deep`.
-- **Never put a theme-dependent `var()` inside `color-mix()`.** Lightning CSS
-  emits a static fallback for `color-mix()` resolved from `:root`, which bakes the
-  _light_ value into the `.dark` block — browsers with oklch but no `color-mix()`
-  (Safari 15.4–16.1) then get a light panel in dark mode. Write the alpha
-  directly instead: `oklch(L C H / a)`, which is equivalent to
-  `color-mix(in oklab, X a%, transparent)`.
-- **Fonts are self-hosted via `@fontsource`,** not Google Fonts. A bundled
-  `@import` gets inlined, and its `@font-face` rules then sit above any later
-  `@import url(...)` — which stops being a leading at-rule and is dropped
-  outright, so the webfont silently never loads. Body face is **Nunito** (the
-  rounded-terminal family), _not_ Nunito Sans — they are two different families.
-- **Pixel holdovers** are deliberate and limited to `Mascot.tsx` and `Logo.astro`,
-  with their own `--color-pixel-*` tokens. `Mascot`'s `PALETTE` must use bare
-  `var(--color-x)` — the old `hsl(var(--x))` form is invalid now that tokens hold
-  full `oklch()` colours, and it fails silently.
+- Semantic aliases resolve through `var()`. Override primitives in `.dark`.
+- Use `bg-accent` + `text-accent-foreground` for fills and `text-accent-text`
+  for text. Coral fills use dark ink; light-theme coral text uses a deeper
+  accessible tone. Never assume white text is legible on the coral fill.
+- The sans-serif stack matches the app websites; monospace output uses
+  self-hosted JetBrains Mono. No remote font imports.
+- `ThemeToggle`, the Base FOUC script, the theme-color metadata and the manifest
+  must stay aligned with the light/dark paper colors.
+- The original `Mascot.tsx` is available but no longer appears in the homepage
+  hero. Preserve its dedicated `--color-pixel-*` tokens and static rendering.
 
 ### Motion
 
-- Scroll reveal is a ~20-line `is:inline` vanilla `IntersectionObserver` in
-  `Base.astro`, not an island — the rest of the site is zero-JS static Astro. Add
-  `data-reveal` to opt an element in. **One shared observer**, and the bottom
-  `rootMargin` is _negative_ (`0px 0px -12% 0px`): a positive margin fires while
-  the element is still below the fold, so the fade finishes before it is visible.
-- Without JS, no `.reveal` class is added, so elements stay visible — the script
-  adds both `.reveal` and later `.reveal-in`. Print and `forced-colors` get an
-  explicit opacity-1 override, since neither ever scrolls.
-- Everything is gated behind `prefers-reduced-motion: reduce`.
-- User theme changes use a 750 ms Polygon reveal through the native View
-  Transition API. Keep the light/dark/auto cycle and storage handling in
-  `ThemeToggle`; the upstream animation hook would overwrite auto mode.
-  Snapshot CSS is scoped to `data-theme-transition` and uses SVG masks, with
-  immediate switching for reduced motion and unsupported browsers. The adapted
-  animation's MIT notice ships in `public/theme-animation-license.txt`.
+- All sections remain visible without JavaScript; there is no scroll observer.
+- The page entrance and interactive transitions respect reduced motion.
+- Theme changes retain the 750ms native View Transition polygon reveal and
+  the light/dark/auto cycle. Keep storage handling and cross-tab sync intact.
+  The animation's MIT notice remains in `public/theme-animation-license.txt`.
 
 ### Data & islands
 
@@ -156,7 +119,7 @@ rectangle. Never nest `.glass*` inside `.glass*`.
   rebuilds data with `pnpm emoji:update`; `--refresh-apple` reads CoreEmoji only
   on macOS. Keep raw Apple weights and provenance in the checked-in snapshot.
   See `docs/emoji-data.md`. `pnpm test` also runs Python trie fixture tests.
-- **`LinkBlock`** renders homepage link sections. Each has a `cat` (category with
+- **`LinkBlock`** renders the toolbox, projects and personal links. Each has a `cat` (category with
   `name`) and a `links` array typed `NormalLink | SocialLink | GitHubLink` — see
   `src/types`. `links.json` drives the homepage structure. Its shields.io badge
   colours are literal hex (a remote image cannot read CSS tokens).

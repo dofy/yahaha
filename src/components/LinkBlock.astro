@@ -5,95 +5,150 @@ interface Props {
   cat: LinkCategory
   links: (NormalLink | SocialLink | GitHubLink)[]
 }
-
 const { cat, links } = Astro.props
-
-const catLabels: Record<string, string> = {
-  social: 'social',
-  heart: 'dharma',
-  github: 'projects',
-  tool: 'tools',
+const sections: Record<
+  string,
+  { id: string; title: string; description: string }
+> = {
+  tool: {
+    id: 'tools',
+    title: 'A small toolbox.',
+    description: 'For a quick answer, a curious moment, or just a little fun.'
+  },
+  github: {
+    id: 'projects',
+    title: 'Out in the open.',
+    description: 'Configs, experiments, and things you can make your own.'
+  },
+  social: {
+    id: 'social',
+    title: 'Around the web.',
+    description: 'Find me elsewhere.'
+  },
+  heart: {
+    id: 'dharma',
+    title: 'A moment of quiet.',
+    description: 'The Heart Sutra, in four languages.'
+  }
 }
-// Adventure-prop icon per section — ligne-claire decoration, not real chars.
-const catIcons: Record<string, string> = {
-  social: '🧭', // compass
-  heart: '🕯️', // candle
-  github: '🗺️', // map
-  tool: '🔍', // magnifier
+const section = sections[cat.name] ?? {
+  id: cat.name,
+  title: cat.name,
+  description: ''
 }
-const label = catLabels[cat.name] ?? cat.name
-const icon = catIcons[cat.name] ?? '✦'
-
-// shields.io renders remotely, so these have to be literal hex — they cannot
-// read the CSS tokens. Tuned to mint-deep / ink.
-const badgeColor = '2f7d78'
-const badgeLabelColor = '2b3243'
+const toolDescriptions: Record<string, string> = {
+  '/24points': 'Four numbers. Find a way to 24.',
+  '/tarot': 'Explore the 22 major arcana.',
+  '/emoji': 'Find an emoji in your own words.',
+  '/emoticon': 'A little expression, ready to copy.',
+  '/morse': 'Turn words into dots and dashes.',
+  'https://sync-text.phpz.org/': 'Send a snippet between devices.'
+}
 ---
 
-<section class="glass rounded-blob mt-10 px-5 py-5 sm:px-6 sm:py-6" data-reveal>
-  <h2 class="section-label mb-4 flex items-center gap-2">
-    <span aria-hidden="true" class="text-base">{icon}</span>
-    {label}
-  </h2>
-
-  {
-    cat.name === 'github' ? (
-      <ul class="grid gap-x-8 gap-y-3 text-[15px] sm:grid-cols-2">
-        {(links as GitHubLink[]).map((g) => (
-          <li class="flex items-center justify-between gap-3">
-            <a
-              href={`https://github.com/dofy/${g.url}`}
-              class="group link truncate"
+<section
+  id={section.id}
+  class:list={[
+    'home-section',
+    { 'compact-section': ['social', 'heart'].includes(cat.name) }
+  ]}
+  aria-labelledby={`${section.id}-heading`}
+>
+  <div class='section-heading'>
+    <div>
+      <h2 id={`${section.id}-heading`}>{section.title}</h2>
+      <p>{section.description}</p>
+    </div>
+  </div>
+  {cat.name === 'github' ? (
+    <ul class='project-grid'>
+      {(links as GitHubLink[]).map((g) => (
+        <li>
+          <a href={`https://github.com/dofy/${g.url}`} class='project-link'>
+            <span>{g.name}</span>
+            <svg
+              width='16'
+              height='16'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='1.7'
+              aria-hidden='true'
             >
-              <span class="link-label">{g.name}</span>
-            </a>
-            <img
-              width={g.width}
-              height={20}
-              alt={`${g.name} stars`}
-              loading="lazy"
-              class="shrink-0 opacity-90"
-              src={`https://img.shields.io/github/stars/dofy/${g.url}?style=flat&color=${badgeColor}&labelColor=${badgeLabelColor}`}
-            />
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <ul class="flex flex-wrap gap-x-5 gap-y-2 text-[15px]">
-        {links.map((link) => {
-          if (cat.name === 'social') {
-            const s = link as SocialLink
-            const host = new URL(s.url).hostname
-            return (
-              <li>
-                <a
-                  href={`${s.url}${s.userId}`}
-                  class="group link inline-flex items-center gap-1.5"
-                >
-                  <img
-                    width={16}
-                    height={16}
-                    alt=""
-                    loading="lazy"
-                    class="size-4"
-                    src={`https://www.google.com/s2/favicons?domain=${host}&sz=64`}
-                  />
-                  <span class="link-label">{s.name}</span>
-                </a>
-              </li>
-            )
-          }
-          const n = link as NormalLink
+              <path d='M7 17 17 7M7 7h10v10' />
+            </svg>
+          </a>
+          <img
+            width={g.width}
+            height={20}
+            alt={`${g.name} stars`}
+            loading='lazy'
+            src={`https://img.shields.io/github/stars/dofy/${g.url}?style=flat&color=eaf1f4&labelColor=52717a`}
+          />
+        </li>
+      ))}
+    </ul>
+  ) : cat.name === 'tool' ? (
+    <ul class='tool-grid'>
+      {(links as NormalLink[]).map((link) => (
+        <li>
+          <a href={link.url} class='tool-item'>
+            <span class='tool-icon' aria-hidden='true'>
+              {link.icon}
+            </span>
+            <div>
+              <h3>{link.name}</h3>
+              <p>{toolDescriptions[link.url]}</p>
+            </div>
+            <svg
+              width='18'
+              height='18'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='1.7'
+              aria-hidden='true'
+            >
+              <path d='m9 5 7 7-7 7' />
+            </svg>
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <ul class='text-links'>
+      {links.map((link) => {
+        if (cat.name === 'social') {
+          const s = link as SocialLink
           return (
             <li>
-              <a href={n.url} class="group link inline-flex items-center gap-1.5">
-                {n.icon && <span aria-hidden="true">{n.icon}</span>}
-                <span class="link-label">{n.name}</span>
+              <a
+                href={`${s.url}${s.userId}`}
+                class='link link-label social-link'
+              >
+                <img
+                  src={s.favicon}
+                  width='16'
+                  height='16'
+                  alt=''
+                  aria-hidden='true'
+                  loading='lazy'
+                  decoding='async'
+                />
+                <span>{s.name}</span>
               </a>
             </li>
           )
-        })}
-      </ul>
-    )
-  }
+        }
+        const n = link as NormalLink
+        return (
+          <li>
+            <a href={n.url} class='link link-label'>
+              {n.name}
+            </a>
+          </li>
+        )
+      })}
+    </ul>
+  )}
 </section>

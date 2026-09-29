@@ -22,7 +22,7 @@ _The answer exists only in the Tao._
 
 | Route                                                             | What it does                                                                |
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [`/`](https://yahaha.net/)                                        | Home — upcoming apps, links, projects, and the pixel explorer               |
+| [`/`](https://yahaha.net/)                                        | Home — upcoming apps, browser tools, projects and personal links           |
 | [`/24points`](https://yahaha.net/24points)                        | Solves the 24-points card game for any four numbers                         |
 | [`/tarot`](https://yahaha.net/tarot)                              | All 22 Major Arcana, with upright and reversed readings                     |
 | [`/emoji`](https://yahaha.net/emoji)                              | Finds and copies Emoji 17.0 with Chinese, English and Apple search keywords |
@@ -30,7 +30,7 @@ _The answer exists only in the Tao._
 | [`/morse`](https://yahaha.net/morse)                              | Text ⇄ morse code, click the result to copy                                 |
 | [`/heart/{hans,hant,en,original}`](https://yahaha.net/heart/hans) | Heart Sutra in Simplified, Traditional, English, and Sanskrit               |
 
-Tools run entirely in the browser. There is no API, database or analytics. The homepage loads public favicons and GitHub star badges from Google and shields.io.
+Tools run entirely in the browser. There is no API, database or analytics. The homepage loads public GitHub star badges from shields.io.
 
 The homepage also introduces [Cruft](https://cruft.phpz.org/),
 [WordClip](https://wordclip.phpz.org/) and [LinguaDock](https://linguadock.phpz.org/)
@@ -50,38 +50,25 @@ See [data provenance, update instructions and search behavior](docs/emoji-data.m
 
 ## Design
 
-The visual language is **liquid glass** — translucent frosted panels floating over
-an ambient CSS gradient mesh, in a mint-and-peach palette. Light and dark are both
-first-class, on a three-state toggle (light → dark → auto).
+The site shares its visual language with the Cruft, WordClip and LinguaDock
+websites: paper white (`#fffdfc`), coral (`#ff6554`), rounded system fonts,
+faint horizontal rules and generous spacing within a 1180px layout.
 
-The glass is not simple transparency. Three effects stack to make a panel read as
-a physical pane:
+The homepage introduces the apps, browser toolbox and open-source projects.
+Its overlapping tool previews link to the real tools. Shared navigation and
+footer appear on every page; the tool pages use solid working surfaces,
+rounded rectangular controls and the same semantic colors.
 
-1. a **vertical tint gradient**, brighter at the top edge, giving the pane a lit
-   side and a shaded side;
-2. **`saturate()`** inside the backdrop filter, so colour bleeding through looks
-   refracted rather than merely washed out;
-3. **inset highlights** top and bottom — the specular rim of a real bevel.
+Light, dark and system themes remain available. Coral text uses a deeper tone
+in light mode for readable contrast; filled coral buttons use dark text.
+The original favicon marks the header and footer; the original kaomoji image
+remains centered above the footer on every page. The original pixel mascot is still
+available as a standalone static SVG component.
 
-Five tiers cover every surface, picked by content density:
-
-| Class           | Use                                                                  |
-| --------------- | -------------------------------------------------------------------- |
-| `.glass`        | cards and page panels                                                |
-| `.glass-strong` | sticky chrome                                                        |
-| `.glass-solid`  | dense text, tooltips                                                 |
-| `.chip`         | controls **inside** an already-frosted parent — deliberately no blur |
-| `.glass-chip`   | controls sitting directly on the page background                     |
-
-The palette is shared verbatim with its sibling project
-[chrome-ntp-wallpapers](https://github.com/dofy/chrome-ntp-wallpapers), so tokens
-can be copied between the two.
-
-One thing stays resolutely un-glassy: the **pixel explorer** in the hero and the
-kaomoji sign-off in the footer are holdovers from the site's previous
-_ligne claire + pixel_ design, kept as easter eggs with their own colour tokens.
-The mascot is hand-authored original art — a 14×15 dot grid rendered as SVG with
-`shapeRendering="crispEdges"`.
+This is Seven's personal website. The name beside the favicon and the browser
+title follow the current domain, using the configured names for dofy.net,
+PHPz.xyz, PHPz.org and yahaha.net. Social favicons are stored locally in
+`public/social/`; the kaomoji sign-off uses a transparent copy of the original.
 
 ## Quick start
 
@@ -125,11 +112,11 @@ src/
 │   ├── tarot.astro
 │   └── heart/[lang].astro  # dynamic lang param
 ├── layouts/
-│   └── Base.astro           # <head> meta, anti-FOUC theme guard, reveal script
+│   └── Base.astro           # <head> meta, anti-FOUC theme guard, shared header/footer
 ├── components/
 │   ├── LinkBlock.astro      # homepage link sections
 │   ├── Footer.astro
-│   ├── Logo.astro           # kaomoji sign-off
+│   ├── Logo.astro           # original kaomoji image above the footer
 │   ├── islands/             # React, hydrated with client:*
 │   │   ├── ThemeToggle.tsx
 │   │   ├── Mascot.tsx       # pixel explorer (SVG dot grid)
@@ -142,49 +129,35 @@ src/
 ├── data/                    # static JSON — links, heart, morse, tarot, emoji
 ├── lib/                     # pure logic (solvers, generators)
 └── styles/
-    └── globals.css          # @theme tokens, glass tiers, motion
+    └── globals.css          # shared app-site tokens, layout, motion
 ```
 
-Interactive islands are hydrated individually. The pixel mascot is rendered as
-static SVG. Every page includes the shared theme control and small reveal/footer
-scripts; static text and link sections do not hydrate.
+Interactive islands are hydrated individually. Every page includes the shared
+header, theme control and footer; static text and link sections do not hydrate.
 
 ## Implementation notes
 
 A few decisions that are easy to get wrong and worth knowing before editing:
 
-**Never nest `.glass*` inside `.glass*`.** A nested `backdrop-filter` makes the
-parent a new backdrop root, and Chrome then paints the child's blur as a
-hard-edged rectangle. That is why `.chip` has no blur — a plain translucent fill
-reads identically inside a frosted parent and costs one fewer compositing layer.
+**Keep the app-site palette aligned.** The base colors and typography come from
+`../LinguaDock/website/styles.css`, `../Cruft/website/styles.css` and
+`../wordclip/website/styles.css`. Site-specific dark colors live in `.dark`;
+semantic aliases resolve through `var()` in both themes.
 
-**Dark glass is not light glass at lower opacity.** A white tint over a dark
-ground reads as fog. Two things change in kind: the tint takes a low-alpha light
-blue-grey so the pane keeps a hue, and the bottom inset flips from a dimmed white
-highlight to an actual black recess, which is what carries depth against a dark
-backdrop.
+**Use the right accent.** `bg-accent` plus `text-accent-foreground` is for a
+filled control; `text-accent-text` is for links and text. The deeper light-mode
+text accent improves contrast without changing the shared coral fill.
 
-**Two accents, not one.** `mint` and `mint-deep` swap which one is legible as text
-between themes — mint scores 2.77 against light paper but 5.69 against dark, and
-mint-deep is exactly inverted. So `bg-accent` + `text-accent-foreground` is for a
-solid fill, and `text-accent-text` is for text and borders on the page background.
+**Keep working surfaces solid.** `.panel`, `.panel-solid` and `.chip` use the
+same theme-aware backing and a fine border. Depth is reserved for the homepage
+tool previews; ordinary sections use whitespace and dividers.
 
-**No theme-dependent `var()` inside `color-mix()`.** Lightning CSS emits a static
-fallback for `color-mix()` resolved from `:root`, which bakes the _light_ value
-into the `.dark` block; browsers with `oklch()` but no `color-mix()` then get a
-light panel in dark mode. Write the alpha directly instead — `oklch(L C H / a)` is
-equivalent to `color-mix(in oklab, X a%, transparent)`.
+**Fonts follow the app websites.** Body text uses the rounded system stack;
+JetBrains Mono remains self-hosted for tool output. No font is fetched from a
+third-party host.
 
-**Fonts are self-hosted.** A bundled `@import` gets inlined, and its `@font-face`
-rules then sit above any later `@import url(...)`, which stops being a leading
-at-rule and is dropped outright — the webfont silently never loads. The body face
-is **Nunito** (rounded terminals), _not_ Nunito Sans; they are different families.
-
-**Scroll reveal is ~20 lines of inline vanilla JS**, not an island — a fade-in
-does not justify hydration. One shared `IntersectionObserver` serves every
-element, and its bottom `rootMargin` is _negative_: a positive margin fires while
-the element is still below the fold, so the animation finishes before anyone sees
-it. All motion is gated behind `prefers-reduced-motion`.
+**Keep content visible.** Sections do not depend on scroll-reveal JavaScript.
+The page entrance and native theme-transition animation respect reduced motion.
 
 Longer architecture notes live in [`CLAUDE.md`](./CLAUDE.md).
 

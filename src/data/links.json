@@ -10,31 +10,36 @@
         "userId": "dofy",
         "userName": "Seven",
         "name": "plurk",
-        "url": "https://plurk.com/"
+        "url": "https://plurk.com/",
+        "favicon": "/social/plurk.png"
       },
       {
         "userId": "people/dofy",
         "userName": "Seven",
         "name": "douban",
-        "url": "https://douban.com/"
+        "url": "https://douban.com/",
+        "favicon": "/social/douban.ico"
       },
       {
         "userId": "dofy",
         "userName": "Seven",
         "name": "GitHub",
-        "url": "https://github.com/"
+        "url": "https://github.com/",
+        "favicon": "/social/github.png"
       },
       {
         "userId": "dofy",
         "userName": "Seven",
         "name": "Twitter",
-        "url": "https://twitter.com/"
+        "url": "https://twitter.com/",
+        "favicon": "/social/twitter.ico"
       },
       {
         "userId": "dofyyu",
         "userName": "Seven",
         "name": "Instagram",
-        "url": "https://instagram.com/"
+        "url": "https://instagram.com/",
+        "favicon": "/social/instagram.webp"
       }
     ]
   },

@@ -133,7 +133,7 @@ export default function TarotBrowser() {
 
       {/* Sticky panel on desktop */}
       <aside className='hidden lg:block'>
-        <div className='glass rounded-soft sticky top-8 p-6'>
+        <div className='panel rounded-soft sticky top-8 p-6'>
           {selected ? (
             <Detail key={selected.index} tarot={selected} />
           ) : (

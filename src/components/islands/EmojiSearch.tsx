@@ -21,7 +21,7 @@ function EmojiCandidate({ entry, matchedTerm }: EmojiMatch) {
         type='button'
         onClick={doCopy}
         aria-label={`Copy ${entry.emoji} ${entry.name}`}
-        className='tx flex min-h-20 w-full cursor-pointer items-center gap-3 rounded-xl p-3 text-left hover:bg-mint-wash focus-visible:outline-2 focus-visible:outline-ring'
+        className='tx flex min-h-20 w-full cursor-pointer items-center gap-3 rounded-xl p-3 text-left hover:bg-coral-wash focus-visible:outline-2 focus-visible:outline-ring'
       >
         <span aria-hidden='true' className='w-12 shrink-0 text-center text-3xl'>
           {entry.emoji}
@@ -203,7 +203,7 @@ export default function EmojiSearch() {
         <>
           <ul
             aria-label='Search results'
-            className='glass mt-3 grid grid-cols-1 gap-1 rounded-soft p-2 sm:grid-cols-2'
+            className='panel mt-3 grid grid-cols-1 gap-1 rounded-soft p-2 sm:grid-cols-2'
           >
             {entries.slice(0, limit).map((match) => (
               <EmojiCandidate

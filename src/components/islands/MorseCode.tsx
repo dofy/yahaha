@@ -25,7 +25,7 @@ export default function MorseCode() {
             setText('')
             reset()
           }}
-          className='chip block appearance-none rounded-full py-2 pl-4 pr-10 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-ring'
+          className='chip block appearance-none rounded-xl py-2 pl-4 pr-10 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-ring'
         >
           <option value='encode'>Text → Morse</option>
           <option value='decode'>Morse → Text</option>
@@ -62,7 +62,7 @@ export default function MorseCode() {
             onClick={doCopy}
             aria-label='Copy result'
             title='Click to copy'
-            className='glass rounded-soft tx w-full cursor-pointer p-5 text-left hover:border-accent focus-visible:outline-2 focus-visible:outline-ring'
+            className='panel rounded-soft tx w-full cursor-pointer p-5 text-left hover:border-accent focus-visible:outline-2 focus-visible:outline-ring'
           >
             <span
               className='block whitespace-pre-wrap break-words font-mono text-lg text-accent-text'

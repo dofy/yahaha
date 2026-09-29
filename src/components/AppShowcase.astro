@@ -2,45 +2,45 @@
 import apps from '@/data/apps.json'
 ---
 
-<section
-  aria-labelledby='apps-heading'
-  class='glass rounded-blob mt-10 px-5 py-5 sm:px-6 sm:py-6'
-  data-reveal
->
-  <div class='mb-2 flex flex-wrap items-center justify-between gap-3'>
-    <h2 id='apps-heading' class='text-lg font-bold'>
-      Apps
-    </h2>
-    <span class='bg-mint-wash text-accent-text rounded-full px-3 py-1 text-xs font-semibold'>
-      Coming soon
+<section id='apps' aria-labelledby='apps-heading' class='home-section'>
+  <div class='section-heading'>
+    <div>
+      <h2 id='apps-heading'>Made for the everyday.</h2>
+      <p>A cleaner Mac, a new word, a thought in another language.</p>
+    </div>
+    <span class='status-label'>
+      <span aria-hidden='true'></span>Apps coming soon
     </span>
   </div>
-
-  <ul class='divide-border/60 divide-y'>
+  <ul class='app-grid'>
     {apps.map((app) => (
-      <li class='py-3 first:pt-2 last:pb-0'>
-        <a
-          href={app.url}
-          class='tx group rounded-soft hover:bg-mint-wash focus-visible:outline-ring -mx-2 grid grid-cols-[3rem_minmax(0,1fr)] items-start gap-4 p-2 focus-visible:outline-2 focus-visible:outline-offset-4'
-        >
+      <li>
+        <a href={app.url} class='app-item'>
           <img
             src={app.icon}
             alt=''
-            width={48}
-            height={48}
+            width={76}
+            height={76}
             loading='lazy'
             decoding='async'
-            class='size-12'
           />
-          <div class='min-w-0'>
-            <h3 class='text-base font-bold group-hover:underline group-hover:underline-offset-4'>
-              {app.name}
-            </h3>
-            <p class='text-ink-soft mt-1 text-sm leading-relaxed'>
-              {app.description}
-            </p>
-            <p class='text-ink-faint mt-2 text-xs'>{app.platform}</p>
-          </div>
+          <p class='platform-label'>{app.platform}</p>
+          <h3>{app.name}</h3>
+          <p class='app-description'>{app.description}</p>
+          <span class='app-link'>
+            Meet {app.name}
+            <svg
+              width='16'
+              height='16'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='1.7'
+              aria-hidden='true'
+            >
+              <path d='M7 17 17 7M7 7h10v10' />
+            </svg>
+          </span>
         </a>
       </li>
     ))}

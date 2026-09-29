@@ -14,7 +14,7 @@ function systemDark() {
 }
 
 // Must match the values in globals.css: --color-paper light / dark.
-const THEME_COLOR = { light: '#fcfaf1', dark: '#191f2b' } as const
+const THEME_COLOR = { light: '#fffdfc', dark: '#1b1a18' } as const
 
 function apply(theme: Theme) {
   const dark = theme === 'dark' || (theme === 'auto' && systemDark())

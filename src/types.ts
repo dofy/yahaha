@@ -26,6 +26,7 @@ export type SocialLink = {
   userName: string
   name: string
   url: string
+  favicon: string
 }
 
 export type Links = {

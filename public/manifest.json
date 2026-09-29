@@ -1,6 +1,6 @@
 {
-  "name": "dofy.net & PHPz.xyz & yahaha.net",
-  "short_name": "PHPz",
+  "name": "Seven's personal website",
+  "short_name": "Seven",
   "icons": [
     {
       "src": "logo.png",
@@ -11,8 +11,8 @@
   "scope": "/",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fcfaf1",
-  "theme_color": "#fcfaf1",
+  "background_color": "#fffdfc",
+  "theme_color": "#fffdfc",
   "orientation": "portrait",
   "shortcuts": [
     {
