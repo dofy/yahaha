@@ -21,13 +21,14 @@ pnpm preview  # Serve the built dist/ locally
 ```
 
 Run `pnpm verify` before delivery: ESLint (Astro/JSX accessibility included),
-`astro check`, Node regression tests, production build and static-output checks.
-Run `pnpm audit` to check published dependency advisories. CI runs both.
+`astro check`, Node/Python regression tests, production build and static-output checks.
+Run `pnpm audit --audit-level moderate` to check published dependency advisories. CI runs both.
 Use Node 22.22.3+ on the Node 22 release line; no separate test runner is needed.
 
 ## Project Structure
 
-Personal toolbox site (`yahaha.net`) with several standalone utility pages.
+Seven's personal site on dofy.net, PHPz.xyz, PHPz.org and yahaha.net;
+`yahaha` is the repository and hosting-project name, not a fixed website label.
 Each page in `src/pages/` is a self-contained route with its own data + UI.
 
 ```
@@ -101,10 +102,11 @@ src/
 ### Data & islands
 
 - **Data** lives in `src/data/*.json`. Pages import JSON directly — no API
-  routes, no external fetching (static output).
+  routes or database. Emoji loads its hashed catalogue from the same-origin
+  static output. Social favicons are local; GitHub badges are external images.
 - **Islands** are React components hydrated with `client:load`. The mascot is
   static SVG and must not hydrate. Every page has a shared theme island and small
-  inline scripts; static content does not hydrate.
+  browser scripts for theme and domain identity; static content does not hydrate.
 - **24 points:** `solve24` uses exact BigInt fractions, complete pair combinations
   and canonical commutative subexpressions. Do not reintroduce `eval` or floating
   equality. Regression tests cover all 1,820 unordered inputs from 1 to 13.
@@ -112,6 +114,11 @@ src/
   copy the same output string, including unknown-character placeholders.
 - **Clipboard:** use `useClipboard` for copied/error feedback and pending request
   invalidation. Copy targets must remain keyboard-accessible.
+- **Emoticon Kit:** character pools live in `src/lib/Emoticon.ts`; `mouse` is the
+  historical mouth field. Eyes and face frames use paired indexes, so preserve
+  array lengths/order. Duplicates affect weights; combining marks must remain
+  intact. Update [the character inventory](docs/emoticon-characters.md) when the
+  pools change. The page's fixed table-flip text and Logo image are separate.
 - **Emoji:** `catalogue.json` covers Unicode Emoji 17.0 and CLDR 48.2 zh/zh_Hant/en,
   plus modern Apple keywords and legacy aliases. Load it via `?url` as a hashed
   static asset. `src/lib/emoji.ts` ranks and deduplicates candidates; preserve
@@ -123,3 +130,13 @@ src/
   `name`) and a `links` array typed `NormalLink | SocialLink | GitHubLink` — see
   `src/types`. `links.json` drives the homepage structure. Its shields.io badge
   colours are literal hex (a remote image cannot read CSS tokens).
+
+## Documentation and releases
+
+- [docs/README.md](docs/README.md) indexes character/data references and dated
+  verification records. Keep README and the relevant data reference aligned with
+  changes; preserve historical results and append new verification dates.
+- Production is the Git-connected Cloudflare Pages project `yahaha`: branch
+  `main`, command `pnpm build`, output `dist/`. Other branches are previews.
+  After an authorized release, verify the production commit and all four domains;
+  Pages build success and GitHub CI success are separate checks.

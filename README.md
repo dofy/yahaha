@@ -1,8 +1,8 @@
 <div align="center">
 
-# yahaha
+# Seven's personal website
 
-**A small toolbox — math, morse, tarot, emoji, and more.**
+**Personal apps, browser tools, and open-source projects.**
 
 _The answer exists only in the Tao._
 
@@ -22,7 +22,7 @@ _The answer exists only in the Tao._
 
 | Route                                                             | What it does                                                                |
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [`/`](https://yahaha.net/)                                        | Home — upcoming apps, browser tools, projects and personal links           |
+| [`/`](https://yahaha.net/)                                        | Home — upcoming apps, browser tools, projects and personal links            |
 | [`/24points`](https://yahaha.net/24points)                        | Solves the 24-points card game for any four numbers                         |
 | [`/tarot`](https://yahaha.net/tarot)                              | All 22 Major Arcana, with upright and reversed readings                     |
 | [`/emoji`](https://yahaha.net/emoji)                              | Finds and copies Emoji 17.0 with Chinese, English and Apple search keywords |
@@ -30,7 +30,9 @@ _The answer exists only in the Tao._
 | [`/morse`](https://yahaha.net/morse)                              | Text ⇄ morse code, click the result to copy                                 |
 | [`/heart/{hans,hant,en,original}`](https://yahaha.net/heart/hans) | Heart Sutra in Simplified, Traditional, English, and Sanskrit               |
 
-Tools run entirely in the browser. There is no API, database or analytics. The homepage loads public GitHub star badges from shields.io.
+The repository is named `yahaha`; the website identifies itself by the current domain.
+Tools run entirely in the browser. There is no API, database or analytics. Social
+favicons are local assets; GitHub star badges load from shields.io.
 
 The homepage also introduces [Cruft](https://cruft.phpz.org/),
 [WordClip](https://wordclip.phpz.org/) and [LinguaDock](https://linguadock.phpz.org/)
@@ -47,6 +49,11 @@ asset rather than a large JavaScript module.
 Run `pnpm emoji:update` with Python 3 to rebuild the data; use
 `pnpm emoji:update --refresh-apple` on macOS to refresh the Apple snapshot.
 See [data provenance, update instructions and search behavior](docs/emoji-data.md).
+
+Emoticon Kit combines eight character pools containing 268 candidate entries,
+184 distinct strings and 177 distinct Unicode code points. Paired eyes and face
+frames share an index; arms, mouths and decorations are drawn independently.
+See the [complete character inventory and maintenance notes](docs/emoticon-characters.md).
 
 ## Design
 
@@ -78,26 +85,43 @@ pnpm install --frozen-lockfile
 pnpm dev        # → http://localhost:4321
 ```
 
-| Script         | Does                                                         |
-| -------------- | ------------------------------------------------------------ |
-| `pnpm dev`     | Dev server with HMR                                          |
-| `pnpm build`   | Static production build → `dist/`                            |
-| `pnpm preview` | Serve the built `dist/` locally                              |
-| `pnpm check`   | Type-check Astro, React and TypeScript                       |
-| `pnpm lint`    | ESLint, including Astro and JSX accessibility rules          |
-| `pnpm test`    | Node regression tests, including all 1,820 card combinations |
-| `pnpm verify`  | Lint → type check → tests → build → static-output checks     |
-| `pnpm audit`   | Check installed dependencies for published advisories        |
+| Script         | Does                                                               |
+| -------------- | ------------------------------------------------------------------ |
+| `pnpm dev`     | Dev server with HMR                                                |
+| `pnpm build`   | Static production build → `dist/`                                  |
+| `pnpm preview` | Serve the built `dist/` locally                                    |
+| `pnpm check`   | Type-check Astro, React and TypeScript                             |
+| `pnpm lint`    | ESLint, including Astro and JSX accessibility rules                |
+| `pnpm test`    | Node and Python regressions, including all 1,820 card combinations |
+| `pnpm verify`  | Lint → type check → tests → build → static-output checks           |
+| `pnpm audit`   | Check installed dependencies for published advisories              |
 
 Output is fully static, so `dist/` can be served from anywhere. `pnpm verify` is
 the local gate. GitHub Actions runs the same checks plus a dependency audit.
 Static-output checks cover all ten pages, language and sharing metadata, internal
-links and assets, sitemap entries, manifest shortcuts, and the static mascot.
+links and assets, sitemap entries, manifest shortcuts, and absence of mascot hydration.
 
 The 24-points solver uses exact fractions and all binary expression shapes. Its
 tests compare every unordered input against an independent five-shape oracle and
 validate each returned expression. Morse supports both encoding and decoding;
 letters use spaces, words use `/`, and unsupported input stays visible as `?`.
+
+## Deployment
+
+Production uses the Git-connected Cloudflare Pages project `yahaha`, with `main`
+as the production branch, `pnpm build` as the build command and `dist/` as output.
+The custom domains are dofy.net, PHPz.xyz, PHPz.org and yahaha.net.
+
+Before an authorized release, run `pnpm verify` and
+`pnpm audit --audit-level moderate`, then fast-forward `main` to the verified
+commit. Other branches produce previews. GitHub checks and Pages builds run
+independently: confirm both succeed, confirm the production deployment's commit,
+and check the custom domains and shipped assets. See [release evidence and limits](docs/verification.md).
+
+## Documentation
+
+Start with the [docs index](docs/README.md), which links the Emoticon Kit character
+inventory, Emoji data notes and dated verification/release records.
 
 ## Structure
 
@@ -115,6 +139,8 @@ src/
 │   └── Base.astro           # <head> meta, anti-FOUC theme guard, shared header/footer
 ├── components/
 │   ├── LinkBlock.astro      # homepage link sections
+│   ├── Header.astro         # shared navigation
+│   ├── SiteBrand.astro      # original favicon + current domain
 │   ├── Footer.astro
 │   ├── Logo.astro           # original kaomoji image above the footer
 │   ├── islands/             # React, hydrated with client:*

@@ -1,5 +1,7 @@
 # Emoji 数据与搜索
 
+[项目文档索引](README.md)
+
 当前词库覆盖 Emoji 17.0 的 **3,944 个 fully-qualified 序列**，包含肤色、旗帜和 ZWJ 组合；每个条目均有简体中文、繁体中文及英文名称，共 **42,796 个不同搜索词**。
 
 ## 数据来源
@@ -54,4 +56,4 @@ pnpm verify
 - Apple 二进制固定样本验证 UTF-16 surrogate、真实 ID 与 word offset；损坏、循环、重复编号被拒绝。
 - 生产产物包含哈希 JSON 与 Unicode 许可文件；词库重复生成结果完全一致。
 
-浏览器验证细节见 `verification.md`。
+浏览器验证及正式发布记录见 [verification.md](verification.md)。
