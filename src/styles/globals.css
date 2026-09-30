@@ -488,6 +488,7 @@
 }
 .app-grid {
   display: grid;
+  row-gap: 32px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .app-grid > li + li {
@@ -507,6 +508,9 @@
   padding-right: 0;
 }
 .app-item img {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
   margin-bottom: 25px;
 }
 .app-item .platform-label {
@@ -957,5 +961,23 @@ html[data-theme-transition='light']::view-transition-new(root) {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (min-width: 661px) {
+  .app-grid > li:nth-child(3n + 1) {
+    border-left: 0;
+  }
+  .app-grid > li:nth-child(3n + 1) .app-item {
+    padding-left: 0;
+  }
+  .app-grid > li:nth-child(3n) .app-item {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 660px) {
+  .app-grid {
+    row-gap: 0;
   }
 }

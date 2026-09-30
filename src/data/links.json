@@ -81,7 +81,7 @@
         "width": 60
       },
       {
-        "name": "Learning Vim",
+        "name": "Learn Vim Tutorial",
         "url": "learn-vim",
         "width": 72
       },
@@ -104,6 +104,21 @@
         "name": "My Alfred Workflows",
         "url": "awf",
         "width": 54
+      },
+      {
+        "name": "Tsudoi (Invite Maker)",
+        "url": "invite-maker",
+        "width": 60
+      },
+      {
+        "name": "Learning Vim",
+        "url": "learning-vim",
+        "width": 60
+      },
+      {
+        "name": "Brew Graph",
+        "url": "brew-graph",
+        "width": 60
       }
     ]
   },

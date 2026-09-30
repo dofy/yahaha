@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Learning Vim</title>
+  <desc id="desc">A mint-green V with two yellow celebratory marks.</desc>
+  <rect width="512" height="512" rx="112" fill="#17324d"/>
+  <path d="M122 183l118 176c8 12 25 12 33-1l114-180" fill="none" stroke="#65c7a2" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M205 112l-27-43M303 109l11-54" fill="none" stroke="#f4c95d" stroke-width="29" stroke-linecap="round"/>
+</svg>
