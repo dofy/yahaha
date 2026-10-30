@@ -23,6 +23,11 @@ export const pageMetadata: Record<string, PageMetadata> = {
       'Generate random kaomoji and copy your favorite emoticon to the clipboard.',
     lang: 'en'
   },
+  '/ascii-art': {
+    description:
+      'Generate and copy ASCII art from text with a choice of FIGlet fonts.',
+    lang: 'en'
+  },
   '/morse': {
     description:
       'Encode text as Morse code or decode Morse back to text, with clear word separators and one-click copying.',

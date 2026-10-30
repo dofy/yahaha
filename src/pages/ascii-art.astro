@@ -1,0 +1,14 @@
+---
+import Base from '@/layouts/Base.astro'
+import AsciiArt from '@/components/islands/AsciiArt'
+---
+
+<Base title='ASCII Art Generator' wide>
+  <header>
+    <h1 class='page-title'>ASCII Art Generator</h1>
+    <p class='page-subtitle'>
+      Turn text into FIGlet art. Pick a font and copy the result.
+    </p>
+  </header>
+  <AsciiArt client:load />
+</Base>

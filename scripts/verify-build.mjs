@@ -10,7 +10,7 @@ const dist = join(root, 'dist')
 const files = readdirSync(dist, { recursive: true }).filter((path) =>
   path.endsWith('index.html')
 )
-assert.equal(files.length, 10, 'Expected all ten site pages')
+assert.equal(files.length, 11, 'Expected all eleven site pages')
 const sitemap = readFileSync(join(dist, 'sitemap.xml'), 'utf8')
 const robots = readFileSync(join(dist, 'robots.txt'), 'utf8')
 const canonicalUrls = []

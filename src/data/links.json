@@ -155,6 +155,11 @@
         "icon": "📡"
       },
       {
+        "name": "ASCII Art",
+        "url": "/ascii-art",
+        "icon": "🔤"
+      },
+      {
         "name": "Sync Text",
         "url": "https://sync-text.phpz.org/",
         "icon": "🔗"

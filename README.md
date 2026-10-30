@@ -27,6 +27,7 @@ _The answer exists only in the Tao._
 | [`/tarot`](https://yahaha.net/tarot)                              | All 22 Major Arcana, with upright and reversed readings                     |
 | [`/emoji`](https://yahaha.net/emoji)                              | Finds and copies Emoji 17.0 with Chinese, English and Apple search keywords |
 | [`/emoticon`](https://yahaha.net/emoticon)                        | Generates kaomoji — click to copy                                           |
+| [`/ascii-art`](https://yahaha.net/ascii-art)                      | Generate and copy ASCII art with FIGlet fonts                               |
 | [`/morse`](https://yahaha.net/morse)                              | Text ⇄ morse code, click the result to copy                                 |
 | [`/heart/{hans,hant,en,original}`](https://yahaha.net/heart/hans) | Heart Sutra in Simplified, Traditional, English, and Sanskrit               |
 
