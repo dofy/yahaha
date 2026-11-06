@@ -145,7 +145,11 @@
   min-height: 128px;
   border: 0;
   border-radius: 16px;
-  background: var(--color-paper-warm);
+  background: color-mix(
+    in srgb,
+    var(--color-coral-wash) 45%,
+    var(--color-paper)
+  );
 }
 .home-page .tool-item:hover,
 .home-page .tool-item:focus-visible {
