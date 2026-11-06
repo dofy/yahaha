@@ -27,8 +27,8 @@ export default function MorseCode() {
           }}
           className='chip block appearance-none rounded-xl py-2 pl-4 pr-10 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-ring'
         >
-          <option value='encode'>Text → Morse</option>
-          <option value='decode'>Morse → Text</option>
+          <option value='encode'>Text to Morse</option>
+          <option value='decode'>Morse to Text</option>
         </select>
         <ChevronDown
           aria-hidden='true'

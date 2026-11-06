@@ -138,7 +138,7 @@ export default function TarotBrowser() {
             <Detail key={selected.index} tarot={selected} />
           ) : (
             <p className='py-16 text-center text-sm text-muted-foreground'>
-              ← 选择一张牌
+              选择一张牌
             </p>
           )}
         </div>

@@ -81,7 +81,7 @@ PHPz.xyz, PHPz.org and yahaha.net. Social favicons are stored locally in
 ## Quick start
 
 ```bash
-# Node 22.22.3 or newer in the Node 22 release line (.nvmrc)
+# Node 22.23.4 or newer in the Node 22 release line (.nvmrc)
 pnpm install --frozen-lockfile
 pnpm dev        # → http://localhost:4321
 ```

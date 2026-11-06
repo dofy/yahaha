@@ -1,5 +1,6 @@
 ---
 import Base from '@/layouts/Base.astro'
+import '@/styles/home-redesign.css'
 import LinkBlock from '@/components/LinkBlock.astro'
 import AppShowcase from '@/components/AppShowcase.astro'
 import allLinks from '@/data/links.json'
@@ -14,70 +15,39 @@ const projects = links.find(({ cat }) => cat.name === 'github')!
 <Base>
   <section class='home-hero' aria-labelledby='hero-heading'>
     <div class='hero-copy'>
-      <p class='product-note'>Small apps. Everyday tools.</p>
+      <p class='product-note'>A little corner of the internet, by Seven</p>
       <h1 id='hero-heading'>The answer exists only in the Tao.</h1>
       <p class='hero-description'>
-        A few things I make, and a few things I find useful. Apps for your daily
-        routine. A toolbox for everything in between.
+        A collection of small apps, useful tools and things made out of
+        curiosity.
       </p>
-      <div class='hero-actions'>
-        <a href='#apps' class='site-button site-button-primary'>
-          Explore the apps
-        </a>
-        <a href='#tools' class='site-button site-button-secondary'>
-          Open the toolbox
-        </a>
-      </div>
+      <a href='#apps' class='site-button site-button-primary'>
+        Explore the collection
+      </a>
       <a href='https://github.com/dofy/yahaha/releases' class='hero-version'>
         v{version}
       </a>
     </div>
-    <div class='hero-demo'>
-      <a
-        href='/24points'
-        class='demo-window points-preview'
-        aria-label='Open 24 Points'
-      >
-        <div class='mock-toolbar'>
-          <span class='traffic-lights' aria-hidden='true'>
-            <i></i>
-            <i></i>
-            <i></i>
-          </span>
-          <span>24 Points</span>
-          <span aria-hidden='true'>＋</span>
-        </div>
-        <p class='preview-intro'>Four numbers. One answer.</p>
-        <div class='number-hand' aria-hidden='true'>
-          <span>3</span>
-          <span>3</span>
-          <span>8</span>
-          <span>8</span>
-        </div>
-        <p class='preview-answer'>
-          8 ÷ (3 − 8 ÷ 3) = <strong>24</strong>
-        </p>
-        <div class='preview-footer'>
-          <span>A little puzzle for your day.</span>
-          <span class='preview-action'>Try it</span>
-        </div>
-      </a>
-      <a
-        href='/emoji'
-        class='demo-window emoji-preview'
-        aria-label='Open Apple Emoji Dictionary'
-      >
-        <div class='emoji-preview-heading'>
-          <span>Apple Emoji Dictionary</span>
-          <span class='platform-label'>简 / 繁 / EN</span>
-        </div>
-        <p class='emoji-preview-query'>
-          <span aria-hidden='true'>⌕</span> Find the right feeling.
-        </p>
-        <div class='emoji-preview-results' aria-hidden='true'>
-          🫡 🩷 🫩 🐦‍🔥
-        </div>
-      </a>
+    <div class='hero-art' aria-label='A collection of apps and tools'>
+      <div class='art-top'>
+        <span>Made by Seven</span>
+        <span>Apps, tools & ideas</span>
+      </div>
+      <img
+        class='art-face'
+        src='/logo-transparent.png'
+        alt=''
+        width='640'
+        height='640'
+      />
+      <div class='art-bottom'>
+        <span>
+          Make things.
+          <br />
+          Stay curious.
+        </span>
+        <span aria-hidden='true'>✳</span>
+      </div>
     </div>
   </section>
   <AppShowcase />

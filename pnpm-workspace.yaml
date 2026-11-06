@@ -2,3 +2,6 @@ autoInstallPeers: false
 onlyBuiltDependencies:
   - sharp
   - unrs-resolver
+# Pin patched minimatch across tooling until upstream ranges include it.
+overrides:
+  'minimatch@>=7 <11': ^11.0.1

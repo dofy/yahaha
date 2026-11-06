@@ -96,16 +96,34 @@ const image = new URL('/logo.png', canonical)
       })()
     </script>
   </head>
-  <body>
+  <body class:list={{ 'home-page': pathname === '/' }}>
     <Header>
       <ThemeToggle client:load />
     </Header>
     <div class={containerClass}>
-      <main id='main' tabindex='-1' class='animate-fade-in'>
+      <main
+        id='main'
+        tabindex='-1'
+        class:list={['animate-fade-in', { 'inner-page': pathname !== '/' }]}
+      >
         {pathname !== '/' && (
           <nav aria-label='Main navigation' class='mb-6'>
-            <a href='/' class='link text-sm'>
-              ← Home
+            <a href='/' class='link home-link text-sm'>
+              <svg
+                width='18'
+                height='18'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                stroke-width='1.7'
+                stroke-linecap='round'
+                stroke-linejoin='round'
+                aria-hidden='true'
+              >
+                <path d='M3.5 10.5 12 3.5l8.5 7v9a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z' />
+                <path d='M9 20.5v-6h6v6' />
+              </svg>
+              <span>Home</span>
             </a>
           </nav>
         )}
@@ -116,6 +134,41 @@ const image = new URL('/logo.png', canonical)
     <Footer />
     <script>
       import { siteIdentity } from '@/lib/identity'
+
+      // Only prepare sections below the viewport, so content remains available
+      // without JavaScript and anchor navigation never starts with a blank screen.
+      if (
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+        'IntersectionObserver' in window
+      ) {
+        const sections = document.querySelectorAll<HTMLElement>('.home-section')
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.remove('reveal-pending')
+                entry.target.classList.add('is-visible')
+                observer.unobserve(entry.target)
+              }
+            }
+          },
+          { threshold: 0, rootMargin: '0px 0px -8% 0px' }
+        )
+        sections.forEach((section) => {
+          if (section.getBoundingClientRect().top > window.innerHeight) {
+            section.classList.add('reveal-pending')
+            section.addEventListener(
+              'focusin',
+              () => {
+                section.classList.remove('reveal-pending')
+                observer.unobserve(section)
+              },
+              { once: true }
+            )
+            observer.observe(section)
+          }
+        })
+      }
 
       const { name, domain } = siteIdentity(window.location.hostname)
       document
