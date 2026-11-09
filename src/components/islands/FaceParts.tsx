@@ -72,9 +72,13 @@ export default function FaceParts({
 
   return (
     <Tabs value={layer} onValueChange={setLayer}>
-      <TabsList className='h-auto flex-wrap justify-start gap-1'>
+      <TabsList className='bg-background/95 sticky top-[58px] z-10 flex h-auto w-full flex-nowrap justify-start gap-1 overflow-x-auto backdrop-blur sm:static sm:flex-wrap sm:backdrop-blur-none'>
         {rows.map((row) => (
-          <TabsTrigger key={row.name} value={row.name} className='gap-1.5'>
+          <TabsTrigger
+            key={row.name}
+            value={row.name}
+            className='shrink-0 gap-1.5'
+          >
             {row.label}
             {overrides[row.name] !== undefined && (
               <Pin aria-label='Pinned' className='size-3' />

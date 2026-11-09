@@ -83,6 +83,8 @@ export default function FaceKit() {
   const [frame, setFrame] = React.useState<FaceFrame>('rounded')
   const [gallery, setGallery] = React.useState<string[]>([])
   const [pngError, setPngError] = React.useState(false)
+  const [preview, setPreview] = React.useState(true)
+  const avatar = React.useRef<HTMLElement>(null)
 
   const selection = React.useMemo(
     () => selectFace(seed, overrides),
@@ -123,6 +125,18 @@ export default function FaceKit() {
     )
   }, [seed, overrides])
 
+  // The pinned strip only earns its space once the big preview is off screen.
+  React.useEffect(() => {
+    const node = avatar.current
+    if (!node || !('IntersectionObserver' in window)) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setPreview(entry.isIntersecting),
+      { rootMargin: '-72px 0px 0px 0px' }
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
   const shuffle = () => {
     setSeed(randomSeed())
     setOverrides({})
@@ -150,13 +164,17 @@ export default function FaceKit() {
 
   return (
     <div className='mt-8 space-y-6'>
-      <section className='panel rounded-soft p-4 sm:p-5' aria-label='Avatar'>
-        <div className='flex flex-col gap-5 sm:flex-row sm:items-start'>
+      <section
+        ref={avatar}
+        className='panel rounded-soft p-4 sm:p-5'
+        aria-label='Avatar'
+      >
+        <div className='flex items-center gap-4 sm:items-start sm:gap-5'>
           <FaceSvg
             selection={selection}
             frame={frame}
             label={description}
-            className='h-44 w-44 shrink-0 self-center sm:h-52 sm:w-52'
+            className='h-24 w-24 shrink-0 sm:h-52 sm:w-52'
           />
           <div className='min-w-0 flex-1'>
             <label
@@ -174,74 +192,104 @@ export default function FaceKit() {
                 value={seed}
                 placeholder='Anything at all'
                 onChange={(event) => setSeed(event.target.value)}
-                className='min-w-40 flex-1'
+                className='min-w-32 flex-1'
               />
               <Button type='button' variant='outline' onClick={shuffle}>
                 <Dices /> Random
               </Button>
             </div>
             <p className='text-muted-foreground mt-2 text-xs'>
-              Hash <span className='font-mono'>{codeOf(seed)}</span> · the same
-              seed always draws the same face.
+              Hash <span className='font-mono'>{codeOf(seed)}</span>
+              <span className='hidden sm:inline'>
+                {' '}
+                · the same seed always draws the same face.
+              </span>
             </p>
-
-            <fieldset className='mt-4'>
-              <legend className='sr-only'>Frame</legend>
-              <div className='flex flex-wrap gap-2'>
-                {frames.map((option) => (
-                  <Button
-                    key={option.id}
-                    type='button'
-                    size='sm'
-                    variant={frame === option.id ? 'default' : 'outline'}
-                    aria-pressed={frame === option.id}
-                    onClick={() => setFrame(option.id)}
-                  >
-                    {option.label}
-                  </Button>
-                ))}
-              </div>
-            </fieldset>
-
-            <div className='mt-4 flex flex-wrap gap-2'>
-              <Button type='button' variant='outline' onClick={doCopy}>
-                {copied ? <Check /> : <Copy />}
-                {copied ? 'Copied' : 'Copy SVG'}
-              </Button>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={() =>
-                  downloadBlob(
-                    new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }),
-                    `${fileStem(seed)}.svg`
-                  )
-                }
-              >
-                <Download /> SVG
-              </Button>
-              <Button type='button' variant='outline' onClick={savePng}>
-                <Download /> PNG {EXPORT_SIZE}px
-              </Button>
-            </div>
-            <div
-              aria-live='polite'
-              className='text-muted-foreground mt-2 text-xs'
-            >
-              {copyError && <p>Could not copy. Download the file instead.</p>}
-              {pngError && (
-                <p>Could not render the PNG. The SVG still works.</p>
-              )}
-            </div>
           </div>
+        </div>
+
+        <fieldset className='mt-4'>
+          <legend className='sr-only'>Frame</legend>
+          <div className='grid grid-cols-3 gap-2 sm:flex sm:flex-wrap'>
+            {frames.map((option) => (
+              <Button
+                key={option.id}
+                type='button'
+                variant={frame === option.id ? 'default' : 'outline'}
+                aria-pressed={frame === option.id}
+                onClick={() => setFrame(option.id)}
+              >
+                {option.label}
+              </Button>
+            ))}
+          </div>
+        </fieldset>
+
+        <div className='mt-2 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap'>
+          <Button type='button' variant='outline' onClick={doCopy}>
+            {copied ? <Check /> : <Copy />}
+            {copied ? 'Copied' : 'Copy'}
+          </Button>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() =>
+              downloadBlob(
+                new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }),
+                `${fileStem(seed)}.svg`
+              )
+            }
+          >
+            <Download /> SVG
+          </Button>
+          <Button type='button' variant='outline' onClick={savePng}>
+            <Download /> PNG
+          </Button>
+        </div>
+        <div aria-live='polite' className='text-muted-foreground mt-2 text-xs'>
+          {copyError && <p>Could not copy. Download the file instead.</p>}
+          {pngError && <p>Could not render the PNG. The SVG still works.</p>}
         </div>
       </section>
 
-      <section className='panel rounded-soft p-4 sm:p-5' aria-label='Parts'>
+      {/* Phones scroll the big preview away while parts are picked, so the
+          face follows along in a strip pinned to the top. */}
+      <div
+        aria-hidden={preview}
+        className={`bg-background/95 sticky top-0 z-20 -mx-5 flex items-center gap-3 border-b border-[var(--color-line)] px-5 py-2 backdrop-blur transition-opacity duration-200 sm:hidden ${
+          preview ? 'pointer-events-none opacity-0' : 'opacity-100'
+        }`}
+      >
+        <FaceSvg
+          selection={selection}
+          frame={frame}
+          className='size-11 shrink-0'
+        />
+        <span className='min-w-0 flex-1'>
+          <span className='block truncate text-sm font-medium'>
+            {seed || 'No seed'}
+          </span>
+          <span className='text-muted-foreground block font-mono text-xs'>
+            {codeOf(seed)}
+          </span>
+        </span>
+        <Button type='button' variant='outline' size='sm' onClick={shuffle}>
+          <Dices /> Random
+        </Button>
+      </div>
+
+      <section
+        className='panel rounded-soft scroll-mt-20 p-4 sm:scroll-mt-0 sm:p-5'
+        aria-label='Parts'
+      >
         <h2 className='text-sm font-semibold'>Parts</h2>
         <p className='text-muted-foreground mt-1 mb-4 text-xs'>
-          Pick a layer, then pick the part you want drawn. A pinned layer stops
-          following the seed and travels in the address bar with it.
+          Pick a layer, then pick the part you want drawn.
+          <span className='hidden sm:inline'>
+            {' '}
+            A pinned layer stops following the seed and travels in the address
+            bar with it.
+          </span>
         </p>
         <FaceParts
           selection={selection}
@@ -253,7 +301,6 @@ export default function FaceKit() {
           <Button
             type='button'
             variant='outline'
-            size='sm'
             disabled={Object.keys(overrides).length === 0}
             onClick={() => setOverrides({})}
           >
@@ -271,7 +318,6 @@ export default function FaceKit() {
           <Button
             type='button'
             variant='outline'
-            size='sm'
             onClick={() =>
               setGallery(
                 Array.from({ length: GALLERY_SIZE }, () => randomSeed())

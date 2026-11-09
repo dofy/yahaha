@@ -96,6 +96,13 @@ seed → FNV-1a 32 位 → mulberry32 → 依次取 palette、bg、face、hair�
 选项网格用 `grid-cols-[repeat(auto-fill,minmax(68px,1fr))]`，各层选项数不同也不会留下
 孤零零的尾行。
 
+手机上（`sm` 以下）布局另有三处安排，因为挑部件时大预览会被滚出屏幕：
+
+- 大预览滚出视口后，顶部出现一条**吸顶条**（头像 + seed + Random），用
+  `IntersectionObserver` 观察预览区决定显隐，所以第一屏不会出现两张一样的脸。
+- 层标签吸在吸顶条下方（`sticky top-[58px]`），并且是**单行横向滚动**而不是折成三行。
+- 头像与 seed 输入框并排，外框与导出按钮各占一行三列；所有可点目标高度 ≥ 36px。
+
 选 `eye` 与 `brow` 时，预览会临时把 `extra` 设为 `none`——否则眼镜、墨镜会把正在挑的部件
 挡住。`OCCLUDED` 常量记录这类"会被遮挡的层"。
 
