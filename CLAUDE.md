@@ -38,6 +38,7 @@ src/
 │   ├── 24points.astro    # 24-points solver
 │   ├── emoji.astro       # Emoji search (EmojiSearch island)
 │   ├── emoticon.astro    # Emoticon generator
+│   ├── lock.astro        # Lock Kit (LockKit island: single/double row bittings)
 │   ├── morse.astro       # Morse code
 │   ├── tarot.astro       # Tarot (TarotBrowser island)
 │   └── heart/[lang].astro# Heart Sutra, dynamic lang param
@@ -112,6 +113,17 @@ src/
   equality. Regression tests cover all 1,820 unordered inputs from 1 to 13.
 - **Morse:** pure encode/decode functions live in `src/lib/morse.ts`. Render and
   copy the same output string, including unknown-character placeholders.
+- **Lock Kit:** `src/lib/lock.ts` enumerates key bittings with prefix pruning, so
+  cost tracks surviving codes rather than `pins ** holes`; rule I is a minimum
+  Hamming distance filter using masked keys, not pairwise comparison. Keep
+  `DEFAULT_LIMIT`/`DEFAULT_NODE_BUDGET` in place — the search runs on the main
+  thread. `explainCode` drives both the rule chips and the chamber highlights in
+  `KeyProfile.tsx`, which must stay the single source of rule wording.
+  The double-row tab reuses the single-row search per row (`rowParamsFor`) and
+  only the paired-sum rule H′ and rule I run over the pairs, so row rules have
+  exactly one implementation. Pairing is a product, so keep `DEFAULT_ROW_LIMIT`
+  alongside the result limit and budget.
+  See [the rule reference](docs/lock-coding.md).
 - **Clipboard:** use `useClipboard` for copied/error feedback and pending request
   invalidation. Copy targets must remain keyboard-accessible.
 - **Emoticon Kit:** character pools live in `src/lib/Emoticon.ts`; `mouse` is the

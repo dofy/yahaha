@@ -1,0 +1,15 @@
+---
+import Base from '@/layouts/Base.astro'
+import LockKit from '@/components/islands/LockKit'
+---
+
+<Base title='Lock Kit' wide>
+  <header>
+    <h1 class='page-title'>Lock Kit</h1>
+    <p class='page-subtitle'>
+      Generate pin tumbler key bittings (牙花编码) that satisfy every cutting
+      rule, and read each rule off the key itself.
+    </p>
+  </header>
+  <LockKit client:load />
+</Base>

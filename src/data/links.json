@@ -160,6 +160,11 @@
         "icon": "🔤"
       },
       {
+        "name": "Lock Kit",
+        "url": "/lock",
+        "icon": "🔑"
+      },
+      {
         "name": "Sync Text",
         "url": "https://sync-text.phpz.org/",
         "icon": "🔗"
