@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { formatCode, type DoubleCode, type DoubleLockParams } from '@/lib/lock'
 
 /**
@@ -12,9 +13,22 @@ import { formatCode, type DoubleCode, type DoubleLockParams } from '@/lib/lock'
 
 const SPACING = 46
 const BODY_HEIGHT = 68
-const CUT_CEILING = 6
-const CUT_FLOOR = 52
-const CUT_HALF_WIDTH = 16
+const CUT_CEILING = 8
+/** Deepest cut; a real blade keeps a solid spine under the deepest pin. */
+const CUT_FLOOR = 46
+/** Half the width an empty chamber reserves on the blade edge. */
+const CUT_HALF_WIDTH = 15
+/** Half the flat root of a cut; real bitting cuts are trapezoids, not Vs. */
+const CUT_ROOT = 3.5
+
+/**
+ * Cut walls are milled at a fixed angle, so a deeper cut is also a wider one.
+ * The slope is flattened enough that neighbouring cuts never run into each
+ * other at this chamber spacing.
+ */
+function cutHalfWidth(depth: number): number {
+  return 9 + depth * 0.14
+}
 const BOW_WIDTH = 72
 const BLADE_START = BOW_WIDTH + 18
 /** Space above a blade for the step labels and the C/D markers. */
@@ -63,8 +77,23 @@ function KeyBlade({
     longPinFloor,
     maxStep
   } = marks
+  const uid = React.useId().replace(/:/gu, '')
   const tipX = tipOf(holes)
   const bottom = oy + BODY_HEIGHT
+  // Bow and neck in one outline: a rounded head that tapers into the blade.
+  const bowOutline = [
+    `M 26 ${oy - 18}`,
+    `L ${BOW_WIDTH - 4} ${oy - 18}`,
+    `Q ${BOW_WIDTH + 10} ${oy - 18} ${BOW_WIDTH + 12} ${oy - 6}`,
+    `L ${BLADE_START} ${oy + 4}`,
+    `L ${BLADE_START} ${bottom - 4}`,
+    `Q ${BOW_WIDTH + 10} ${bottom + 18} ${BOW_WIDTH - 4} ${bottom + 18}`,
+    `L 26 ${bottom + 18}`,
+    `Q 6 ${bottom + 18} 6 ${bottom - 2}`,
+    `L 6 ${oy - 2}`,
+    `Q 6 ${oy - 18} 26 ${oy - 18}`,
+    'Z'
+  ].join(' ')
   const depthOf = (pin: number) =>
     pins < 2
       ? CUT_CEILING
@@ -78,16 +107,22 @@ function KeyBlade({
       outline.push(`L ${x + CUT_HALF_WIDTH} ${oy}`)
       continue
     }
+    const depth = depthOf(pin)
+    const half = cutHalfWidth(depth)
     outline.push(
-      `L ${x - CUT_HALF_WIDTH} ${oy}`,
-      `L ${x} ${oy + depthOf(pin)}`,
-      `L ${x + CUT_HALF_WIDTH} ${oy}`
+      `L ${x - half} ${oy}`,
+      `L ${x - CUT_ROOT} ${oy + depth}`,
+      `L ${x + CUT_ROOT} ${oy + depth}`,
+      `L ${x + half} ${oy}`
     )
   }
+  // Tip: the chamfer that lets the key find the keyway.
   outline.push(
     `L ${tipX} ${oy}`,
-    `L ${tipX + 18} ${oy + 20}`,
-    `L ${tipX + 18} ${bottom}`,
+    `L ${tipX + 15} ${oy + 17}`,
+    `L ${tipX + 18} ${oy + 27}`,
+    `L ${tipX + 18} ${bottom - 9}`,
+    `L ${tipX + 9} ${bottom}`,
     `L ${BLADE_START} ${bottom}`,
     'Z'
   )
@@ -106,20 +141,57 @@ function KeyBlade({
         />
       ))}
 
-      {/* Bow */}
-      <rect
-        x={6}
-        y={oy - 18}
-        width={BOW_WIDTH}
-        height={BODY_HEIGHT + 36}
-        rx={20}
+      <defs>
+        <linearGradient
+          id={`${uid}-metal`}
+          x1='0'
+          y1={oy - 18}
+          x2='0'
+          y2={bottom + 18}
+          gradientUnits='userSpaceOnUse'
+        >
+          <stop offset='0' stopColor='currentColor' stopOpacity='0.16' />
+          <stop offset='0.3' stopColor='currentColor' stopOpacity='0.01' />
+          <stop offset='0.62' stopColor='currentColor' stopOpacity='0.04' />
+          <stop offset='1' stopColor='currentColor' stopOpacity='0.14' />
+        </linearGradient>
+        <clipPath id={`${uid}-blade`}>
+          <path d={outline.join(' ')} />
+        </clipPath>
+        <clipPath id={`${uid}-bow`}>
+          <path d={bowOutline} />
+        </clipPath>
+      </defs>
+
+      {/* Bow, with the neck that runs into the blade */}
+      <path
+        d={bowOutline}
         fill='var(--color-blue-wash)'
         stroke='var(--color-line)'
+        strokeLinejoin='round'
+      />
+      <g clipPath={`url(#${uid}-bow)`}>
+        <rect
+          x={0}
+          y={oy - 18}
+          width={BLADE_START + 4}
+          height={BODY_HEIGHT + 36}
+          fill={`url(#${uid}-metal)`}
+        />
+      </g>
+      {/* Key ring hole with its worn rim */}
+      <circle
+        cx={6 + BOW_WIDTH / 2}
+        cy={oy + BODY_HEIGHT / 2 - 2}
+        r={15}
+        fill='none'
+        stroke='currentColor'
+        strokeOpacity='0.12'
       />
       <circle
         cx={6 + BOW_WIDTH / 2}
-        cy={oy + BODY_HEIGHT / 2}
-        r={13}
+        cy={oy + BODY_HEIGHT / 2 - 2}
+        r={12}
         fill='var(--color-background)'
         stroke='var(--color-line)'
       />
@@ -143,6 +215,42 @@ function KeyBlade({
         stroke='var(--color-line)'
         strokeLinejoin='round'
       />
+      <g clipPath={`url(#${uid}-blade)`}>
+        <rect
+          x={BLADE_START - 2}
+          y={oy - 2}
+          width={tipX - BLADE_START + 24}
+          height={BODY_HEIGHT + 4}
+          fill={`url(#${uid}-metal)`}
+        />
+        {/* Warding groove, milled below the cuts along the whole blade */}
+        <rect
+          x={BLADE_START - 6}
+          y={oy + BODY_HEIGHT - 20}
+          width={tipX - BLADE_START + 20}
+          height={9}
+          rx={4.5}
+          fill='currentColor'
+          fillOpacity='0.07'
+        />
+        <line
+          x1={BLADE_START - 6}
+          x2={tipX + 14}
+          y1={oy + BODY_HEIGHT - 19.5}
+          y2={oy + BODY_HEIGHT - 19.5}
+          stroke='currentColor'
+          strokeOpacity='0.14'
+        />
+        {/* Shoulder: the stop the key rests against in the keyway */}
+        <line
+          x1={BLADE_START}
+          x2={BLADE_START}
+          y1={oy}
+          y2={bottom}
+          stroke='currentColor'
+          strokeOpacity='0.12'
+        />
+      </g>
 
       {/* K — at least one cut must reach below this line */}
       {longPinFloor > 0 && longPinFloor < pins && (
