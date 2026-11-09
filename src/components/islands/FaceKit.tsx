@@ -240,8 +240,8 @@ export default function FaceKit() {
       <section className='panel rounded-soft p-4 sm:p-5' aria-label='Parts'>
         <h2 className='text-sm font-semibold'>Parts</h2>
         <p className='text-muted-foreground mt-1 mb-4 text-xs'>
-          Open a layer to see every part drawn on this face. A pinned layer
-          stops following the seed and travels in the address bar with it.
+          Pick a layer, then pick the part you want drawn. A pinned layer stops
+          following the seed and travels in the address bar with it.
         </p>
         <FaceParts
           selection={selection}

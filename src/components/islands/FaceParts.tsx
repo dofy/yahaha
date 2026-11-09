@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { ChevronDown, Pin } from 'lucide-react'
+import { Pin } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import FaceSvg from '@/components/islands/FaceSvg'
 import {
   faceLayers,
@@ -10,12 +11,22 @@ import {
 } from '@/lib/face'
 
 /**
- * Part picker. Every option is the face itself with that one part swapped in,
- * so a choice is read from the drawing rather than from its name. Only the open
- * layer renders its options, which keeps the page from drawing all 78 of them.
+ * Part picker. One layer is open at a time, so the options themselves get the
+ * space instead of nine collapsed rows. Every option is the face with that one
+ * part swapped in, which reads faster than a variant name.
  */
+
 /** Layers an extra can cover; their previews drop the extra. */
 const OCCLUDED = new Set(['eye', 'brow'])
+
+type Row = {
+  name: string
+  label: string
+  current: string
+  count: number
+  optionLabel: (index: number) => string
+  preview: (index: number) => FaceSelection
+}
 
 export default function FaceParts({
   selection,
@@ -29,28 +40,23 @@ export default function FaceParts({
   frame: FaceFrame
   onPick: (name: string, value: number | 'auto') => void
 }) {
-  const [open, setOpen] = React.useState<string | null>(null)
+  const [layer, setLayer] = React.useState('hair')
 
-  const rows: {
-    name: string
-    label: string
-    current: string
-    count: number
-    preview: (index: number) => FaceSelection
-  }[] = [
-    ...faceLayers.map((layer) => ({
-      name: layer.name,
-      label: layer.label,
-      current: variantOf(selection, layer).id,
-      count: layer.variants.length,
+  const rows: Row[] = [
+    ...faceLayers.map((entry) => ({
+      name: entry.name,
+      label: entry.label,
+      current: variantOf(selection, entry).id,
+      count: entry.variants.length,
+      optionLabel: (index: number) => entry.variants[index].id,
       preview: (index: number) => ({
         ...selection,
         parts: {
           ...selection.parts,
           // Glasses and the like sit over the eyes, so they step aside while
           // the part under them is the one being chosen.
-          ...(OCCLUDED.has(layer.name) ? { extra: 0 } : {}),
-          [layer.name]: index
+          ...(OCCLUDED.has(entry.name) ? { extra: 0 } : {}),
+          [entry.name]: index
         }
       })
     })),
@@ -59,107 +65,79 @@ export default function FaceParts({
       label: 'Palette',
       current: facePalettes[selection.palette].id,
       count: facePalettes.length,
+      optionLabel: (index: number) => facePalettes[index].id,
       preview: (index: number) => ({ ...selection, palette: index })
     }
   ]
 
-  const optionLabel = (name: string, index: number) =>
-    name === 'palette'
-      ? facePalettes[index].id
-      : faceLayers.find((layer) => layer.name === name)!.variants[index].id
-
   return (
-    <div className='space-y-2'>
-      {rows.map((row) => {
-        const pinned = overrides[row.name] !== undefined
-        const expanded = open === row.name
-        return (
-          <div key={row.name} className='chip rounded-xl'>
-            <button
-              type='button'
-              aria-expanded={expanded}
-              aria-controls={`face-options-${row.name}`}
-              onClick={() => setOpen(expanded ? null : row.name)}
-              className='flex w-full items-center gap-3 p-2 text-left'
-            >
-              <FaceSvg
-                selection={selection}
-                frame={frame}
-                className='size-10 shrink-0'
-              />
-              <span className='min-w-0 flex-1'>
-                <span className='block text-sm font-medium'>{row.label}</span>
-                <span className='text-muted-foreground block truncate font-mono text-xs'>
-                  {pinned ? row.current : `auto · ${row.current}`}
-                </span>
-              </span>
-              {pinned && (
-                <Pin
-                  aria-label='Pinned'
-                  className='text-accent-text size-3.5 shrink-0'
-                />
-              )}
-              <ChevronDown
-                aria-hidden='true'
-                className={`size-4 shrink-0 transition-transform duration-200 ${
-                  expanded ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
+    <Tabs value={layer} onValueChange={setLayer}>
+      <TabsList className='h-auto flex-wrap justify-start gap-1'>
+        {rows.map((row) => (
+          <TabsTrigger key={row.name} value={row.name} className='gap-1.5'>
+            {row.label}
+            {overrides[row.name] !== undefined && (
+              <Pin aria-label='Pinned' className='size-3' />
+            )}
+          </TabsTrigger>
+        ))}
+      </TabsList>
 
-            {expanded && (
-              <ul
-                id={`face-options-${row.name}`}
-                className='grid grid-cols-4 gap-2 p-2 pt-0 sm:grid-cols-6 lg:grid-cols-8'
+      {rows.map((row) => (
+        <TabsContent key={row.name} value={row.name} className='mt-3'>
+          <p className='text-muted-foreground mb-2 text-xs'>
+            {overrides[row.name] === undefined
+              ? 'Follows the seed · '
+              : 'Pinned · '}
+            <span className='font-mono'>{row.current}</span>
+          </p>
+          <ul className='grid grid-cols-[repeat(auto-fill,minmax(68px,1fr))] gap-2'>
+            <li>
+              <button
+                type='button'
+                aria-pressed={overrides[row.name] === undefined}
+                onClick={() => onPick(row.name, 'auto')}
+                className={`chip hover:border-accent w-full rounded-lg p-1.5 ${
+                  overrides[row.name] === undefined
+                    ? 'border-accent text-accent-text'
+                    : ''
+                }`}
               >
-                <li>
+                <FaceSvg
+                  selection={selection}
+                  frame={frame}
+                  className='h-auto w-full'
+                />
+                <span className='mt-1 block truncate text-[11px]'>auto</span>
+              </button>
+            </li>
+            {Array.from({ length: row.count }, (_, index) => {
+              const active = overrides[row.name] === index
+              return (
+                <li key={row.optionLabel(index)}>
                   <button
                     type='button'
-                    aria-pressed={!pinned}
-                    onClick={() => onPick(row.name, 'auto')}
-                    className={`panel-solid w-full rounded-lg p-1.5 ${
-                      pinned ? '' : 'border-accent text-accent-text'
+                    aria-pressed={active}
+                    onClick={() => onPick(row.name, index)}
+                    className={`chip hover:border-accent w-full rounded-lg p-1.5 ${
+                      active ? 'border-accent text-accent-text' : ''
                     }`}
                   >
                     <FaceSvg
-                      selection={selection}
+                      selection={row.preview(index)}
                       frame={frame}
                       className='h-auto w-full'
                     />
-                    <span className='mt-1 block truncate text-[11px]'>
-                      auto
+                    <span className='mt-1 block truncate font-mono text-[11px]'>
+                      {row.optionLabel(index)}
                     </span>
                   </button>
                 </li>
-                {Array.from({ length: row.count }, (_, index) => {
-                  const active = overrides[row.name] === index
-                  return (
-                    <li key={optionLabel(row.name, index)}>
-                      <button
-                        type='button'
-                        aria-pressed={active}
-                        onClick={() => onPick(row.name, index)}
-                        className={`panel-solid hover:border-accent w-full rounded-lg p-1.5 ${
-                          active ? 'border-accent text-accent-text' : ''
-                        }`}
-                      >
-                        <FaceSvg
-                          selection={row.preview(index)}
-                          frame={frame}
-                          className='h-auto w-full'
-                        />
-                        <span className='mt-1 block truncate font-mono text-[11px]'>
-                          {optionLabel(row.name, index)}
-                        </span>
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </div>
-        )
-      })}
-    </div>
+              )
+            })}
+          </ul>
+        </TabsContent>
+      ))}
+    </Tabs>
   )
 }
