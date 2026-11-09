@@ -83,6 +83,15 @@ seed → FNV-1a 32 位 → mulberry32 → 依次取 palette、bg、face、hair�
 界面把 seed 与全部覆盖写进地址栏（`?seed=Seven&eye=3`），加载时回读，所以一张脸可以直接
 用链接分享。
 
+## 部件选择
+
+界面的 Parts 面板按层折叠（`FaceParts.tsx`）。每层的选项**不是文字而是图例**：每个选项
+就是当前这张脸把那一个部件换掉之后的样子，名字作为小字写在图下面，首项"auto"表示跟随
+seed。只有展开的那一层才渲染选项，避免一次画出全部 78 个缩略图。
+
+选 `eye` 与 `brow` 时，预览会临时把 `extra` 设为 `none`——否则眼镜、墨镜会把正在挑的部件
+挡住。`OCCLUDED` 常量记录这类"会被遮挡的层"。
+
 ## 导出
 
 - `faceToSvg(selection, { size, frame, seed })` 产出独立 SVG 字符串：带 `xmlns`、`title`

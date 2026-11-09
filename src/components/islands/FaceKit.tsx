@@ -9,20 +9,16 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
+import FaceParts from '@/components/islands/FaceParts'
 import FaceSvg from '@/components/islands/FaceSvg'
 import {
   codeOf,
   describeFace,
   faceCombinations,
-  faceLayers,
-  facePalettes,
   faceToSvg,
   layerNames,
-  paletteOf,
   randomSeed,
   selectFace,
-  variantOf,
   type FaceFrame
 } from '@/lib/face'
 import { useClipboard } from '@/lib/useClipboard'
@@ -244,55 +240,15 @@ export default function FaceKit() {
       <section className='panel rounded-soft p-4 sm:p-5' aria-label='Parts'>
         <h2 className='text-sm font-semibold'>Parts</h2>
         <p className='text-muted-foreground mt-1 mb-4 text-xs'>
-          Every layer follows the seed until you pin it. Pinned layers travel in
-          the address bar with the seed.
+          Open a layer to see every part drawn on this face. A pinned layer
+          stops following the seed and travels in the address bar with it.
         </p>
-        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-          {faceLayers.map((layer) => (
-            <div key={layer.name}>
-              <label
-                htmlFor={`face-${layer.name}`}
-                className='mb-2 block text-sm font-medium'
-              >
-                {layer.label}
-              </label>
-              <Select
-                id={`face-${layer.name}`}
-                value={overrides[layer.name] ?? 'auto'}
-                onChange={(event) => setLayer(layer.name, event.target.value)}
-              >
-                <option value='auto'>
-                  Auto · {variantOf(selection, layer).id}
-                </option>
-                {layer.variants.map((variant, index) => (
-                  <option key={variant.id} value={index}>
-                    {variant.id}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          ))}
-          <div>
-            <label
-              htmlFor='face-palette'
-              className='mb-2 block text-sm font-medium'
-            >
-              Palette
-            </label>
-            <Select
-              id='face-palette'
-              value={overrides.palette ?? 'auto'}
-              onChange={(event) => setLayer('palette', event.target.value)}
-            >
-              <option value='auto'>Auto · {paletteOf(selection).id}</option>
-              {facePalettes.map((palette, index) => (
-                <option key={palette.id} value={index}>
-                  {palette.id}
-                </option>
-              ))}
-            </Select>
-          </div>
-        </div>
+        <FaceParts
+          selection={selection}
+          overrides={overrides}
+          frame={frame}
+          onPick={(name, value) => setLayer(name, String(value))}
+        />
         <div className='mt-4 flex flex-wrap items-center gap-3'>
           <Button
             type='button'
