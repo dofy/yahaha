@@ -28,6 +28,11 @@ export const pageMetadata: Record<string, PageMetadata> = {
       'Generate and copy ASCII art from text with a choice of FIGlet fonts.',
     lang: 'en'
   },
+  '/face': {
+    description:
+      'Turn any name or text into a deterministic SVG avatar, pin individual parts, and copy or download the result.',
+    lang: 'en'
+  },
   '/lock': {
     description:
       'Generate single-row and double-row pin tumbler key bittings that satisfy chamber, run, step, paired-sum, reuse and spacing rules, and inspect each rule on a key diagram.',

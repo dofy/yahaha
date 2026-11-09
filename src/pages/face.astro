@@ -1,0 +1,15 @@
+---
+import Base from '@/layouts/Base.astro'
+import FaceKit from '@/components/islands/FaceKit'
+---
+
+<Base title='Face Kit' wide>
+  <header>
+    <h1 class='page-title'>Face Kit</h1>
+    <p class='page-subtitle'>
+      Turn any text into an avatar. The same seed always draws the same face,
+      every part is plain SVG, and you can pin any layer you like.
+    </p>
+  </header>
+  <FaceKit client:load />
+</Base>

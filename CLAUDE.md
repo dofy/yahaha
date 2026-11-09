@@ -38,6 +38,7 @@ src/
 │   ├── 24points.astro    # 24-points solver
 │   ├── emoji.astro       # Emoji search (EmojiSearch island)
 │   ├── emoticon.astro    # Emoticon generator
+│   ├── face.astro        # Face Kit (FaceKit island: seeded SVG avatars)
 │   ├── lock.astro        # Lock Kit (LockKit island: single/double row bittings)
 │   ├── morse.astro       # Morse code
 │   ├── tarot.astro       # Tarot (TarotBrowser island)
@@ -113,6 +114,13 @@ src/
   equality. Regression tests cover all 1,820 unordered inputs from 1 to 13.
 - **Morse:** pure encode/decode functions live in `src/lib/morse.ts`. Render and
   copy the same output string, including unknown-character placeholders.
+- **Face Kit:** parts live as SVG shape data in `src/data/face.json`, never as
+  images; `f`/`s` may only name palette tokens and `m` mirrors a shape across the
+  centre line, so one eye definition draws both. `src/lib/face.ts` hashes the
+  seed with FNV-1a and expands it with mulberry32 — do not go back to summing
+  character codes, which is what skewed the 2012 PHP version. The preview and the
+  exported SVG share `faceShapes`/`shapeAttributes`, so keep both on that path.
+  See [the data reference](docs/face-kit.md).
 - **Lock Kit:** `src/lib/lock.ts` enumerates key bittings with prefix pruning, so
   cost tracks surviving codes rather than `pins ** holes`; rule I is a minimum
   Hamming distance filter using masked keys, not pairwise comparison. Keep

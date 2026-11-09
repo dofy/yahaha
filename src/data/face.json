@@ -1,0 +1,1363 @@
+{
+  "version": 1,
+  "viewBox": "0 0 100 100",
+  "palettes": [
+    {
+      "id": "sand",
+      "bg": "#f7e0c3",
+      "bgAlt": "#efcba2",
+      "skin": "#f3c69a",
+      "skinShade": "#d7a271",
+      "hair": "#4a3426",
+      "hairShade": "#2e1f16",
+      "ink": "#2b2420",
+      "white": "#fffdfc",
+      "accent": "#ff6554"
+    },
+    {
+      "id": "mint",
+      "bg": "#d9ece4",
+      "bgAlt": "#bcdcd0",
+      "skin": "#f6d2b3",
+      "skinShade": "#dcae89",
+      "hair": "#2f4f4a",
+      "hairShade": "#1e3330",
+      "ink": "#22312e",
+      "white": "#fffdfc",
+      "accent": "#ef7d64"
+    },
+    {
+      "id": "sky",
+      "bg": "#dce8f2",
+      "bgAlt": "#bcd3e8",
+      "skin": "#eec29c",
+      "skinShade": "#cf9d74",
+      "hair": "#27405e",
+      "hairShade": "#182a3f",
+      "ink": "#1f2c3d",
+      "white": "#fffdfc",
+      "accent": "#ff8a5c"
+    },
+    {
+      "id": "plum",
+      "bg": "#ead7e6",
+      "bgAlt": "#d6b6d2",
+      "skin": "#e8b893",
+      "skinShade": "#c6906b",
+      "hair": "#4a2740",
+      "hairShade": "#2f172a",
+      "ink": "#2d1f2b",
+      "white": "#fffdfc",
+      "accent": "#ff6f91"
+    },
+    {
+      "id": "clay",
+      "bg": "#f0ddd6",
+      "bgAlt": "#dfbdb0",
+      "skin": "#d79e76",
+      "skinShade": "#b47a55",
+      "hair": "#3a2418",
+      "hairShade": "#24150d",
+      "ink": "#2a1d16",
+      "white": "#fffdfc",
+      "accent": "#e2603f"
+    },
+    {
+      "id": "moss",
+      "bg": "#e4e8cf",
+      "bgAlt": "#cbd3a8",
+      "skin": "#e7bc92",
+      "skinShade": "#c6956c",
+      "hair": "#3d4420",
+      "hairShade": "#272c13",
+      "ink": "#262a1a",
+      "white": "#fffdfc",
+      "accent": "#f0803c"
+    },
+    {
+      "id": "slate",
+      "bg": "#e1e3e6",
+      "bgAlt": "#c3c7cd",
+      "skin": "#c98f66",
+      "skinShade": "#a66f4a",
+      "hair": "#2b2f36",
+      "hairShade": "#1a1d22",
+      "ink": "#1f2227",
+      "white": "#fffdfc",
+      "accent": "#ff6554"
+    },
+    {
+      "id": "coral",
+      "bg": "#fbdcd5",
+      "bgAlt": "#f4bdb0",
+      "skin": "#f0c49c",
+      "skinShade": "#cf9a70",
+      "hair": "#5a2f24",
+      "hairShade": "#3a1c14",
+      "ink": "#2e1d18",
+      "white": "#fffdfc",
+      "accent": "#d94f3d"
+    }
+  ],
+  "layers": [
+    {
+      "name": "bg",
+      "label": "Background",
+      "variants": [
+        {
+          "id": "plain",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 100,
+              "f": "bg"
+            }
+          ]
+        },
+        {
+          "id": "disc",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 100,
+              "f": "bg"
+            },
+            {
+              "t": "circle",
+              "cx": 50,
+              "cy": 54,
+              "r": 38,
+              "f": "bgAlt"
+            }
+          ]
+        },
+        {
+          "id": "halo",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 100,
+              "f": "bg"
+            },
+            {
+              "t": "circle",
+              "cx": 50,
+              "cy": 52,
+              "r": 36,
+              "f": "none",
+              "s": "bgAlt",
+              "sw": 5
+            }
+          ]
+        },
+        {
+          "id": "dots",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 100,
+              "f": "bg"
+            },
+            {
+              "t": "circle",
+              "cx": 14,
+              "cy": 16,
+              "r": 4,
+              "f": "bgAlt"
+            },
+            {
+              "t": "circle",
+              "cx": 86,
+              "cy": 24,
+              "r": 6,
+              "f": "bgAlt"
+            },
+            {
+              "t": "circle",
+              "cx": 20,
+              "cy": 84,
+              "r": 5,
+              "f": "bgAlt"
+            },
+            {
+              "t": "circle",
+              "cx": 82,
+              "cy": 78,
+              "r": 3,
+              "f": "bgAlt"
+            }
+          ]
+        },
+        {
+          "id": "split",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 100,
+              "f": "bg"
+            },
+            {
+              "t": "rect",
+              "x": 0,
+              "y": 56,
+              "w": 100,
+              "h": 44,
+              "f": "bgAlt"
+            }
+          ]
+        },
+        {
+          "id": "arch",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 100,
+              "f": "bg"
+            },
+            {
+              "t": "path",
+              "d": "M50 10 C74 10 90 28 90 54 L90 100 L10 100 L10 54 C10 28 26 10 50 10 Z",
+              "f": "bgAlt"
+            }
+          ]
+        },
+        {
+          "id": "corner",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 100,
+              "f": "bg"
+            },
+            {
+              "t": "path",
+              "d": "M0 100 L0 40 L60 100 Z",
+              "f": "bgAlt"
+            }
+          ]
+        },
+        {
+          "id": "grid",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 100,
+              "f": "bg"
+            },
+            {
+              "t": "path",
+              "d": "M0 25 H100 M0 50 H100 M0 75 H100 M25 0 V100 M50 0 V100 M75 0 V100",
+              "f": "none",
+              "s": "bgAlt",
+              "sw": 2
+            }
+          ]
+        },
+        {
+          "id": "rays",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 100,
+              "f": "bg"
+            },
+            {
+              "t": "path",
+              "d": "M50 54 L100 0 L100 24 Z M50 54 L100 44 L100 68 Z M50 54 L72 100 L48 100 Z",
+              "f": "bgAlt"
+            }
+          ]
+        },
+        {
+          "id": "blob",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 100,
+              "f": "bg"
+            },
+            {
+              "t": "path",
+              "d": "M24 20 C52 6 84 18 88 44 C92 72 72 94 46 92 C20 90 4 68 8 46 C11 32 14 25 24 20 Z",
+              "f": "bgAlt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "face",
+      "label": "Face shape",
+      "variants": [
+        {
+          "id": "round",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 24,
+              "cy": 58,
+              "rx": 5,
+              "ry": 7,
+              "f": "skinShade",
+              "m": true
+            },
+            {
+              "t": "ellipse",
+              "cx": 50,
+              "cy": 56,
+              "rx": 26,
+              "ry": 28,
+              "f": "skin"
+            }
+          ]
+        },
+        {
+          "id": "oval",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 26,
+              "cy": 58,
+              "rx": 5,
+              "ry": 7,
+              "f": "skinShade",
+              "m": true
+            },
+            {
+              "t": "ellipse",
+              "cx": 50,
+              "cy": 56,
+              "rx": 23,
+              "ry": 30,
+              "f": "skin"
+            }
+          ]
+        },
+        {
+          "id": "square",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 24,
+              "cy": 58,
+              "rx": 5,
+              "ry": 7,
+              "f": "skinShade",
+              "m": true
+            },
+            {
+              "t": "rect",
+              "x": 25,
+              "y": 28,
+              "w": 50,
+              "h": 55,
+              "rx": 15,
+              "f": "skin"
+            }
+          ]
+        },
+        {
+          "id": "wide",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 21,
+              "cy": 58,
+              "rx": 5,
+              "ry": 7,
+              "f": "skinShade",
+              "m": true
+            },
+            {
+              "t": "ellipse",
+              "cx": 50,
+              "cy": 57,
+              "rx": 29,
+              "ry": 26,
+              "f": "skin"
+            }
+          ]
+        },
+        {
+          "id": "long",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 27,
+              "cy": 58,
+              "rx": 4,
+              "ry": 7,
+              "f": "skinShade",
+              "m": true
+            },
+            {
+              "t": "ellipse",
+              "cx": 50,
+              "cy": 55,
+              "rx": 22,
+              "ry": 32,
+              "f": "skin"
+            }
+          ]
+        },
+        {
+          "id": "heart",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 24,
+              "cy": 54,
+              "rx": 5,
+              "ry": 7,
+              "f": "skinShade",
+              "m": true
+            },
+            {
+              "t": "path",
+              "d": "M50 85 C34 77 24 64 24 51 C24 37 34 27 50 27 C66 27 76 37 76 51 C76 64 66 77 50 85 Z",
+              "f": "skin"
+            }
+          ]
+        },
+        {
+          "id": "pear",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 26,
+              "cy": 56,
+              "rx": 5,
+              "ry": 7,
+              "f": "skinShade",
+              "m": true
+            },
+            {
+              "t": "path",
+              "d": "M50 26 C61 26 67 33 68 44 C70 61 64 84 50 84 C36 84 30 61 32 44 C33 33 39 26 50 26 Z",
+              "f": "skin"
+            }
+          ]
+        },
+        {
+          "id": "hex",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 24,
+              "cy": 56,
+              "rx": 5,
+              "ry": 7,
+              "f": "skinShade",
+              "m": true
+            },
+            {
+              "t": "path",
+              "d": "M50 26 L70 36 L72 60 L50 84 L28 60 L30 36 Z",
+              "f": "skin"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hair",
+      "label": "Hair",
+      "variants": [
+        {
+          "id": "none",
+          "shapes": []
+        },
+        {
+          "id": "short",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M22 50 C22 30 34 22 50 22 C66 22 78 30 78 50 C74 40 70 36 62 34 C54 32 40 34 34 40 C29 44 25 46 22 50 Z",
+              "f": "hair"
+            }
+          ]
+        },
+        {
+          "id": "bowl",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M21 48 C21 27 34 19 50 19 C66 19 79 27 79 48 L75 43 C71 33 61 29 50 29 C39 29 29 33 25 43 Z",
+              "f": "hair"
+            },
+            {
+              "t": "path",
+              "d": "M25 43 C33 37 44 35 54 37 L52 44 C44 42 33 44 27 48 Z",
+              "f": "hairShade"
+            }
+          ]
+        },
+        {
+          "id": "spiky",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M24 46 L28 27 L34 39 L40 23 L46 37 L52 21 L58 37 L64 25 L70 39 L76 47 C70 34 62 26 50 26 C38 26 30 34 24 46 Z",
+              "f": "hair"
+            }
+          ]
+        },
+        {
+          "id": "curly",
+          "shapes": [
+            {
+              "t": "circle",
+              "cx": 32,
+              "cy": 32,
+              "r": 10,
+              "f": "hair"
+            },
+            {
+              "t": "circle",
+              "cx": 44,
+              "cy": 25,
+              "r": 11,
+              "f": "hair"
+            },
+            {
+              "t": "circle",
+              "cx": 58,
+              "cy": 25,
+              "r": 11,
+              "f": "hair"
+            },
+            {
+              "t": "circle",
+              "cx": 69,
+              "cy": 33,
+              "r": 10,
+              "f": "hair"
+            },
+            {
+              "t": "path",
+              "d": "M24 44 C28 32 38 26 50 26 C62 26 72 32 76 44 Z",
+              "f": "hair"
+            }
+          ]
+        },
+        {
+          "id": "bun",
+          "shapes": [
+            {
+              "t": "circle",
+              "cx": 50,
+              "cy": 15,
+              "r": 9,
+              "f": "hair"
+            },
+            {
+              "t": "path",
+              "d": "M23 46 C23 28 35 20 50 20 C65 20 77 28 77 46 C72 36 63 31 50 31 C37 31 28 36 23 46 Z",
+              "f": "hair"
+            }
+          ]
+        },
+        {
+          "id": "ponytail",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M70 40 C86 43 94 58 87 73 C85 78 77 79 75 75 C84 65 84 52 68 47 Z",
+              "f": "hairShade"
+            },
+            {
+              "t": "circle",
+              "cx": 73,
+              "cy": 43,
+              "r": 4,
+              "f": "accent"
+            },
+            {
+              "t": "path",
+              "d": "M22 48 C22 29 34 21 50 21 C66 21 78 29 78 48 C73 37 64 32 50 32 C36 32 27 37 22 48 Z",
+              "f": "hair"
+            }
+          ]
+        },
+        {
+          "id": "long",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M20 46 C20 60 19 74 22 85 C23 88 30 88 31 85 C32 73 31 58 31 46 Z",
+              "f": "hairShade",
+              "m": true
+            },
+            {
+              "t": "path",
+              "d": "M21 50 C21 28 34 20 50 20 C66 20 79 28 79 50 C74 38 64 33 50 33 C36 33 26 38 21 50 Z",
+              "f": "hair"
+            }
+          ]
+        },
+        {
+          "id": "mohawk",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M43 34 L47 9 L53 9 L57 34 Z",
+              "f": "hair"
+            },
+            {
+              "t": "path",
+              "d": "M28 42 C32 34 40 31 50 31 C60 31 68 34 72 42 L68 40 C62 36 56 35 50 35 C44 35 38 36 32 40 Z",
+              "f": "hairShade"
+            }
+          ]
+        },
+        {
+          "id": "cap",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M22 44 C22 26 36 17 50 17 C64 17 78 26 78 44 Z",
+              "f": "accent"
+            },
+            {
+              "t": "rect",
+              "x": 18,
+              "y": 43,
+              "w": 64,
+              "h": 6,
+              "rx": 3,
+              "f": "hairShade"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "brow",
+      "label": "Brows",
+      "variants": [
+        {
+          "id": "none",
+          "shapes": []
+        },
+        {
+          "id": "flat",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 30,
+              "y": 41,
+              "w": 15,
+              "h": 3,
+              "rx": 1.5,
+              "f": "hairShade",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "arched",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M31 43 C35 38 42 38 45 42",
+              "f": "none",
+              "s": "hairShade",
+              "sw": 3,
+              "cap": "round",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "angry",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M31 39 L45 44",
+              "f": "none",
+              "s": "hairShade",
+              "sw": 3,
+              "cap": "round",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "worried",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M31 44 L45 39",
+              "f": "none",
+              "s": "hairShade",
+              "sw": 3,
+              "cap": "round",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "thick",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 29,
+              "y": 39,
+              "w": 17,
+              "h": 5,
+              "rx": 2.5,
+              "f": "hairShade",
+              "m": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "eye",
+      "label": "Eyes",
+      "variants": [
+        {
+          "id": "dot",
+          "shapes": [
+            {
+              "t": "circle",
+              "cx": 38,
+              "cy": 54,
+              "r": 4,
+              "f": "ink",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "oval",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 38,
+              "cy": 54,
+              "rx": 3.5,
+              "ry": 5,
+              "f": "ink",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "wide",
+          "shapes": [
+            {
+              "t": "circle",
+              "cx": 38,
+              "cy": 54,
+              "r": 6.5,
+              "f": "white",
+              "s": "ink",
+              "sw": 1.5,
+              "m": true
+            },
+            {
+              "t": "circle",
+              "cx": 38,
+              "cy": 54,
+              "r": 3,
+              "f": "ink",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "happy",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M32 56 C35 50 41 50 44 56",
+              "f": "none",
+              "s": "ink",
+              "sw": 3,
+              "cap": "round",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "sleepy",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M32 54 L44 54",
+              "f": "none",
+              "s": "ink",
+              "sw": 3,
+              "cap": "round",
+              "m": true
+            },
+            {
+              "t": "path",
+              "d": "M33 49 C36 46 41 46 43 49",
+              "f": "none",
+              "s": "ink",
+              "sw": 1.5,
+              "cap": "round",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "side",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 38,
+              "cy": 54,
+              "rx": 6,
+              "ry": 5,
+              "f": "white",
+              "s": "ink",
+              "sw": 1.5,
+              "m": true
+            },
+            {
+              "t": "circle",
+              "cx": 40.5,
+              "cy": 54,
+              "r": 2.5,
+              "f": "ink",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "star",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M38 48 L40.2 52.4 L45 53.1 L41.5 56.5 L42.3 61.3 L38 59 L33.7 61.3 L34.5 56.5 L31 53.1 L35.8 52.4 Z",
+              "f": "ink",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "wink",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M32 55 C35 50 41 50 44 55",
+              "f": "none",
+              "s": "ink",
+              "sw": 3,
+              "cap": "round"
+            },
+            {
+              "t": "circle",
+              "cx": 62,
+              "cy": 54,
+              "r": 4.5,
+              "f": "ink"
+            }
+          ]
+        },
+        {
+          "id": "angry",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 38,
+              "cy": 55,
+              "rx": 4,
+              "ry": 4.5,
+              "f": "ink",
+              "m": true
+            },
+            {
+              "t": "path",
+              "d": "M32 49 L44 53",
+              "f": "none",
+              "s": "ink",
+              "sw": 3,
+              "cap": "round"
+            },
+            {
+              "t": "path",
+              "d": "M68 49 L56 53",
+              "f": "none",
+              "s": "ink",
+              "sw": 3,
+              "cap": "round"
+            }
+          ]
+        },
+        {
+          "id": "shut",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M32 54 C35 58 41 58 44 54",
+              "f": "none",
+              "s": "ink",
+              "sw": 3,
+              "cap": "round",
+              "m": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "nose",
+      "label": "Nose",
+      "variants": [
+        {
+          "id": "none",
+          "shapes": []
+        },
+        {
+          "id": "dot",
+          "shapes": [
+            {
+              "t": "circle",
+              "cx": 50,
+              "cy": 63,
+              "r": 2.5,
+              "f": "skinShade"
+            }
+          ]
+        },
+        {
+          "id": "line",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M50 57 L50 64",
+              "f": "none",
+              "s": "skinShade",
+              "sw": 2.5,
+              "cap": "round"
+            }
+          ]
+        },
+        {
+          "id": "hook",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M50 56 L50 63 C50 65 52 65 54 64",
+              "f": "none",
+              "s": "skinShade",
+              "sw": 2.5,
+              "cap": "round"
+            }
+          ]
+        },
+        {
+          "id": "button",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 50,
+              "cy": 62,
+              "rx": 4,
+              "ry": 3,
+              "f": "skinShade"
+            }
+          ]
+        },
+        {
+          "id": "wedge",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M50 55 L55 64 L45 64 Z",
+              "f": "skinShade"
+            }
+          ]
+        },
+        {
+          "id": "wide",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 50,
+              "cy": 62,
+              "rx": 6,
+              "ry": 2.5,
+              "f": "skinShade"
+            }
+          ]
+        },
+        {
+          "id": "nostrils",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 46,
+              "cy": 62,
+              "rx": 2,
+              "ry": 1.5,
+              "f": "skinShade",
+              "m": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mouth",
+      "label": "Mouth",
+      "variants": [
+        {
+          "id": "smile",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M39 70 C44 77 56 77 61 70",
+              "f": "none",
+              "s": "ink",
+              "sw": 3,
+              "cap": "round"
+            }
+          ]
+        },
+        {
+          "id": "frown",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M39 76 C44 69 56 69 61 76",
+              "f": "none",
+              "s": "ink",
+              "sw": 3,
+              "cap": "round"
+            }
+          ]
+        },
+        {
+          "id": "flat",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M41 72 L59 72",
+              "f": "none",
+              "s": "ink",
+              "sw": 3,
+              "cap": "round"
+            }
+          ]
+        },
+        {
+          "id": "grin",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M37 68 C44 81 56 81 63 68 Z",
+              "f": "ink"
+            },
+            {
+              "t": "path",
+              "d": "M39 69 L61 69 L60 72 L40 72 Z",
+              "f": "white"
+            }
+          ]
+        },
+        {
+          "id": "open",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 50,
+              "cy": 72,
+              "rx": 8,
+              "ry": 6.5,
+              "f": "ink"
+            },
+            {
+              "t": "ellipse",
+              "cx": 50,
+              "cy": 76,
+              "rx": 5,
+              "ry": 3,
+              "f": "accent"
+            }
+          ]
+        },
+        {
+          "id": "tongue",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M39 70 C44 77 56 77 61 70",
+              "f": "none",
+              "s": "ink",
+              "sw": 3,
+              "cap": "round"
+            },
+            {
+              "t": "ellipse",
+              "cx": 52,
+              "cy": 77,
+              "rx": 4,
+              "ry": 3,
+              "f": "accent"
+            }
+          ]
+        },
+        {
+          "id": "cat",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M41 70 C44 75 48 75 50 71 C52 75 56 75 59 70",
+              "f": "none",
+              "s": "ink",
+              "sw": 2.5,
+              "cap": "round"
+            }
+          ]
+        },
+        {
+          "id": "zigzag",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M39 72 L44 68 L49 74 L54 68 L59 73",
+              "f": "none",
+              "s": "ink",
+              "sw": 2.5,
+              "cap": "round"
+            }
+          ]
+        },
+        {
+          "id": "kiss",
+          "shapes": [
+            {
+              "t": "circle",
+              "cx": 50,
+              "cy": 72,
+              "r": 4,
+              "f": "accent"
+            }
+          ]
+        },
+        {
+          "id": "teeth",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 40,
+              "y": 67,
+              "w": 20,
+              "h": 10,
+              "rx": 4,
+              "f": "white",
+              "s": "ink",
+              "sw": 2
+            },
+            {
+              "t": "path",
+              "d": "M40 72 L60 72",
+              "f": "none",
+              "s": "ink",
+              "sw": 1.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "extra",
+      "label": "Extras",
+      "variants": [
+        {
+          "id": "none",
+          "shapes": []
+        },
+        {
+          "id": "blush",
+          "shapes": [
+            {
+              "t": "ellipse",
+              "cx": 32,
+              "cy": 64,
+              "rx": 6,
+              "ry": 3.5,
+              "f": "accent",
+              "o": 0.35,
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "freckles",
+          "shapes": [
+            {
+              "t": "circle",
+              "cx": 33,
+              "cy": 62,
+              "r": 1.3,
+              "f": "skinShade",
+              "m": true
+            },
+            {
+              "t": "circle",
+              "cx": 37,
+              "cy": 65,
+              "r": 1.3,
+              "f": "skinShade",
+              "m": true
+            },
+            {
+              "t": "circle",
+              "cx": 30,
+              "cy": 67,
+              "r": 1.3,
+              "f": "skinShade",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "glasses",
+          "shapes": [
+            {
+              "t": "circle",
+              "cx": 38,
+              "cy": 54,
+              "r": 9,
+              "f": "none",
+              "s": "ink",
+              "sw": 2,
+              "m": true
+            },
+            {
+              "t": "path",
+              "d": "M47 54 L53 54",
+              "f": "none",
+              "s": "ink",
+              "sw": 2
+            },
+            {
+              "t": "path",
+              "d": "M29 54 L24 55",
+              "f": "none",
+              "s": "ink",
+              "sw": 2,
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "shades",
+          "shapes": [
+            {
+              "t": "rect",
+              "x": 28,
+              "y": 48,
+              "w": 18,
+              "h": 12,
+              "rx": 4,
+              "f": "ink",
+              "m": true
+            },
+            {
+              "t": "path",
+              "d": "M46 52 L54 52",
+              "f": "none",
+              "s": "ink",
+              "sw": 3
+            }
+          ]
+        },
+        {
+          "id": "earring",
+          "shapes": [
+            {
+              "t": "circle",
+              "cx": 24,
+              "cy": 61,
+              "r": 2.2,
+              "f": "accent",
+              "m": true
+            },
+            {
+              "t": "ellipse",
+              "cx": 24,
+              "cy": 67,
+              "rx": 2.6,
+              "ry": 3.6,
+              "f": "accent",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "headphones",
+          "shapes": [
+            {
+              "t": "path",
+              "d": "M20 54 C20 30 34 18 50 18 C66 18 80 30 80 54",
+              "f": "none",
+              "s": "ink",
+              "sw": 4,
+              "cap": "round"
+            },
+            {
+              "t": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 12,
+              "h": 18,
+              "rx": 5,
+              "f": "ink",
+              "m": true
+            }
+          ]
+        },
+        {
+          "id": "mole",
+          "shapes": [
+            {
+              "t": "circle",
+              "cx": 62,
+              "cy": 70,
+              "r": 1.6,
+              "f": "hairShade"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

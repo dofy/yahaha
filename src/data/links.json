@@ -160,6 +160,11 @@
         "icon": "🔤"
       },
       {
+        "name": "Face Kit",
+        "url": "/face",
+        "icon": "🙂"
+      },
+      {
         "name": "Lock Kit",
         "url": "/lock",
         "icon": "🔑"
