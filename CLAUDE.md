@@ -123,7 +123,8 @@ src/
   only the paired-sum rule H′ and rule I run over the pairs, so row rules have
   exactly one implementation. Pairing is a product, so keep `DEFAULT_ROW_LIMIT`
   alongside the result limit and budget.
-  See [the rule reference](docs/lock-coding.md).
+  See [the rule reference](docs/lock-coding.md) and
+  [the algorithm notes](docs/lock-algorithm.md).
 - **Clipboard:** use `useClipboard` for copied/error feedback and pending request
   invalidation. Copy targets must remain keyboard-accessible.
 - **Emoticon Kit:** character pools live in `src/lib/Emoticon.ts`; `mouse` is the
