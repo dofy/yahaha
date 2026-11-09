@@ -45,6 +45,39 @@ test('the part data only uses known shapes and palette tokens', () => {
   }
 })
 
+test('every face silhouette is outlined, so skin never merges into the backdrop', () => {
+  const face = faceLayers.find((layer) => layer.name === 'face')!
+  for (const variant of face.variants) {
+    for (const shape of variant.shapes) {
+      assert.equal(shape.s, 'outline', `${variant.id}: silhouette stroke`)
+      assert.ok((shape.sw ?? 0) > 0, `${variant.id}: stroke width`)
+    }
+  }
+})
+
+test('the outline token separates the head from every background', () => {
+  const channel = (value: number) =>
+    value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
+  const luminance = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map((index) =>
+      channel(Number.parseInt(hex.slice(index, index + 2), 16) / 255)
+    )
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+  }
+  const contrast = (a: string, b: string) => {
+    const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+    return (high + 0.05) / (low + 0.05)
+  }
+  for (const palette of facePalettes) {
+    for (const against of ['bg', 'bgAlt', 'skin'] as const) {
+      assert.ok(
+        contrast(palette.outline, palette[against]) >= 3,
+        `${palette.id}: outline against ${against}`
+      )
+    }
+  }
+})
+
 test('every palette defines the same tokens', () => {
   const keys = Object.keys(facePalettes[0]).sort()
   for (const palette of facePalettes) {

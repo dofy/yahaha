@@ -49,8 +49,13 @@ SVG，并修掉了原版的分布缺陷（见下文"选件"）。
   两侧分别写。
 
 `f` 与 `s` 只能取配色里的 token（`bg`、`bgAlt`、`skin`、`skinShade`、`hair`、`hairShade`、
-`ink`、`white`、`accent`）或 `none`，不写死颜色；换配色即整张头像换色。测试会校验所有
-token 存在、每套配色键集一致、颜色都是 `#rrggbb`。
+`ink`、`white`、`accent`、`outline`）或 `none`，不写死颜色；换配色即整张头像换色。测试会
+校验所有 token 存在、每套配色键集一致、颜色都是 `#rrggbb`。
+
+肤色与背景的对比度天然很低（1.0–2.2），所以**每个脸型（含耳朵）都用 `outline` 描边**，
+`outline` 是该配色 `skinShade` 的 0.62 倍暗度版本，对 `bg`、`bgAlt`、`skin` 的对比度都
+≥ 3。少了这道描边，浅背景上的光头会直接糊进背景里。两条测试分别盯住"脸型必须有描边"
+和"`outline` 对比度达标"。
 
 ## 选件
 

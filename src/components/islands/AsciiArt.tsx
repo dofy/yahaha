@@ -1,8 +1,9 @@
 import * as React from 'react'
 import figlet from 'figlet/browser'
-import { Check, ChevronDown, Copy, Plus, Shuffle, Trash2 } from 'lucide-react'
+import { Check, Copy, Plus, Shuffle, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
 import {
   availableFonts,
   matchesFont,
@@ -105,27 +106,20 @@ function FontPreview({
           >
             Font
           </label>
-          <div className='relative'>
-            <select
-              id={`font-select-${preview.id}`}
-              value={preview.font}
-              onChange={(event) => {
-                onFontChange(event.target.value)
-                reset()
-              }}
-              className='chip block h-10 w-full appearance-none rounded-xl py-2 pl-4 pr-10 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-ring'
-            >
-              {options.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              aria-hidden='true'
-              className='pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-foreground'
-            />
-          </div>
+          <Select
+            id={`font-select-${preview.id}`}
+            value={preview.font}
+            onChange={(event) => {
+              onFontChange(event.target.value)
+              reset()
+            }}
+          >
+            {options.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </Select>
         </div>
         <Button
           variant='outline'

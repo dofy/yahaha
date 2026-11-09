@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
 import FaceSvg from '@/components/islands/FaceSvg'
 import {
   codeOf,
@@ -255,11 +256,10 @@ export default function FaceKit() {
               >
                 {layer.label}
               </label>
-              <select
+              <Select
                 id={`face-${layer.name}`}
                 value={overrides[layer.name] ?? 'auto'}
                 onChange={(event) => setLayer(layer.name, event.target.value)}
-                className='chip focus-visible:outline-ring block h-10 w-full rounded-xl px-4 text-sm'
               >
                 <option value='auto'>
                   Auto · {variantOf(selection, layer).id}
@@ -269,7 +269,7 @@ export default function FaceKit() {
                     {variant.id}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           ))}
           <div>
@@ -279,11 +279,10 @@ export default function FaceKit() {
             >
               Palette
             </label>
-            <select
+            <Select
               id='face-palette'
               value={overrides.palette ?? 'auto'}
               onChange={(event) => setLayer('palette', event.target.value)}
-              className='chip focus-visible:outline-ring block h-10 w-full rounded-xl px-4 text-sm'
             >
               <option value='auto'>Auto · {paletteOf(selection).id}</option>
               {facePalettes.map((palette, index) => (
@@ -291,7 +290,7 @@ export default function FaceKit() {
                   {palette.id}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         </div>
         <div className='mt-4 flex flex-wrap items-center gap-3'>

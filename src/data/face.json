@@ -12,7 +12,8 @@
       "hairShade": "#2e1f16",
       "ink": "#2b2420",
       "white": "#fffdfc",
-      "accent": "#ff6554"
+      "accent": "#ff6554",
+      "outline": "#856446"
     },
     {
       "id": "mint",
@@ -24,7 +25,8 @@
       "hairShade": "#1e3330",
       "ink": "#22312e",
       "white": "#fffdfc",
-      "accent": "#ef7d64"
+      "accent": "#ef7d64",
+      "outline": "#886b54"
     },
     {
       "id": "sky",
@@ -36,7 +38,8 @@
       "hairShade": "#182a3f",
       "ink": "#1f2c3d",
       "white": "#fffdfc",
-      "accent": "#ff8a5c"
+      "accent": "#ff8a5c",
+      "outline": "#806147"
     },
     {
       "id": "plum",
@@ -48,7 +51,8 @@
       "hairShade": "#2f172a",
       "ink": "#2d1f2b",
       "white": "#fffdfc",
-      "accent": "#ff6f91"
+      "accent": "#ff6f91",
+      "outline": "#7a5942"
     },
     {
       "id": "clay",
@@ -60,7 +64,8 @@
       "hairShade": "#24150d",
       "ink": "#2a1d16",
       "white": "#fffdfc",
-      "accent": "#e2603f"
+      "accent": "#e2603f",
+      "outline": "#6f4b34"
     },
     {
       "id": "moss",
@@ -72,7 +77,8 @@
       "hairShade": "#272c13",
       "ink": "#262a1a",
       "white": "#fffdfc",
-      "accent": "#f0803c"
+      "accent": "#f0803c",
+      "outline": "#7a5c42"
     },
     {
       "id": "slate",
@@ -84,7 +90,8 @@
       "hairShade": "#1a1d22",
       "ink": "#1f2227",
       "white": "#fffdfc",
-      "accent": "#ff6554"
+      "accent": "#ff6554",
+      "outline": "#66442d"
     },
     {
       "id": "coral",
@@ -96,7 +103,8 @@
       "hairShade": "#3a1c14",
       "ink": "#2e1d18",
       "white": "#fffdfc",
-      "accent": "#d94f3d"
+      "accent": "#d94f3d",
+      "outline": "#805f45"
     }
   ],
   "layers": [
@@ -329,7 +337,9 @@
               "rx": 5,
               "ry": 7,
               "f": "skinShade",
-              "m": true
+              "m": true,
+              "s": "outline",
+              "sw": 1.6
             },
             {
               "t": "ellipse",
@@ -337,7 +347,9 @@
               "cy": 56,
               "rx": 26,
               "ry": 28,
-              "f": "skin"
+              "f": "skin",
+              "s": "outline",
+              "sw": 1.6
             }
           ]
         },
@@ -351,7 +363,9 @@
               "rx": 5,
               "ry": 7,
               "f": "skinShade",
-              "m": true
+              "m": true,
+              "s": "outline",
+              "sw": 1.6
             },
             {
               "t": "ellipse",
@@ -359,7 +373,9 @@
               "cy": 56,
               "rx": 23,
               "ry": 30,
-              "f": "skin"
+              "f": "skin",
+              "s": "outline",
+              "sw": 1.6
             }
           ]
         },
@@ -373,7 +389,9 @@
               "rx": 5,
               "ry": 7,
               "f": "skinShade",
-              "m": true
+              "m": true,
+              "s": "outline",
+              "sw": 1.6
             },
             {
               "t": "rect",
@@ -382,7 +400,9 @@
               "w": 50,
               "h": 55,
               "rx": 15,
-              "f": "skin"
+              "f": "skin",
+              "s": "outline",
+              "sw": 1.6
             }
           ]
         },
@@ -396,7 +416,9 @@
               "rx": 5,
               "ry": 7,
               "f": "skinShade",
-              "m": true
+              "m": true,
+              "s": "outline",
+              "sw": 1.6
             },
             {
               "t": "ellipse",
@@ -404,7 +426,9 @@
               "cy": 57,
               "rx": 29,
               "ry": 26,
-              "f": "skin"
+              "f": "skin",
+              "s": "outline",
+              "sw": 1.6
             }
           ]
         },
@@ -418,7 +442,9 @@
               "rx": 4,
               "ry": 7,
               "f": "skinShade",
-              "m": true
+              "m": true,
+              "s": "outline",
+              "sw": 1.6
             },
             {
               "t": "ellipse",
@@ -426,7 +452,9 @@
               "cy": 55,
               "rx": 22,
               "ry": 32,
-              "f": "skin"
+              "f": "skin",
+              "s": "outline",
+              "sw": 1.6
             }
           ]
         },
@@ -440,12 +468,16 @@
               "rx": 5,
               "ry": 7,
               "f": "skinShade",
-              "m": true
+              "m": true,
+              "s": "outline",
+              "sw": 1.6
             },
             {
               "t": "path",
               "d": "M50 85 C34 77 24 64 24 51 C24 37 34 27 50 27 C66 27 76 37 76 51 C76 64 66 77 50 85 Z",
-              "f": "skin"
+              "f": "skin",
+              "s": "outline",
+              "sw": 1.6
             }
           ]
         },
@@ -459,12 +491,16 @@
               "rx": 5,
               "ry": 7,
               "f": "skinShade",
-              "m": true
+              "m": true,
+              "s": "outline",
+              "sw": 1.6
             },
             {
               "t": "path",
               "d": "M50 26 C61 26 67 33 68 44 C70 61 64 84 50 84 C36 84 30 61 32 44 C33 33 39 26 50 26 Z",
-              "f": "skin"
+              "f": "skin",
+              "s": "outline",
+              "sw": 1.6
             }
           ]
         },
@@ -478,12 +514,16 @@
               "rx": 5,
               "ry": 7,
               "f": "skinShade",
-              "m": true
+              "m": true,
+              "s": "outline",
+              "sw": 1.6
             },
             {
               "t": "path",
               "d": "M50 26 L70 36 L72 60 L50 84 L28 60 L30 36 Z",
-              "f": "skin"
+              "f": "skin",
+              "s": "outline",
+              "sw": 1.6
             }
           ]
         }
@@ -614,7 +654,7 @@
           "shapes": [
             {
               "t": "path",
-              "d": "M20 46 C20 60 19 74 22 85 C23 88 30 88 31 85 C32 73 31 58 31 46 Z",
+              "d": "M23 42 C17 54 16 68 20 78 C22 83 30 83 31 77 C29 66 29 53 31 42 Z",
               "f": "hairShade",
               "m": true
             },

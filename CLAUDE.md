@@ -54,7 +54,7 @@ src/
 │   ├── islands/          # React islands (client:* hydration)
 │   │   ├── ThemeToggle.tsx   # 3-state light→dark→auto cycle + theme-color meta
 │   │   └── Mascot.tsx        # Original pixel explorer (grid SVG) — pixel easter egg
-│   └── ui/               # shadcn-style primitives (Button, etc.)
+│   └── ui/               # shadcn-style primitives (Button, Input, Select, Tabs, Tooltip, Badge)
 ├── data/           # Static JSON: links, domains, keywords, heart, morse, tarot, emoji/
 ├── lib/            # Pure logic (solvers, generators)
 └── styles/
@@ -120,7 +120,9 @@ src/
   seed with FNV-1a and expands it with mulberry32 — do not go back to summing
   character codes, which is what skewed the 2012 PHP version. The preview and the
   exported SVG share `faceShapes`/`shapeAttributes`, so keep both on that path.
-  See [the data reference](docs/face-kit.md).
+  Face silhouettes must keep their `outline` stroke: skin and background sit
+  within 2.2:1 contrast, so without it a bald head disappears into a pale
+  backdrop. See [the data reference](docs/face-kit.md).
 - **Lock Kit:** `src/lib/lock.ts` enumerates key bittings with prefix pruning, so
   cost tracks surviving codes rather than `pins ** holes`; rule I is a minimum
   Hamming distance filter using masked keys, not pairwise comparison. Keep
