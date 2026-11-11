@@ -6,6 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { makeWorld, strSeed } from './world-gen.js';
+import './daylight.js'; // also loaded in <head>; sets window.SiteMapDaylight
 
 export async function mountMap(SITE) {
 // ---------------- data from site.json ----------------
@@ -1509,29 +1510,8 @@ langMenu.addEventListener('click', e => { const b = e.target.closest('[data-lang
 document.addEventListener('click', () => { langMenu.hidden = true; });
 
 // ---------------- daylight: local time drives sky, sun and lamps ----------------
-// keyframes: hour, sky, sun colour, sun intensity, sun elevation (deg), hemi sky, hemi ground, hemi intensity, lamps 0-1, ink strength
-const DAY = [
-  [0,    '#1f2838', '#8ea3cf', .55, 38, '#3b4b6b', '#20252f', .95, 1,   .55],
-  [4.5,  '#2c3650', '#9aa8d0', .6,  30, '#46537a', '#2a2a33', 1.0, 1,   .6],
-  [6,    '#f0b58f', '#ffaa66', 1.35, 6, '#f3c4a4', '#7d5a48', 1.25, .5,  .75],
-  [7.5,  '#ece3d2', '#ffdcb0', 1.8, 22, '#f1e6d6', '#b98e64', 1.55, 0,  .82],
-  [10,   '#f1eadb', '#fff3e0', 2.05, 45, '#f1eadb', '#c59c6c', 1.75, 0,  .82],
-  [12.5, '#f4efe4', '#ffffff', 2.2, 68, '#f5f0e6', '#c9a576', 1.85, 0,  .82],
-  [15.5, '#f0e4cf', '#ffe6bf', 2.0, 38, '#f0e4d0', '#c39462', 1.7,  0,  .82],
-  [18,   '#e7a27a', '#ff9350', 1.45, 5, '#eaa989', '#6e4a44', 1.2,  .65, .75],
-  [19.5, '#3d3652', '#b3a2d4', .7,  25, '#544b6c', '#2b2733', 1.0,  1,  .6],
-  [24,   '#1f2838', '#8ea3cf', .55, 38, '#3b4b6b', '#20252f', .95, 1,   .55],
-];
-// interface palette per keyframe: card, ink, soft, faint, line, hover, water text, shadow
-const UI_NIGHT = ['#1f2637', '#eef2fa', '#c9d1e2', '#98a4ba', '#38425a', '#4c3443', '#9fc6d1', 'rgba(0, 0, 0, .35)'];
-const UI_EVE = ['#2b2940', '#f2ebf7', '#d4cbe0', '#a9a0bb', '#46425e', '#5a3a4a', '#a9c4d6', 'rgba(10, 6, 20, .32)'];
-const UI_DAWN = ['#fff3ea', '#45291f', '#6a4639', '#8c6656', '#efd5c6', '#ffd0c0', '#4f6f78', 'rgba(90, 50, 35, .18)'];
-const UI_DAY = ['#fffdf8', '#3a2f25', '#5b5046', '#7d7266', '#e2d8c8', '#ffd9cf', '#5a7d86', 'rgba(58, 47, 37, .16)'];
-const UI_DUSK = ['#fbe9dc', '#3a2219', '#63412f', '#866250', '#ebcab4', '#ffc9b4', '#4d6a73', 'rgba(90, 40, 20, .2)'];
-const UIP = [UI_NIGHT, UI_NIGHT, UI_DAWN, UI_DAY, UI_DAY, UI_DAY, UI_DAY, UI_DUSK, UI_EVE, UI_NIGHT];
-const UI_VARS = ['--ui-card', '--ui-ink', '--ui-soft', '--ui-faint', '--ui-line', '--ui-hot', '--ui-water'];
-const PHASE_AT = [0, 4.5, 7.5, 9.5, 11.5, 13.5, 17, 19, 24]; // 深夜 日出 早晨 上午 正午 下午 傍晚 夜晚
-const fixedHour = (() => { const q = new URLSearchParams(location.search).get('t'); const v = q === null ? NaN : parseFloat(q); return Number.isFinite(v) ? ((v % 24) + 24) % 24 : typeof UI.daylight === 'number' ? ((UI.daylight % 24) + 24) % 24 : null; })();
+const DL = window.SiteMapDaylight, { DAY, PHASE_AT } = DL;
+const fixedHour = (() => { const q = new URLSearchParams(location.search).get('t'); const v = q === null ? NaN : parseFloat(q); return Number.isFinite(v) ? ((v % 24) + 24) % 24 : typeof UI.daylight === 'number' ? ((UI.daylight % 24) + 24) % 24 : DL.fixedHour(); })();
 const nowHour = () => { if (fixedHour !== null) return fixedHour; const d = new Date(); return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600; };
 const stars = (() => { const pts = []; for (let i = 0; i < 700; i++) { const a = hash(i, 1) * Math.PI * 2, e = .08 + hash(i, 2) * 1.2, r = 190; pts.push(V(Math.cos(a) * Math.cos(e) * r, Math.sin(e) * r, Math.sin(a) * Math.cos(e) * r)); }
   const m = new THREE.PointsMaterial({ color: 0xfff6dd, size: 1.4, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false, fog: false });
@@ -1542,16 +1522,8 @@ function applyDaylight(h) {
   const A = DAY[i], B = DAY[i + 1], k = sstep(0, 1, (h - A[0]) / (B[0] - A[0]));
   const col = j => new THREE.Color(A[j]).lerp(new THREE.Color(B[j]), k), num = j => lerp(A[j], B[j], k);
   const sky = col(1);
-  { const P = UIP[i], Q = UIP[i + 1], kk = sstep(.15, .85, k), root = document.documentElement.style;
-    // blend only between palettes of the same polarity; light ↔ dark switches as one set at the
-    // midpoint, so card and text never meet in a grey where neither can be read
-    const lum = c => { const x = new THREE.Color(c); return .2126 * x.r + .7152 * x.g + .0722 * x.b; };
-    const flip = (lum(P[0]) > .5) !== (lum(Q[0]) > .5);
-    UI_VARS.forEach((v, j) => root.setProperty(v, '#' + (flip ? new THREE.Color(kk < .5 ? P[j] : Q[j]) : new THREE.Color(P[j]).lerp(new THREE.Color(Q[j]), kk)).getHexString()));
-    root.setProperty('--ui-shadow', kk < .5 ? P[7] : Q[7]); }
+  DL.paint(h); // interface colours, --sky and --sun
   scene.background = sky; fog.color.copy(sky);
-  document.documentElement.style.setProperty('--sky', '#' + sky.getHexString());
-  document.documentElement.style.setProperty('--sun', '#' + col(2).getHexString());
   sun.color.copy(col(2)); sun.intensity = num(3);
   hemi.color.copy(col(5)); hemi.groundColor.copy(col(6)); hemi.intensity = num(7);
   // sun travels east (+x) → south → west; at night the moon hangs high in the south-west

@@ -86,8 +86,9 @@ src/
   the same metadata itself, a static `<h1>` (site brand) and a `<noscript>` link list,
   then calls `mountMap(site)` from `src/scripts/map-engine.js` with `src/data/map.json`.
 - **The engine is vendored** from [dofy/site-to-map](https://github.com/dofy/site-to-map)
-  (`skills/site-to-map/engine/map-engine.js` and `world-gen.js`). Change it there, then copy
-  both here; do not fork it in place. `map.json` sets `world.seed: "{domain}"`, so
+  (`skills/site-to-map/engine/map-engine.js`, `world-gen.js` and `daylight.js`). Change it
+  there, then copy all three here; `daylight.js` is also inlined in the page `<head>` so the
+  loader has the right time-of-day colours on first paint; do not fork it in place. `map.json` sets `world.seed: "{domain}"`, so
   dofy.net, PHPz.xyz, PHPz.org and yahaha.net each get their own generated land (localhost
   and preview deploys fall back to yahaha.net's). `"{domain}-v2"` rerolls all four;
   `layout: "classic"` would bring back the hand-made continent (tag v0.7.3). `ui` turns
