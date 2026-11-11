@@ -8,6 +8,7 @@ _The answer exists only in the Tao._
 
 [![Astro](https://img.shields.io/badge/Astro-7-BC52EE?logo=astro&logoColor=white)](https://astro.build)
 [![React](https://img.shields.io/badge/React-19-087EA4?logo=react&logoColor=white)](https://react.dev)
+[![three.js](https://img.shields.io/badge/three.js-0.170-000000?logo=threedotjs&logoColor=white)](https://threejs.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![pnpm](https://img.shields.io/badge/pnpm-10-F69220?logo=pnpm&logoColor=white)](https://pnpm.io)
@@ -22,24 +23,27 @@ _The answer exists only in the Tao._
 
 | Route                                                             | What it does                                                                |
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [`/`](https://yahaha.net/)                                        | Home — upcoming apps, browser tools, projects and personal links            |
+| [`/`](https://yahaha.net/)                                        | Home — a folded-paper 3D map: five cities of apps, tools, repos and links   |
 | [`/24points`](https://yahaha.net/24points)                        | Solves the 24-points card game for any four numbers                         |
 | [`/tarot`](https://yahaha.net/tarot)                              | All 22 Major Arcana, with upright and reversed readings                     |
 | [`/emoji`](https://yahaha.net/emoji)                              | Finds and copies Emoji 17.0 with Chinese, English and Apple search keywords |
 | [`/emoticon`](https://yahaha.net/emoticon)                        | Generates kaomoji — click to copy                                           |
 | [`/ascii-art`](https://yahaha.net/ascii-art)                      | Generate and copy ASCII art with FIGlet fonts                               |
 | [`/morse`](https://yahaha.net/morse)                              | Text ⇄ morse code, click the result to copy                                 |
+| [`/face`](https://yahaha.net/face)                                | Face Kit — turns any name into an SVG avatar                                |
+| [`/lock`](https://yahaha.net/lock)                                | Lock Kit — single- and double-row key bitting codes                         |
 | [`/heart/{hans,hant,en,original}`](https://yahaha.net/heart/hans) | Heart Sutra in Simplified, Traditional, English, and Sanskrit               |
 
 The repository is named `yahaha`; the website identifies itself by the current domain.
 Tools run entirely in the browser. There is no API, database or analytics. Social
 favicons are local assets; GitHub star badges load from shields.io.
 
-The homepage also introduces [Cruft](https://cruft.phpz.org/),
-[WordClip](https://wordclip.phpz.org/) and [LinguaDock](https://linguadock.phpz.org/)
-as upcoming apps. Their descriptions, platforms and website links live in
-`src/data/apps.json`; `AppShowcase.astro` renders them with local app icons and
-no client-side hydration.
+The homepage is a 3D map built with the [site-to-map](https://github.com/dofy/site-to-map)
+engine. Five cities hold the apps, browser tools, open-source repositories, Heart Sutra
+editions and social links, and every item has its own landmark building. Each domain grows
+its own generated land; light and colours follow the visitor's local time, and the map
+speaks Simplified and Traditional Chinese, Japanese and English. All of it is configured in
+`src/data/map.json`.
 
 Emoji search covers 3,944 fully-qualified Emoji 17.0 sequences with CLDR 48.2
 Simplified Chinese, Traditional Chinese and English annotations, modern macOS
@@ -58,25 +62,20 @@ See the [complete character inventory and maintenance notes](docs/emoticon-chara
 
 ## Design
 
-The site shares its visual language with the Cruft, WordClip and LinguaDock
-websites: paper white (`#fffdfc`), coral (`#ff6554`), rounded system fonts,
-faint horizontal rules and generous spacing within a 1180px layout.
+The homepage map is folded paper: flat-shaded low-poly land with ink-line edges, eight
+times of day from sunrise to late night, and an interface that changes colour with them.
+It opens from the sea looking inland; the Map button returns to that view. There is no
+theme switch on the homepage, because the time of day is the theme.
 
-The homepage introduces the apps, browser toolbox and open-source projects.
-Its overlapping tool previews link to the real tools. Shared navigation and
-footer appear on every page; the tool pages use solid working surfaces,
-rounded rectangular controls and the same semantic colors.
+The tool pages share their visual language with the Cruft, WordClip and LinguaDock
+websites: paper white (`#fffdfc`), coral (`#ff6554`), rounded system fonts, faint
+horizontal rules, solid working surfaces and rounded rectangular controls. Light, dark and
+system themes are available there. Coral text uses a deeper tone in light mode for
+readable contrast; filled coral buttons use dark text. The original favicon marks the
+header and footer, and the original kaomoji image stays centred above the footer.
 
-Light, dark and system themes remain available. Coral text uses a deeper tone
-in light mode for readable contrast; filled coral buttons use dark text.
-The original favicon marks the header and footer; the original kaomoji image
-remains centered above the footer on every page. The original pixel mascot is still
-available as a standalone static SVG component.
-
-This is Seven's personal website. The name beside the favicon and the browser
-title follow the current domain, using the configured names for dofy.net,
-PHPz.xyz, PHPz.org and yahaha.net. Social favicons are stored locally in
-`public/social/`; the kaomoji sign-off uses a transparent copy of the original.
+This is Seven's personal website. The site name and browser title follow the current
+domain, using the configured names for dofy.net, PHPz.xyz, PHPz.org and yahaha.net.
 
 ## Quick start
 
@@ -99,7 +98,7 @@ pnpm dev        # → http://localhost:4321
 
 Output is fully static, so `dist/` can be served from anywhere. `pnpm verify` is
 the local gate. GitHub Actions runs the same checks plus a dependency audit.
-Static-output checks cover all ten pages, language and sharing metadata, internal
+Static-output checks cover all thirteen pages, language and sharing metadata, internal
 links and assets, sitemap entries, manifest shortcuts, and absence of mascot hydration.
 
 The 24-points solver uses exact fractions and all binary expression shapes. Its
@@ -129,17 +128,19 @@ inventory, Emoji data notes and dated verification/release records.
 ```
 src/
 ├── pages/                  # each .astro file is a route
-│   ├── index.astro         # hero + link sections
+│   ├── index.astro         # full-screen 3D map (no Base layout)
 │   ├── 24points.astro
 │   ├── emoji.astro
 │   ├── emoticon.astro
 │   ├── morse.astro
 │   ├── tarot.astro
+│   ├── face.astro
+│   ├── lock.astro
+│   ├── ascii-art.astro
 │   └── heart/[lang].astro  # dynamic lang param
 ├── layouts/
-│   └── Base.astro           # <head> meta, anti-FOUC theme guard, shared header/footer
+│   └── Base.astro           # tool pages: <head> meta, anti-FOUC theme guard, header/footer
 ├── components/
-│   ├── LinkBlock.astro      # homepage link sections
 │   ├── Header.astro         # shared navigation
 │   ├── SiteBrand.astro      # original favicon + current domain
 │   ├── Footer.astro
@@ -151,20 +152,31 @@ src/
 │   │   ├── EmoticonKit.tsx
 │   │   ├── MorseCode.tsx
 │   │   ├── Points24.tsx
-│   │   └── TarotBrowser.tsx
+│   │   ├── TarotBrowser.tsx
+│   │   ├── FaceKit.tsx
+│   │   ├── LockKit.tsx
+│   │   └── AsciiArt.tsx
 │   └── ui/                  # shadcn-style primitives
-├── data/                    # static JSON — links, heart, morse, tarot, emoji
+├── scripts/                 # map-engine.js, world-gen.js, daylight.js (from site-to-map)
+├── data/                    # static JSON — map, heart, morse, tarot, emoji, face
 ├── lib/                     # pure logic (solvers, generators)
 └── styles/
     └── globals.css          # shared app-site tokens, layout, motion
 ```
 
-Interactive islands are hydrated individually. Every page includes the shared
-header, theme control and footer; static text and link sections do not hydrate.
+Interactive islands are hydrated individually. Every tool page includes the shared
+header, theme control and footer; static text does not hydrate. The homepage renders its
+own metadata, a static heading and a no-JavaScript link list, then mounts the map.
 
 ## Implementation notes
 
 A few decisions that are easy to get wrong and worth knowing before editing:
+
+**Change the map engine upstream.** `src/scripts/map-engine.js`, `world-gen.js` and
+`daylight.js` come from [site-to-map](https://github.com/dofy/site-to-map); edit them there
+and copy them back. `daylight.js` is also inlined in the homepage `<head>` so the first
+frame already has the right colours. Map content, its four languages and the GitHub link
+live in `src/data/map.json`; keep every language together when you edit a string.
 
 **Keep the app-site palette aligned.** The base colors and typography come from
 `../LinguaDock/website/styles.css`, `../Cruft/website/styles.css` and
