@@ -1,4 +1,20 @@
 {
+  "world": {
+    "layout": "classic"
+  },
+  "ui": {
+    "languageSwitch": true,
+    "shortcuts": true,
+    "tour": true,
+    "views": true,
+    "clock": true,
+    "compass": true,
+    "daylight": "auto",
+    "intro": true,
+    "motion": true,
+    "blur": true,
+    "infoOpen": true
+  },
   "site": {
     "brand": "yahaha.net",
     "domains": [

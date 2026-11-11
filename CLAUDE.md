@@ -86,8 +86,10 @@ src/
   the same metadata itself, a static `<h1>` (site brand) and a `<noscript>` link list,
   then calls `mountMap(site)` from `src/scripts/map-engine.js` with `src/data/map.json`.
 - **The engine is vendored** from [dofy/site-to-map](https://github.com/dofy/site-to-map)
-  (`skills/site-to-map/engine/map-engine.js`). Change it there, then copy it here; do not
-  fork it in place. It is plain JS on bundled `three` 0.170.
+  (`skills/site-to-map/engine/map-engine.js` and `world-gen.js`). Change it there, then copy
+  both here; do not fork it in place. `map.json` pins `world.layout: "classic"` (the
+  hand-made continent; without it the engine generates a new world from a seed) and turns
+  every `ui` option on, including the language switch and shortcuts that default to off. It is plain JS on bundled `three` 0.170.
 - The map draws a folded-paper continent with `MeshLambertMaterial` flat shading and an
   ink-line post pass (normal + depth edges), plus depth-of-field and tilt-shift blur.
   Five cities (Minas Tirith = tools, Rivendell = Heart Sutra, Grey Havens = apps,

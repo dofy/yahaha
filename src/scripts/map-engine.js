@@ -5,20 +5,15 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { makeWorld, strSeed } from './world-gen.js';
 
 export async function mountMap(SITE) {
 // ---------------- data from site.json ----------------
 const CENTER = { x: 4, z: 8.5 };
 const COLS = 'ABC';
 const WL = -0.3; // water level
-// five town slots on the fixed continent; each slot keeps its own scenery
-const SLOTS = {
-  center: { cx: -.5, cz: -5, y: .2 },
-  highland: { cx: -12.5, cz: -7, y: 1.7, gate: true },
-  coast: { cx: 11.5, cz: -8, y: .2, harbor: true },
-  south: { cx: -2.5, cz: 7, y: .2 },
-  east: { cx: 11.5, cz: 5, y: .2 },
-};
+// five town roles; the world generator decides where each one sits
+const SLOTS = { center: {}, highland: {}, coast: {}, south: {}, east: {} };
 const SLOT_ORDER = ['center', 'south', 'coast', 'east', 'highland'];
 const PROP_KINDS = new Set(['oak', 'pine', 'birch', 'rock', 'boulders', 'signpost', 'flowerbed', 'statue', 'well', 'lamp', 'bench', 'stall']);
 const loc = (v, lang) => v == null ? '' : typeof v === 'string' ? v : (v[lang] ?? v.en ?? v.zh ?? Object.values(v)[0] ?? '');
@@ -28,7 +23,6 @@ const CITIES = [];
   const free = SLOT_ORDER.filter(s => !taken.has(s));
   for (const src of (SITE.cities || []).slice(0, 5)) {
     const slot = SLOTS[src.slot] ? src.slot : free.shift();
-    const S = SLOTS[slot];
     const all = (src.items || []).map(it => ({ ...it }));
     const builds = all.filter(it => !PROP_KINDS.has(it.kind)).slice(0, 9);
     const props = all.filter(it => !builds.includes(it));
@@ -37,18 +31,24 @@ const CITIES = [];
     const c = {
       id: src.id, slot, en: loc(src.name, 'en'), name: loc(src.name, 'zh'), nameRaw: src.name,
       roleRaw: src.role, blurbRaw: src.blurb, key: (src.key || '').toLowerCase(),
-      cols, rows, y: S.y, gate: !!S.gate, harbor: !!S.harbor,
+      cols, rows, y: .2, gate: false, harbor: false,
       walls: !!f.walls, hedge: !!f.hedge, lamps: f.lamps !== false, centerpiece: f.centerpiece || (slot === 'east' ? 'fountain' : slot === 'coast' ? 'statue' : 'pond'),
       roof: (src.style && src.style.roofs && src.style.roofs[0]) || 'terra',
       style: { walls: ['paper', 'road', 'wallRose', 'wallSage'], roofs: ['terra', 'mustard', 'olive', 'roofSlate'], annex: ['tree', 'lantern', 'hut', 'barrels'], ...(src.style || {}) },
       items: [...builds, ...props], nBuild: n, suburbs: f.suburbs ?? (slot === 'highland' ? 3 : 7),
     };
-    c.W = cols * 2 + 1; c.H = rows * 2 + 1; c.cx = S.cx; c.cz = S.cz;
-    c.ox = c.cx + CENTER.x - c.W / 2; c.oy = c.cz + CENTER.z - c.H / 2;
+    c.W = cols * 2 + 1; c.H = rows * 2 + 1;
     CITIES.push(c);
   }
 }
-const usedSlots = new Set(CITIES.map(c => c.slot));
+// ---------------- world: classic continent or a generated one ----------------
+const WCFG = { ...(SITE.world || {}) };
+{ const q = new URLSearchParams(location.search); if (q.get('seed')) WCFG.seed = strSeed(q.get('seed')); if (q.get('world')) { WCFG.type = q.get('world'); if (WCFG.layout === 'classic') WCFG.layout = 'auto'; } if (q.get('seed') && WCFG.layout === 'classic') WCFG.layout = 'auto'; }
+if (WCFG.seed == null) WCFG.seed = strSeed((SITE.site?.brand || '') + '|' + CITIES.map(c => c.id).join(','));
+else if (typeof WCFG.seed === 'string') WCFG.seed = strSeed(WCFG.seed);
+const WORLD = makeWorld(WCFG, CITIES.map(c => ({ slot: c.slot, rx: c.W / 2 + .95, rz: c.H / 2 + .95 })), { vnoise, fbm: (x, y) => fbm(x, y), ridge: (x, z) => ridge(x, z) });
+CITIES.forEach((c, i) => { const P = WORLD.townPos[i]; c.cx = P.cx; c.cz = P.cz; c.y = P.y; c.gate = !!P.gate; c.harbor = !!P.harbor;
+  c.ox = c.cx + CENTER.x - c.W / 2; c.oy = c.cz + CENTER.z - c.H / 2; });
 const SP = 2.15;
 for (const c of CITIES) {
   c.ph = hash(c.ox + 40, c.oy + 40) * 6.28; c.ang = (hash(c.oy + 9, c.ox + 9) - .5) * .7;
@@ -63,34 +63,22 @@ for (const c of CITIES) {
 function blobR(c, th) { return 1 + .12 * Math.sin(3 * th + c.ph) + .07 * Math.sin(5 * th + c.ph * 2.3) + .05 * Math.sin(2 * th + c.ph * .7); }
 function blobSd(c, x, z) { const dx = (x - c.cx) / c.rx, dz = (z - c.cz) / c.rz; return (Math.hypot(dx, dz) - blobR(c, Math.atan2(dz, dx))) * Math.min(c.rx, c.rz); }
 function blobPt(c, th, k = 1) { const r = blobR(c, th) * k; return [Math.cos(th) * c.rx * r, Math.sin(th) * c.rz * r]; }
-const RIVERS = [
-  { name: 'Anduin', w: .8, pts: [[5.2, -21], [5.5, -13], [5.6, -8], [5.3, -3.5], [4.6, .5], [4.3, 5], [4.8, 9.5], [5.8, 13], [6.6, 18]] },
-  { name: 'Brandywine', w: .55, pts: [[-8, -20], [-7.6, -13], [-7.2, -8], [-7, -3.5], [-5.6, .5], [-2, 1.6], [1.5, 1.4], [4.6, .7]] },
-];
-const ROADS_ALL = [
-  { a: 'center', b: 'highland', pts: [[-4.3, -5], [-7, -5.6], [-9.9, -6.6]] },
-  { a: 'center', b: 'coast', pts: [[3.3, -5.5], [5.5, -6.2], [7.9, -7.6]] },
-  { a: 'center', b: 'south', pts: [[-1, -1.3], [-1.4, 1.5], [-2.5, 3.3]] },
-  { a: 'south', b: 'east', pts: [[1.3, 6.6], [4.5, 5.6], [7.9, 5]] },
-  { a: 'coast', b: 'east', pts: [[11.5, -5.3], [11.9, -1.5], [11.5, 2.3]] },
-  { a: 'highland', b: 'south', pts: [[-12.5, -4.3], [-11.3, 0], [-8.6, 4.2], [-6.2, 7]] },
-  { a: 'east', b: 'east', pts: [[15.2, 5], [16.4, 6.5]] },
-];
-// keep roads whose towns exist; pull loose ends onto the edge of a smaller town
-const ROADS = ROADS_ALL.filter(r => usedSlots.has(r.a) && usedSlots.has(r.b)).map(r => r.pts.map(p => p.slice())).map(pts => {
-  for (const end of [pts[0], pts[pts.length - 1]]) {
+const RIVERS = WORLD.rivers.map(r => ({ ...r, pts: r.pts.map(p => p.slice()) }));
+// classic roads come as fixed polylines; generated ones as town-to-town links shaped here
+const ROADS = (WORLD.snapRoads ? WORLD.roads : WORLD.roadsSpec.map(r => {
+  const A = CITIES[r.i], [ax, az] = blobPt(A, r.th1, .96), a = [A.cx + ax, A.cz + az];
+  let b;
+  if (r.j >= 0) { const B = CITIES[r.j], [bx, bz] = blobPt(B, r.th2, .96); b = [B.cx + bx, B.cz + bz]; } else b = r.end;
+  const dx = b[0] - a[0], dz = b[1] - a[1], m = [(a[0] + b[0]) / 2 - dz * r.bend, (a[1] + b[1]) / 2 + dx * r.bend];
+  return [a, m, b];
+})).map(pts => {
+  if (WORLD.snapRoads) for (const end of [pts[0], pts[pts.length - 1]]) {
     const c = CITIES.slice().sort((p, q) => Math.hypot(p.cx - end[0], p.cz - end[1]) - Math.hypot(q.cx - end[0], q.cz - end[1]))[0];
     if (c && blobSd(c, end[0], end[1]) > .8) { const th = Math.atan2((end[1] - c.cz) / c.rz, (end[0] - c.cx) / c.rx), [bx, bz] = blobPt(c, th, .96); end[0] = c.cx + bx; end[1] = c.cz + bz; }
   }
   return pts;
 });
-const FIELDS = [
-  { x: -14.6, z: 4.4, w: 3.2, d: 2.4, rot: .15 },
-  { x: 13.6, z: -1.6, w: 2.3, d: 2.4, rot: 0 },
-  { x: -10.2, z: 9.2, w: 3, d: 2.4, rot: -.12 },
-  { x: 8.6, z: 10.8, w: 2.4, d: 2, rot: .2 },
-  { x: -1.5, z: -11.2, w: 3.4, d: 1.8, rot: 0 },
-];
+const FIELDS = WORLD.fields.map(f => ({ ...f }));
 
 // ---------------- language, domain, theme preference ----------------
 const SITEINFO = SITE.site || {};
@@ -98,8 +86,11 @@ const DOMAINS = SITEINFO.domains || [location.hostname || 'localhost'];
 const host = location.hostname.replace(/^www\./, '').toLowerCase();
 const DOMAIN = DOMAINS.find(d => d.toLowerCase() === host) || SITEINFO.brand || DOMAINS[DOMAINS.length - 1];
 const STORE_KEY = (SITEINFO.storageKey || 'site-map') + '-lang';
+// optional interface features (site.json "ui"); see references/site-schema.md
+const UI = { languageSwitch: false, shortcuts: false, tour: true, views: true, clock: true, compass: true,
+  daylight: 'auto', intro: true, motion: true, blur: true, infoOpen: true, ...(SITE.ui || {}) };
 const store = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* storage may be disabled */ } } };
-let LANG = store.get(STORE_KEY) || (SITEINFO.lang && SITEINFO.lang !== 'auto' ? SITEINFO.lang : null) || ((navigator.language || 'en').toLowerCase().startsWith('zh') ? 'zh' : 'en');
+let LANG = (UI.languageSwitch ? store.get(STORE_KEY) : null) || (SITEINFO.lang && SITEINFO.lang !== 'auto' ? SITEINFO.lang : null) || ((navigator.language || 'en').toLowerCase().startsWith('zh') ? 'zh' : 'en');
 const T = {
   zh: { me: '全图', five: n => `${n} 座城`, map: '全图', tour: '导览', spin: '环绕', top: '俯视', hide: '收起', show: '展开', info: '说明', where: '位置', view: '视角',
     hintW: '拖拽旋转 · Shift/空格+拖拽平移 · 滚轮缩放', hintC: '点建筑看详情 · Esc 返回', title: '地图', sub: n => `${n} 座城，一片大陆`,
@@ -123,13 +114,16 @@ const T = {
 // site text overrides (SITE.text.zh / SITE.text.en)
 for (const lg of ['zh', 'en']) Object.assign(T[lg], (SITE.text || {})[lg] || {});
 const KEY_LIST = CITIES.filter(c => c.key).map(c => c.key.toUpperCase()).join(' ');
-for (const lg of ['zh', 'en']) T[lg].keys = T[lg].keys.filter(k => k[0] !== 'KEYS' || KEY_LIST).map(k => k[0] === 'KEYS' ? [KEY_LIST, k[1]] : k);
+for (const lg of ['zh', 'en']) T[lg].keys = T[lg].keys.filter(k => k[0] !== 'KEYS' || KEY_LIST).filter(k => !(k[0] === 'L' && !UI.languageSwitch) && !(k[0] === 'T' && !UI.tour) && !(['O', 'V'].includes(k[0]) && !UI.views)).map(k => k[0] === 'KEYS' ? [KEY_LIST, k[1]] : k);
 function setLangData() { for (const c of CITIES) { c.role = loc(c.roleRaw, LANG); c.blurb = loc(c.blurbRaw, LANG); for (const it of c.items) { it.desc = loc(it.descRaw, LANG); it.name = loc(it.nameRaw, LANG); } } }
 for (const c of CITIES) for (const it of c.items) { it.descRaw = it.desc; it.nameRaw = it.name; }
 setLangData();
 const L = () => T[LANG];
 const EXT_ICON = '<svg class="ext" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M5.5 3.5h7v7M12.5 3.5 4 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
+{ const hide = (sel, off) => { if (off) document.querySelectorAll(sel).forEach(el => { el.hidden = true; }); };
+  hide('#b-lang', !UI.languageSwitch); hide('#b-keys', !UI.shortcuts); hide('.tools .sep', !UI.languageSwitch && !UI.shortcuts);
+  hide('#b-tour', !UI.tour); hide('#b-spin, #b-top', !UI.views); hide('#clock', !UI.clock); hide('.compass', !UI.compass); }
 document.getElementById('site').textContent = DOMAIN; document.getElementById('site').href = SITEINFO.home || 'https://' + DOMAIN.toLowerCase();
 { const a = document.getElementById('about'); if (SITEINFO.about && SITEINFO.about.url) a.href = SITEINFO.about.url; else a.remove(); }
 { const cp = document.querySelector('.foot .copy'), co = SITEINFO.copyright || {}; if (cp && co.owner) cp.innerHTML = `&copy; ${co.since ? co.since + '&ndash;' : ''}<span id="year"></span> ${co.owner}`; else if (cp && !co.owner) cp.remove(); }
@@ -225,13 +219,13 @@ const post = new THREE.ShaderMaterial({
       e *= 1. - smoothstep(fogFar * .3, fogFar * .8, z0);
       float coc = max(smoothstep(focus * 1.0, focus * 1.5, z0), smoothstep(.3, .5, abs(vUv.y - .5)) * .8);
       vec3 c = texture2D(tColor, vUv).rgb;
-      if (coc > .01) {
+      if (coc > .01 && blurMax > 0.) {
         vec3 acc = c;
         for (int i = 0; i < 16; i++) { float a = float(i) * 2.39996, r = sqrt((float(i) + .5) / 16.);
           acc += texture2D(tColor, vUv + vec2(cos(a), sin(a)) * r * coc * blurMax / res).rgb; }
         c = acc / 17.;
       }
-      e *= 1. - coc * .9;
+      e *= 1. - coc * .9 * step(.001, blurMax);
       gl_FragColor = linearToOutputTexel(vec4(mix(c, ink, e * edgeK), 1.));
     }`,
   depthTest: false, depthWrite: false,
@@ -670,33 +664,18 @@ function distPath(path, x, z, pad = 3) {
 }
 const flats = CITIES.map(c => ({ sd: (x, z) => blobSd(c, x, z), y: c.y - .04, m: 2.2, city: c }));
 const terraceStep = .3;
-const farness = (x, z) => Math.max(sstep(-12.5, -19, z), sstep(-20, -27, x), sstep(28, 38, Math.hypot(x + 3, z + 3)), sstep(17.5, 22, x));
+const farness = WORLD.farness;
 const terrace = h => { const k = h / terraceStep, f = Math.floor(k), t = k - f; return (f + sstep(.6, .9, t)) * terraceStep; };
-function seaSd(x, z) { // > 0 on land
-  const wob = (fbm(x * .12 + 7, z * .12 + 3) - .5) * 2.6;
-  const east = Math.max(17 - x, -13.5 - z) + wob;
-  const bay = (Math.hypot((x - 3) / 24, (z - 27) / 12.5) - 1) * 12 + wob;
-  const lakeA = (Math.hypot((x + 31) / 5.5, (z - 11) / 3.4) - 1) * 3.6 + wob * .4;
-  return Math.min(east, bay, lakeA);
-}
+const seaSd = WORLD.sea; // > 0 on land
 function landMask(x, z) { return sstep(-1.2, 1.4, seaSd(x, z)); }
 const ridge = (x, z) => { const n = 1 - Math.abs(2 * vnoise(x, z) - 1); return n * n * .7 + (1 - Math.abs(2 * vnoise(x * 2.1 + 5, z * 2.1) - 1)) * .3; };
-function natural(x, z) {
-  let h = .35 + (fbm(x * .12, z * .12) - .5) * 1.7;
-  h += 2.0 * Math.exp(-((x + 12.5) ** 2 + (z + 7) ** 2) / 34);
-  h += sstep(-9, -15, z) * (1.2 + 1.8 * fbm(x * .2 + 11, z * .2));
-  h += sstep(-14, -20, x) * 1.6 * fbm(x * .2, z * .2 + 5);
-  h += sstep(-17, -32, z) * (2 + 6.5 * ridge(x * .085 + 2, z * .085));
-  h += sstep(-25, -46, x) * (1.5 + 5.5 * ridge(x * .08 + 9, z * .08 + 4));
-  const far = sstep(28, 60, Math.hypot(x + 3, z + 3)); h += far * (fbm(x * .05 + 3, z * .05) - .35) * 3.2;
-  return h;
-}
+const natural = WORLD.natural;
 function flatten(h, x, z, list) {
   for (const f of list) { const d = f.sd(x, z); if (d < f.m) h = lerp(h, f.y, sstep(f.m, 0, d)); }
   return h;
 }
 // fields sit on terrace of their natural height
-for (const f of FIELDS) f.y = terrace(flatten(natural(f.x, f.z), f.x, f.z, flats)) + .02;
+for (const f of FIELDS) f.y = Math.max(terrace(flatten(natural(f.x, f.z), f.x, f.z, flats)) + .02, WORLD.minFieldY ?? -9);
 const fieldFlats = FIELDS.map(f => ({ sd: (x, z) => sdBox(x, z, f.x, f.z, f.w / 2 + .2, f.d / 2 + .2, .5), y: f.y, m: 1.2 }));
 const allFlats = [...flats, ...fieldFlats];
 function smoothH(x, z) { return flatten(natural(x, z), x, z, flats); } // continuous, roads follow it
@@ -760,10 +739,7 @@ function mountain(x, z, r, h, seed) {
   const ng = g.toNonIndexed(); ng.computeVertexNormals(); ng.translate(x, h / 2 - .6, z);
   return { geo: ng, h, base: -.6 };
 }
-const peaks = [];
-for (let i = 0; i < 15; i++) { const x = -25 + i * 3.1 + (hash(i, 3) - .5) * 1.6; peaks.push(mountain(x, -16.8 - hash(i, 4) * 2.6, 2.6 + hash(i, 5) * 1.8, 3.6 + hash(i, 6) * 3.8, i)); }
-for (let i = 0; i < 5; i++) peaks.push(mountain(-20.5 - hash(i, 8) * 1.5, -11 + i * 2.6, 2.2 + hash(i, 9), 3 + hash(i, 10) * 2.4, 40 + i));
-peaks.push(mountain(-15.5, -11.5, 2.4, 4.6, 70), mountain(-10.5, -12.8, 2.2, 3.8, 71));
+const peaks = WORLD.peaks.map(([x, z, r, h, sd]) => mountain(x, z, r, h, sd));
 const mgeo = mergeGeometries(peaks.map(p => p.geo));
 const mClass = [];
 {
@@ -838,8 +814,9 @@ anims.push((t, dt) => {
 // sea strokes
 {
   const wp = [];
-  for (let i = 0; i < 1400; i++) {
-    const x = -20 + rand() * 90, z = -16 + rand() * 75;
+  const ST = WORLD.strokes;
+  for (let i = 0; i < ST.n; i++) {
+    const x = ST.x0 + rand() * (ST.x1 - ST.x0), z = ST.z0 + rand() * (ST.z1 - ST.z0);
     if (landMask(x, z) > .02) continue;
     const w = .35 + rand() * .4;
     for (let s = 0; s < 6; s++) { const a = s / 6, b = (s + 1) / 6; wp.push(V(x + a * w, WL + .01, z + Math.sin(a * 6.28) * .05), V(x + b * w, WL + .01, z + Math.sin(b * 6.28) * .05)); }
@@ -889,10 +866,11 @@ function farmhouse(x, z, rot, roof = M.terra, seed = 1) {
     const sc = new THREE.Mesh(new THREE.ConeGeometry(.13, .14, 8), roof); sc.position.set(-w / 2 - .16, .62, 0); g.add(sc); }
   if (hash(seed, 9) < .5) { const tr = annex('tree', roof, wall, seed); tr.position.set(-w / 2 - .3, 0, d / 2 + .2); g.add(tr); }
 }
-[[-12.4, 2.6, .2], [-16.6, 6.4, -.3], [14.9, -3.6, 0], [-8.3, 10.8, .5], [10.2, 12.2, -.2], [-3.6, -12.8, .1], [1.2, -12.4, -.4], [17.4, 8.2, .6]].forEach(([x, z, r], i) => farmhouse(x, z, r, [M.terra, M.roofSlate, M.mustard, M.kraftDeep][i % 4], i + 3));
+WORLD.farms.forEach(([x, z, r], i) => farmhouse(x, z, r, [M.terra, M.roofSlate, M.mustard, M.kraftDeep][i % 4], i + 3));
 // windmill
 {
-  const x = -12.6, z = 6.4, y = H(x, z), g = new THREE.Group(); g.position.set(x, y, z); world.add(g);
+  if (WORLD.windmill) {
+  const [x, z] = WORLD.windmill, y = H(x, z), g = new THREE.Group(); g.position.set(x, y, z); world.add(g); occupied.push([x, z, .8]);
   const tw = new THREE.Mesh(new THREE.CylinderGeometry(.22, .36, 1.5, 8), M.paper); tw.position.y = .75; g.add(tw);
   g.add(rings(.3, 0, 1.5, 2));
   const cap = new THREE.Mesh(new THREE.ConeGeometry(.3, .35, 8), M.terra); cap.position.y = 1.67; g.add(cap);
@@ -900,11 +878,12 @@ function farmhouse(x, z, rot, roof = M.terra, seed = 1) {
   for (let i = 0; i < 4; i++) { const b = new THREE.Mesh(new THREE.BoxGeometry(.12, .85, .02), M.road); b.position.y = .45; const arm = new THREE.Group(); arm.rotation.z = i * Math.PI / 2; arm.add(b); hub.add(arm);
     const lat = lineSeg([V(-.06, .1, .012), V(.06, .1, .012), V(-.06, .35, .012), V(.06, .35, .012), V(-.06, .6, .012), V(.06, .6, .012)], strokeHard); arm.add(lat); }
   anims.push(t => { hub.rotation.z = t * .9; });
+  }
 }
 // sheep near Bree and the Shire field
 const sheep = [];
-for (let i = 0; i < 14; i++) {
-  const home = i < 7 ? [14.2, 10.2] : [-15.6, 1.6];
+for (let i = 0; i < 7 * WORLD.sheep.length; i++) {
+  const home = WORLD.sheep[Math.floor(i / 7)];
   const s = new THREE.Group(); world.add(s);
   const body = new THREE.Mesh(new THREE.IcosahedronGeometry(.13, 0), M.snow); body.scale.set(1.3, 1, 1); body.position.y = .14; s.add(body);
   const head = new THREE.Mesh(new THREE.BoxGeometry(.07, .07, .07), M.ink); head.position.set(.16, .17, 0); s.add(head);
@@ -1031,14 +1010,15 @@ for (const c of CITIES) {
       districts[id] = { id, city: c.id, k, it, g, plot, lab, el, world: () => grp.localToWorld(V(x, wy + top + .6, z)) };
     }); }
   if (c.harbor) {
+    const hb = new THREE.Group(); hb.rotation.y = -WORLD.harborAngle; grp.add(hb);
     const ex = blobPt(c, 0)[0];
     for (let p = 0; p < 3; p++) {
       const pz = -1.7 + p * 1.7, x0 = blobPt(c, Math.atan2(pz / c.rz, 1))[0] - .3;
-      const deck = new THREE.Mesh(new THREE.BoxGeometry(2.4, .07, .36), M.kraft); deck.position.set(x0 + 1.2, WL + .28, pz); grp.add(deck);
-      for (const px of [.6, 1.3, 2]) for (const s of [-.15, .15]) { const post = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .7, 5), M.kraftDeep); post.position.set(x0 + px, WL, pz + s); grp.add(post); }
+      const deck = new THREE.Mesh(new THREE.BoxGeometry(2.4, .07, .36), M.kraft); deck.position.set(x0 + 1.2, WL + .28, pz); hb.add(deck);
+      for (const px of [.6, 1.3, 2]) for (const s of [-.15, .15]) { const post = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .7, 5), M.kraftDeep); post.position.set(x0 + px, WL, pz + s); hb.add(post); }
     }
     const [lx, lz] = blobPt(c, -.75, .86);
-    const lh = new THREE.Group(); lh.position.set(lx, Gy, lz); grp.add(lh);
+    const lh = new THREE.Group(); lh.position.set(lx, Gy, lz); hb.add(lh);
     const a = (geo, mat, yy) => { const m = new THREE.Mesh(geo, mat); m.position.y = yy; lh.add(m); return m; };
     a(new THREE.CylinderGeometry(.2, .3, 1.6, 10), M.paper, .8); a(new THREE.CylinderGeometry(.205, .23, .18, 10), M.coral, 1.0); a(new THREE.CylinderGeometry(.215, .25, .14, 10), M.coral, .5);
     a(new THREE.CylinderGeometry(.26, .26, .05, 10), M.slate, 1.62); a(new THREE.CylinderGeometry(.15, .15, .25, 8), M.lamp, 1.77); halo(lh, 0, 1.77, 0, 1.6);
@@ -1046,7 +1026,7 @@ for (const c of CITIES) {
     const beam = onLines(new THREE.Mesh(new THREE.ConeGeometry(.35, 2.6, 16, 1, true), beamMat));
     beam.geometry.translate(0, -1.3, 0); beam.rotation.z = Math.PI / 2; const piv = new THREE.Group(); piv.position.y = 1.77; piv.add(beam); lh.add(piv);
     anims.push(t => { piv.rotation.y = t * .8; });
-    cityOcc.push([c.cx + lx, c.cz + lz, .5]); void ex;
+    { const ca = Math.cos(WORLD.harborAngle), sa = Math.sin(WORLD.harborAngle); cityOcc.push([c.cx + lx * ca - lz * sa, c.cz + lx * sa + lz * ca, .5]); } void ex;
   }
   const el = document.createElement('button');
   el.type = 'button'; el.className = 'c-tag'; el.dataset.city = c.id; el.style.setProperty('--d', `${520 + CITIES.indexOf(c) * 110}ms`);
@@ -1114,21 +1094,22 @@ const blocked = (x, z) => {
   if (occupied.some(([ox, oz, or]) => Math.hypot(ox - x, oz - z) < or)) return true;
   return false;
 };
-for (let gx2 = -28; gx2 < 22; gx2 += .55) for (let gz2 = -24; gz2 < 18; gz2 += .55) {
+const [NX0, NX1, NZ0, NZ1] = WORLD.near;
+for (let gx2 = NX0; gx2 < NX1; gx2 += .55) for (let gz2 = NZ0; gz2 < NZ1; gz2 += .55) {
   const x = gx2 + (hash(gx2 * 100 | 0, gz2 * 100 | 0) - .5) * .5, z = gz2 + (hash(gz2 * 100 | 0, gx2 * 100 | 0) - .5) * .5;
   const h = H(x, z);
   if (h < WL + .25 || h > 3) continue;
-  const dens = fbm(x * .14 + 20, z * .14) + 1.0 * Math.exp(-((x + 18) ** 2 + (z + 1) ** 2) / 14) + .5 * Math.exp(-((x - 0) ** 2 + (z + 14) ** 2) / 30);
+  const dens = WORLD.forestDens(x, z);
   const keep = dens > .56 ? .8 : .05;
   if (hash(Math.round(x * 37), Math.round(z * 53)) > keep) continue;
   if (inMountain(x, z) && h < 1) continue;
   if (blocked(x, z)) continue;
   const r = hash(Math.round(x * 71), Math.round(z * 13));
-  const kind = z < -10 || h > 1.8 ? (r < .8 ? 'pine' : 'poplar') : r < .42 ? 'pine' : r < .72 ? 'poplar' : 'round';
+  const kind = WORLD.pineZone(x, z, h) ? (r < .8 ? 'pine' : 'poplar') : r < .42 ? 'pine' : r < .72 ? 'poplar' : 'round';
   treeKinds[kind].push({ x, y: h, z, s: .75 + hash(Math.round(x * 13), Math.round(z * 7)) * .6, rot: r * 6.28, tone: hash(Math.round(x * 5), Math.round(z * 91)) });
 }
 for (let gx2 = -75; gx2 < 70; gx2 += 1.25) for (let gz2 = -70; gz2 < 65; gz2 += 1.25) {
-  if (gx2 > -28 && gx2 < 22 && gz2 > -24 && gz2 < 18) continue;
+  if (gx2 > NX0 && gx2 < NX1 && gz2 > NZ0 && gz2 < NZ1) continue;
   const x = gx2 + (hash(gx2 * 10 | 0, gz2 * 10 | 0) - .5) * 1.1, z = gz2 + (hash(gz2 * 10 | 0, gx2 * 10 | 0) - .5) * 1.1, h = H(x, z);
   if (h < WL + .3 || h > 3.4) continue;
   if (fbm(x * .07 + 30, z * .07) < .5 || hash(Math.round(x * 17), Math.round(z * 29)) > .7) continue;
@@ -1211,12 +1192,8 @@ function boat(path, speed, phase, sailMat) {
 }
 const sailA = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide }), sailB = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide });
 recolorers.push(() => { sailA.color.copy(C.paper); sailB.color.copy(C.mustard); });
-const GH = SLOTS.coast;
-boat(u => V(GH.cx + 7.4 + Math.cos(u) * 1.4, 0, GH.cz + Math.sin(u) * 3.2), .25, 0, sailA);
-boat(u => V(GH.cx + 7.8 + Math.cos(u) * 2.6, 0, GH.cz + 1 + Math.sin(u) * 4.6), -.16, 2, sailB);
-boat(u => V(2 + Math.cos(u) * 6, 0, 17.4 + Math.sin(u) * 1.4), .09, 1, sailA);
-boat(u => V(-3 + Math.cos(u) * 6, 0, 22 + Math.sin(u) * 2), -.07, 4, sailB);
-boat(u => V(23 + Math.cos(u) * 3, 0, -4 + Math.sin(u) * 6), .06, 5, sailA);
+for (const B of WORLD.boats) { const ca = Math.cos(B.ang), sa = Math.sin(B.ang);
+  boat(u => { const lx = Math.cos(u) * B.a, lz = Math.sin(u) * B.b; return V(B.cx + lx * ca - lz * sa, 0, B.cz + lx * sa + lz * ca); }, B.sp, B.ph, B.sail ? sailB : sailA); }
 // river raft on the Anduin
 {
   const curve = new THREE.CatmullRomCurve3(RIVERS[0].path);
@@ -1252,10 +1229,9 @@ function place(text, zh, x, y, z, cls = '') {
   const el = document.createElement('div'); el.className = 'place ' + cls; el.style.setProperty('--d', `${1100 + placeLabels.length * 90}ms`); el.innerHTML = `${text}<small>${zh}</small>`;
   const o = new CSS2DObject(el); o.position.set(x, y, z); world.add(o); placeLabels.push(o);
 }
-const ANCHORS = { north: [-4, 7.8, -18], riverA: [5.9, .4, -11.5], riverB: [-7.2, .6, -12.5], forest: [-18, 2.4, -1.5], fields: [-14.6, 1.6, 5.2],
-  sea: [24, .3, 2], bay: [2, .3, 21.5], west: [-42, 8.5, -4], lake: [-31, .4, 11] };
+const ANCHORS = WORLD.anchors;
 const WATERY = new Set(['riverA', 'riverB', 'sea', 'bay', 'lake']);
-for (const p of SITE.places || []) { const at = ANCHORS[p.at] || p.at; if (Array.isArray(at)) place(loc(p.name, 'en'), loc(p.name, 'zh') === loc(p.name, 'en') ? '' : loc(p.name, 'zh'), at[0], at[1], at[2], WATERY.has(p.at) ? 'water' : ''); }
+for (const p of SITE.places || []) { const at = ANCHORS[p.at] || (Array.isArray(p.at) ? p.at : null); if (Array.isArray(at)) place(loc(p.name, 'en'), loc(p.name, 'zh') === loc(p.name, 'en') ? '' : loc(p.name, 'zh'), at[0], at[1], at[2], WATERY.has(p.at) ? 'water' : ''); }
 
 // selection pin
 const pin = new THREE.Group(); pin.visible = false; scene.add(pin);
@@ -1270,7 +1246,7 @@ terrain.castShadow = true;
 
 // ---------------- camera + controls ----------------
 let controls, tween = null, topDown = false;
-const PAN = { x0: -17, x1: 16, z0: -13, z1: 12 };
+const PAN = WORLD.pan;
 if (renderer) {
   controls = new OrbitControls(camera, renderer.domElement);
   Object.assign(controls, { enableDamping: true, dampingFactor: .08, minDistance: 5, maxDistance: 110, maxPolarAngle: 1.3, minPolarAngle: .12,
@@ -1290,8 +1266,8 @@ if (renderer) {
 }
 function viewFor(id) {
   const d = id ? cityData[id] : null;
-  const target = d ? d.center.clone() : V(-1.5, 0, -1.5);
-  const dist = d ? Math.max(d.W, d.H) * 2.6 + 8 : 62;
+  const target = d ? d.center.clone() : V(WORLD.view.x, 0, WORLD.view.z);
+  const dist = d ? Math.max(d.W, d.H) * 2.6 + 8 : WORLD.view.dist;
   const phi = topDown ? .14 : (d ? .95 : .9);
   const theta = controls ? controls.getAzimuthalAngle() : .35;
   return { pos: target.clone().add(new THREE.Vector3().setFromSphericalCoords(dist, phi, theta)), target };
@@ -1336,7 +1312,7 @@ function refresh() {
 function renderPanel() {
   const c = state.city && cityData[state.city].c, t = L();
   crumb.innerHTML = c ? `<button type="button" data-go="world">${t.me}</button><span class="sep">/</span><span class="here">${c.en}</span>` : `<span class="here">${t.me} · ${typeof t.five === 'function' ? t.five(CITIES.length) : t.five}</span>`;
-  hint.innerHTML = `${c ? t.hintC : t.hintW} · ${t.keysHint.replace('?', '<kbd>?</kbd>')}`;
+  hint.innerHTML = `${c ? t.hintC : t.hintW}${UI.shortcuts ? ' · ' + t.keysHint.replace('?', '<kbd>?</kbd>') : ''}`;
   if (!c) {
     eyebrow.textContent = `${DOMAIN} · ${t.map}`;
     panel.innerHTML = `<h2>${t.title}<small>${typeof t.sub === 'function' ? t.sub(CITIES.length) : t.sub}</small></h2><p>${t.intro}</p>
@@ -1451,6 +1427,7 @@ document.addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest?.('input, textarea, select, [contenteditable]')) return;
   const k = e.key;
   if (k === 'Escape') { if (!keysEl.hidden) return toggleKeys(false); stopTour(); if (state.sel) go(state.city, null); else go(null); return; }
+  if (!UI.shortcuts) return; // Esc stays; everything below is the optional shortcut set
   if (k === '?' || (k === '/' && e.shiftKey)) { e.preventDefault(); return toggleKeys(); }
   const btnFocused = e.target.closest?.('button, a');
   if (k === 'Enter' && btnFocused) return;
@@ -1459,7 +1436,7 @@ document.addEventListener('keydown', e => {
     ArrowRight: () => { stopTour(); step2(1); }, ArrowLeft: () => { stopTour(); step2(-1); },
     Enter: () => { const d = state.sel && districts[state.sel]; if (d) window.open(d.it.url, '_blank', 'noopener'); },
     '+': () => zoom(.78), '=': () => zoom(.78), '-': () => zoom(1.28), '_': () => zoom(1.28),
-    t: () => tourBtn.click(), o: () => spinBtn.click(), v: () => topBtn.click(), l: () => document.getElementById('b-lang').click(), i: () => fold.click(),
+    t: () => { if (UI.tour) tourBtn.click(); }, o: () => { if (UI.views) spinBtn.click(); }, v: () => { if (UI.views) topBtn.click(); }, l: () => { if (UI.languageSwitch) document.getElementById('b-lang').click(); }, i: () => fold.click(),
   };
   const initial = CITIES.find(c => c.key && c.key === k.toLowerCase?.())?.id;
   if (initial) { e.preventDefault(); stopTour(); go(initial); return; }
@@ -1496,7 +1473,7 @@ const UI_DUSK = ['#fbe9dc', '#3a2219', '#63412f', '#866250', '#ebcab4', '#ffc9b4
 const UIP = [UI_NIGHT, UI_NIGHT, UI_DAWN, UI_DAY, UI_DAY, UI_DAY, UI_DAY, UI_DUSK, UI_EVE, UI_NIGHT];
 const UI_VARS = ['--ui-card', '--ui-ink', '--ui-soft', '--ui-faint', '--ui-line', '--ui-hot', '--ui-water'];
 const PHASE_AT = [0, 4.5, 7.5, 9.5, 11.5, 13.5, 17, 19, 24]; // 深夜 日出 早晨 上午 正午 下午 傍晚 夜晚
-const fixedHour = (() => { const q = new URLSearchParams(location.search).get('t'); const v = q === null ? NaN : parseFloat(q); return Number.isFinite(v) ? ((v % 24) + 24) % 24 : null; })();
+const fixedHour = (() => { const q = new URLSearchParams(location.search).get('t'); const v = q === null ? NaN : parseFloat(q); return Number.isFinite(v) ? ((v % 24) + 24) % 24 : typeof UI.daylight === 'number' ? ((UI.daylight % 24) + 24) % 24 : null; })();
 const nowHour = () => { if (fixedHour !== null) return fixedHour; const d = new Date(); return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600; };
 const stars = (() => { const pts = []; for (let i = 0; i < 700; i++) { const a = hash(i, 1) * Math.PI * 2, e = .08 + hash(i, 2) * 1.2, r = 190; pts.push(V(Math.cos(a) * Math.cos(e) * r, Math.sin(e) * r, Math.sin(a) * Math.cos(e) * r)); }
   const m = new THREE.PointsMaterial({ color: 0xfff6dd, size: 1.4, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false, fog: false });
@@ -1555,9 +1532,9 @@ function resize() {
   colorRT = new THREE.WebGLRenderTarget(W, H2, { samples: 4, type: THREE.HalfFloatType });
   normalRT = new THREE.WebGLRenderTarget(W, H2, { depthTexture: new THREE.DepthTexture(W, H2) });
   post.uniforms.tColor.value = colorRT.texture; post.uniforms.tNormal.value = normalRT.texture; post.uniforms.tDepth.value = normalRT.depthTexture;
-  post.uniforms.res.value.set(W, H2); post.uniforms.thick.value = Math.max(1, pr * .65); post.uniforms.blurMax.value = 7 * pr;
+  post.uniforms.res.value.set(W, H2); post.uniforms.thick.value = Math.max(1, pr * .65); post.uniforms.blurMax.value = UI.blur ? 7 * pr : 0;
 }
-if (matchMedia('(max-width: 560px)').matches) { info.classList.add('folded'); fold.setAttribute('aria-expanded', 'false'); fold.textContent = L().show; }
+if (matchMedia('(max-width: 560px)').matches || !UI.infoOpen) { info.classList.add('folded'); fold.setAttribute('aria-expanded', 'false'); fold.textContent = L().show; }
 new ResizeObserver(resize).observe(mapEl);
 resize();
 
@@ -1578,7 +1555,7 @@ const clock = new THREE.Clock(); let t = 0;
 const normalBg = new THREE.Color(.5, .5, 1);
 function frame() {
   const dt = Math.min(clock.getDelta(), .05);
-  if (!reduce) { t += dt; for (const a of anims) a(t, dt); }
+  if (!reduce && UI.motion) { t += dt; for (const a of anims) a(t, dt); }
   if (tween) {
     const p = Math.min(1, (performance.now() - tween.start) / tween.dur), e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
     camera.position.lerpVectors(tween.p0, tween.v.pos, e); controls.target.lerpVectors(tween.t0, tween.v.target, e);
@@ -1607,13 +1584,13 @@ state.city = cityData[start] ? start : null;
 refresh(); applyLang();
 if (renderer) {
   const v = viewFor(state.city);
-  camera.position.copy(v.target.clone().add(new THREE.Vector3().setFromSphericalCoords(reduce ? v.pos.distanceTo(v.target) : 140, reduce ? .9 : .35, .35 - (reduce ? 0 : .9))));
+  camera.position.copy(v.target.clone().add(new THREE.Vector3().setFromSphericalCoords(reduce || !UI.intro ? v.pos.distanceTo(v.target) : 140, reduce || !UI.intro ? .9 : .35, .35 - (reduce || !UI.intro ? 0 : .9))));
   controls.target.copy(v.target); controls.update();
   flyTo(viewFor(state.city), 2600);
   // interface enters in layers once the town is built; panel content only animates this once
   function reveal() { mapEl.classList.remove('intro'); mapEl.classList.add('revealing'); setTimeout(() => mapEl.classList.remove('revealing'), 2800); }
   // pop-up-book intro: land unfolds, then buildings rise city by city
-  if (!reduce) {
+  if (!reduce && UI.intro) {
     world.scale.y = .01; buildOrder.forEach(b => b.g.scale.set(1, .001, 1));
     const t0 = performance.now();
     const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
