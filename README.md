@@ -24,6 +24,8 @@ The map is available in Simplified Chinese, Traditional Chinese, Japanese and En
 
 The map uses the [site-to-map skill](https://github.com/dofy/site-to-map), which turns personal sites and bookmarks into explorable 3D maps.
 
+Use the number keys or ↑/↓ to fly between cities, ←/→ to switch buildings, and `?` for the full list of keyboard shortcuts.
+
 ## Find your way around
 
 - **Apps and projects** — discover Seven's apps and open-source work.

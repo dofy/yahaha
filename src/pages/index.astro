@@ -79,12 +79,14 @@ const fallback = site.cities.map((c) => ({
       </div>
       </div>
       <footer class="ui foot">
+        <div class="foot-meta"><span class="clock" id="clock"></span><span class="copy">&copy; 2007&ndash;<span id="year">2026</span> Seven</span><a class="ver" id="version" href={`https://github.com/dofy/yahaha/releases/tag/v${version}`}>v{version}</a></div>
+      </footer>
+      <div class="ui keys" id="keys" role="dialog" aria-modal="false" aria-labelledby="keys-title" hidden>
+        <h2 id="keys-title">Keyboard shortcuts</h2><dl id="keys-list"></dl><p id="keys-close"></p>
         <nav class="domains" aria-label="Domains">
           {site.site.domains.map((domain) => <a href={`https://${domain.toLowerCase()}`}>{domain}</a>)}
         </nav>
-        <div class="foot-meta"><span class="clock" id="clock"></span><span class="copy">&copy; 2007&ndash;<span id="year">2026</span> Seven</span><a class="ver" id="version" href={`https://github.com/dofy/yahaha/releases/tag/v${version}`}>v{version}</a></div>
-      </footer>
-      <div class="ui keys" id="keys" role="dialog" aria-modal="false" aria-labelledby="keys-title" hidden><h2 id="keys-title">Keyboard shortcuts</h2><dl id="keys-list"></dl><p id="keys-close"></p></div>
+      </div>
       <aside class="ui info" id="info" aria-label="说明">
         <div class="info-head"><span class="eyebrow" id="info-eyebrow">yahaha.net</span><button type="button" class="fold" id="fold" aria-expanded="true" aria-controls="panel">收起</button></div>
         <div class="panel" id="panel" aria-live="polite"></div>
@@ -194,6 +196,7 @@ body { transition: background-color .8s; background: var(--sky); color: var(--ui
   border: 1.5px solid var(--ui-ink); border-radius: 14px; padding: 6px 12px; }
 .lang-en .place small { display: none; }
 .keys { left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(380px, calc(100vw - 32px)); flex-direction: column; align-items: stretch; gap: 10px;
+  max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain;
   background: var(--ui-card); color: var(--ui-ink); border: 1.5px solid var(--ui-ink); border-radius: 14px; padding: 18px 20px; box-shadow: 0 18px 50px var(--ui-shadow); z-index: 4; }
 [hidden] { display: none !important; }
 .keys h2 { margin: 0; font-family: var(--font-map); font-style: italic; font-weight: 600; font-size: 24px; }
@@ -204,9 +207,8 @@ body { transition: background-color .8s; background: var(--sky); color: var(--ui
 .keys kbd, .hint kbd { font-family: var(--font-mono); font-size: 11px; min-width: 22px; text-align: center; padding: 2px 6px; border: 1px solid var(--ui-ink);
   border-bottom-width: 2px; border-radius: 5px; background: var(--ui-card); color: var(--ui-ink); }
 .keys p { margin: 0; font-family: var(--font-mono); font-size: 11px; color: var(--ui-faint); }
-.foot { flex-direction: column; align-items: flex-start; gap: 4px; }
 .foot-meta { display: flex; align-items: center; gap: 10px; color: var(--ui-faint); }
-.domains { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 12px; }
+.domains { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; border-top: 1px solid var(--ui-line); padding-top: 12px; font-family: var(--font-mono); font-size: 12px; }
 .domains a { color: var(--ui-ink); text-decoration: none; }
 .domains a:hover, .domains a:focus-visible { color: var(--ui-ink); text-decoration: underline; }
 .domains a[aria-current="page"] { color: var(--ui-ink); font-weight: 600; text-decoration: underline; text-decoration-color: var(--coral); text-underline-offset: 3px; }

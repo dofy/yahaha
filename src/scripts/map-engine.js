@@ -125,7 +125,7 @@ const T = {
     steps: ['铺开地形', '折起山脉', '修路架桥', '开垦农田', '盖起城镇', '种一片森林', '放出行人和船'],
     phases: ['深夜', '日出', '早晨', '上午', '正午', '下午', '傍晚', '夜晚'], langName: '简体中文', langShort: '简',
     keysT: '快捷键', keysClose: '按 ? 或 Esc 关闭', keysHint: '按 ? 看快捷键',
-    keys: [[`1–${Math.min(9, CITIES.length)}`, '按列表顺序飞到对应的城'], ['KEYS', '按城名首字母飞过去'], ['0 / H', '回到全图，恢复默认视角'], ['← →', '上一个 / 下一个城或建筑'], ['Enter', '打开选中的建筑'], ['Esc', '返回上一级'], ['+ −', '拉近 / 拉远'], ['Shift 空格', '按住再拖拽可平移'], ['T', '开始或停止导览'], ['O', '开关环绕'], ['V', '开关俯视'], ['L', '切换语言'], ['I', '收起或展开信息卡']],
+    keys: [[`1–${Math.min(9, CITIES.length)}`, '按列表顺序飞到对应的城'], ['KEYS', '按城名首字母飞过去'], ['0 / H', '回到全图，恢复默认视角'], ['↑ ↓', '上一个 / 下一个城'], ['← →', '上一个 / 下一个建筑'], ['Enter', '打开选中的建筑'], ['Esc', '返回上一级'], ['+ −', '拉近 / 拉远'], ['Shift 空格', '按住再拖拽可平移'], ['T', '开始或停止导览'], ['O', '开关环绕'], ['V', '开关俯视'], ['L', '切换语言'], ['I', '收起或展开信息卡']],
     nowebgl: '这个浏览器没法创建 WebGL，3D 地图无法显示。右下角列表仍然可以导航。' },
   en: { cities: 'Cities', worldName: 'Map', homeTip: 'Back to the whole map at the default angle', townCount: '{n} towns', map: 'Map', tour: 'Tour', spin: 'Orbit', top: 'Top', hide: 'Hide', show: 'Show', info: 'About this map', where: 'Location', view: 'View',
     hintW: 'Drag to orbit · Shift/Space + drag to pan · Scroll to zoom', hintC: 'Click a building for details · Esc to go back', title: 'Map', sub: '{n} towns, one continent',
@@ -134,7 +134,7 @@ const T = {
     steps: ['Laying out the land', 'Folding the mountains', 'Building roads and bridges', 'Ploughing the fields', 'Raising the towns', 'Planting a forest', 'Sending out travellers and boats'],
     phases: ['Late night', 'Sunrise', 'Morning', 'Forenoon', 'Noon', 'Afternoon', 'Dusk', 'Evening'], langName: 'English', langShort: 'EN',
     keysT: 'Keyboard shortcuts', keysClose: 'Press ? or Esc to close', keysHint: 'Press ? for shortcuts',
-    keys: [[`1–${Math.min(9, CITIES.length)}`, 'Fly to a town in list order'], ['KEYS', 'Fly to a town by its initial'], ['0 / H', 'Back to the whole map, default angle'], ['← →', 'Previous / next town or building'], ['Enter', 'Open the selected building'], ['Esc', 'Go back one level'], ['+ −', 'Zoom in / out'], ['Shift Space', 'Hold and drag to pan'], ['T', 'Start or stop the tour'], ['O', 'Toggle orbit'], ['V', 'Toggle top view'], ['L', 'Switch language'], ['I', 'Hide or show the info card']],
+    keys: [[`1–${Math.min(9, CITIES.length)}`, 'Fly to a town in list order'], ['KEYS', 'Fly to a town by its initial'], ['0 / H', 'Back to the whole map, default angle'], ['↑ ↓', 'Previous / next town'], ['← →', 'Previous / next building'], ['Enter', 'Open the selected building'], ['Esc', 'Go back one level'], ['+ −', 'Zoom in / out'], ['Shift Space', 'Hold and drag to pan'], ['T', 'Start or stop the tour'], ['O', 'Toggle orbit'], ['V', 'Toggle top view'], ['L', 'Switch language'], ['I', 'Hide or show the info card']],
     nowebgl: 'This browser could not create WebGL, so the 3D map cannot be shown. The list in the corner still works.' },
   'zh-Hant': { cities: '城市', worldName: '全圖', homeTip: '回到全圖，恢復預設視角', townCount: '{n} 座城', map: '全圖', tour: '導覽', spin: '環繞', top: '俯視', hide: '收起', show: '展開', info: '說明', where: '位置', view: '視角',
     hintW: '拖曳旋轉 · Shift/空白鍵+拖曳平移 · 滾輪縮放', hintC: '點建築看詳情 · Esc 返回', title: '地圖', sub: '{n} 座城，一片大陸',
@@ -143,7 +143,7 @@ const T = {
     steps: ['鋪開地形', '摺起山脈', '修路架橋', '開墾農田', '蓋起城鎮', '種一片森林', '放出行人和船'],
     phases: ['深夜', '日出', '清晨', '上午', '正午', '下午', '傍晚', '夜晚'], langName: '繁體中文', langShort: '繁',
     keysT: '快捷鍵', keysClose: '按 ? 或 Esc 關閉', keysHint: '按 ? 看快捷鍵',
-    keys: [[`1–${Math.min(9, CITIES.length)}`, '依列表順序飛到對應的城'], ['KEYS', '按城名首字母飛過去'], ['0 / H', '回到全圖，恢復預設視角'], ['← →', '上一個 / 下一個城或建築'], ['Enter', '開啟選中的建築'], ['Esc', '返回上一層'], ['+ −', '拉近 / 拉遠'], ['Shift 空白鍵', '按住再拖曳可平移'], ['T', '開始或停止導覽'], ['O', '開關環繞'], ['V', '開關俯視'], ['L', '切換語言'], ['I', '收起或展開資訊卡']],
+    keys: [[`1–${Math.min(9, CITIES.length)}`, '依列表順序飛到對應的城'], ['KEYS', '按城名首字母飛過去'], ['0 / H', '回到全圖，恢復預設視角'], ['↑ ↓', '上一個 / 下一個城'], ['← →', '上一個 / 下一個建築'], ['Enter', '開啟選中的建築'], ['Esc', '返回上一層'], ['+ −', '拉近 / 拉遠'], ['Shift 空白鍵', '按住再拖曳可平移'], ['T', '開始或停止導覽'], ['O', '開關環繞'], ['V', '開關俯視'], ['L', '切換語言'], ['I', '收起或展開資訊卡']],
     nowebgl: '這個瀏覽器無法建立 WebGL，3D 地圖無法顯示。右下角的列表仍然可以導覽。' },
   ja: { cities: '町', worldName: '全体図', homeTip: '全体図に戻り、視点を元に戻す', townCount: '{n} つの町', map: '全体図', tour: 'ツアー', spin: '回転', top: '真上', hide: '閉じる', show: '開く', info: 'この地図について', where: '現在地', view: '視点',
     hintW: 'ドラッグで回転 · Shift/スペース+ドラッグで移動 · ホイールでズーム', hintC: '建物をクリックで詳細 · Esc で戻る', title: '地図', sub: '{n} つの町、ひとつの大陸',
@@ -152,7 +152,7 @@ const T = {
     steps: ['大地を広げる', '山を折る', '道と橋をつくる', '畑を耕す', '町を建てる', '森を植える', '旅人と船を送り出す'],
     phases: ['深夜', '日の出', '朝', '午前', '正午', '午後', '夕暮れ', '夜'], langName: '日本語', langShort: '日',
     keysT: 'キーボードショートカット', keysClose: '? か Esc で閉じる', keysHint: '? でショートカット一覧',
-    keys: [[`1–${Math.min(9, CITIES.length)}`, '一覧の順に町へ飛ぶ'], ['KEYS', '町の頭文字で飛ぶ'], ['0 / H', '全体図と元の視点に戻る'], ['← →', '前 / 次の町・建物'], ['Enter', '選んだ建物を開く'], ['Esc', 'ひとつ前に戻る'], ['+ −', 'ズームイン / アウト'], ['Shift スペース', '押したままドラッグで移動'], ['T', 'ツアーの開始 / 停止'], ['O', '回転のオン / オフ'], ['V', '真上視点のオン / オフ'], ['L', '言語を切り替える'], ['I', '情報カードを開く / 閉じる']],
+    keys: [[`1–${Math.min(9, CITIES.length)}`, '一覧の順に町へ飛ぶ'], ['KEYS', '町の頭文字で飛ぶ'], ['0 / H', '全体図と元の視点に戻る'], ['↑ ↓', '前 / 次の町'], ['← →', '前 / 次の建物'], ['Enter', '選んだ建物を開く'], ['Esc', 'ひとつ前に戻る'], ['+ −', 'ズームイン / アウト'], ['Shift スペース', '押したままドラッグで移動'], ['T', 'ツアーの開始 / 停止'], ['O', '回転のオン / オフ'], ['V', '真上視点のオン / オフ'], ['L', '言語を切り替える'], ['I', '情報カードを開く / 閉じる']],
     nowebgl: 'このブラウザでは WebGL を作れないため、3D 地図を表示できません。右下の一覧からは移動できます。' },
 };
 // site text overrides (SITE.text.zh / SITE.text.en)
@@ -1406,7 +1406,11 @@ function flyTo(v, dur) {
   const hop = t0.distanceTo(v.target), zoom = Math.abs(Math.log(b.radius / a.radius));
   dur = dur ?? THREE.MathUtils.clamp(850 + hop * 22 + zoom * 380 + Math.abs(dth) * 260, 900, 1800);
   const lift = hop > 10 ? Math.min(.45, hop / 60) : 0; // zoom out a bit on long hops, like a map app
-  tween = { t0, v, a, b, dth, lift, start: performance.now(), dur };
+  // Interrupted flights share one ceiling, so their temporary lifts cannot compound.
+  const baseRadius = tween ? Math.max(tween.baseRadius, b.radius) : Math.max(a.radius, b.radius);
+  const peakLift = Math.max(tween?.peakLift || 0, lift);
+  const peakRadius = Math.max(a.radius, baseRadius * (1 + peakLift));
+  tween = { t0, v, a, b, dth, lift, baseRadius, peakLift, peakRadius, start: performance.now(), dur };
 }
 
 // ---------------- state + panel ----------------
@@ -1615,10 +1619,15 @@ function zoom(f) {
   const off = camera.position.clone().sub(controls.target), d = THREE.MathUtils.clamp(off.length() * f, controls.minDistance, controls.maxDistance);
   flyTo({ pos: controls.target.clone().add(off.setLength(d)), target: controls.target.clone() }, 350);
 }
-function step2(dir) {
-  if (!state.city) { const o = LIST_ORDER(), i = o.indexOf(state.hoverCity); state.hoverCity = null; go(o[(i + dir + o.length) % o.length]); return; }
+function stepCity(dir) {
+  const ids = LIST_ORDER(), i = ids.indexOf(state.city || state.hoverCity);
+  if (!ids.length) return;
+  go(ids[i < 0 ? (dir > 0 ? 0 : ids.length - 1) : (i + dir + ids.length) % ids.length]);
+}
+function stepBuilding(dir) {
+  if (!state.city) return;
   const ids = Object.values(districts).filter(d => d.city === state.city).map(d => d.id), i = ids.indexOf(state.sel);
-  go(state.city, ids[i < 0 ? (dir > 0 ? 0 : ids.length - 1) : (i + dir + ids.length) % ids.length]);
+  if (ids.length) go(state.city, ids[i < 0 ? (dir > 0 ? 0 : ids.length - 1) : (i + dir + ids.length) % ids.length]);
 }
 document.addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest?.('input, textarea, select, [contenteditable]')) return;
@@ -1626,12 +1635,14 @@ document.addEventListener('keydown', e => {
   if (k === 'Escape' && (!cityMenu.hidden || !langMenu.hidden)) { const focus = cityMenu.hidden ? document.getElementById('b-lang') : cityBtn; cityMenu.hidden = langMenu.hidden = true; cityBtn.setAttribute('aria-expanded', 'false'); document.getElementById('b-lang').setAttribute('aria-expanded', 'false'); focus.focus(); return; }
   if (k === 'Escape') { if (!keysEl.hidden) return toggleKeys(false); stopTour(); if (state.sel) go(state.city, null); else go(null); return; }
   if (!UI.shortcuts) return; // Esc stays; everything below is the optional shortcut set
+  if (!keysEl.hidden && k.startsWith('Arrow')) return; // let the help panel scroll
   if (k === '?' || (k === '/' && e.shiftKey)) { e.preventDefault(); return toggleKeys(); }
   const btnFocused = e.target.closest?.('button, a');
   if (k === 'Enter' && btnFocused) return;
   const act = {
     '0': () => resetView(), h: () => act['0'](), H: () => act['0'](), Home: () => act['0'](),
-    ArrowRight: () => { stopTour(); step2(1); }, ArrowLeft: () => { stopTour(); step2(-1); },
+    ArrowRight: () => { if (state.city) { stopTour(); stepBuilding(1); } }, ArrowLeft: () => { if (state.city) { stopTour(); stepBuilding(-1); } },
+    ArrowDown: () => { stopTour(); stepCity(1); }, ArrowUp: () => { stopTour(); stepCity(-1); },
     Enter: () => { const d = state.sel && districts[state.sel]; if (d) window.open(d.it.url, '_blank', 'noopener'); },
     '+': () => zoom(.78), '=': () => zoom(.78), '-': () => zoom(1.28), '_': () => zoom(1.28),
     t: () => { if (UI.tour) tourBtn.click(); }, o: () => { if (UI.views) spinBtn.click(); }, v: () => { if (UI.views) topBtn.click(); }, l: () => { if (UI.languageSwitch && LANGS.length > 1) setLang(LANGS[(LANGS.indexOf(LANG) + 1) % LANGS.length]); }, i: () => fold.click(),
@@ -1770,7 +1781,7 @@ function frame() {
     const p = Math.min(1, (performance.now() - tween.start) / tween.dur), e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
     const { a, b } = tween, et = 1 - Math.pow(1 - p, 3); // target leads slightly so the view settles on it
     controls.target.lerpVectors(tween.t0, tween.v.target, Math.min(1, et * .35 + e * .65));
-    const r = Math.exp(lerp(Math.log(a.radius), Math.log(b.radius), e)) * (1 + tween.lift * Math.sin(Math.PI * p));
+    const r = Math.min(tween.peakRadius, Math.exp(lerp(Math.log(a.radius), Math.log(b.radius), e)) * (1 + tween.lift * Math.sin(Math.PI * p)));
     const phi = lerp(a.phi, b.phi, e) - tween.lift * .25 * Math.sin(Math.PI * p);
     camera.position.copy(controls.target).add(new THREE.Vector3().setFromSphericalCoords(r, Math.max(.05, phi), a.theta + tween.dth * e));
     if (p >= 1) { camera.position.copy(tween.v.pos); controls.target.copy(tween.v.target); }
