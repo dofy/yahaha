@@ -1543,7 +1543,11 @@ function applyDaylight(h) {
   const col = j => new THREE.Color(A[j]).lerp(new THREE.Color(B[j]), k), num = j => lerp(A[j], B[j], k);
   const sky = col(1);
   { const P = UIP[i], Q = UIP[i + 1], kk = sstep(.15, .85, k), root = document.documentElement.style;
-    UI_VARS.forEach((v, j) => root.setProperty(v, '#' + new THREE.Color(P[j]).lerp(new THREE.Color(Q[j]), kk).getHexString()));
+    // blend only between palettes of the same polarity; light ↔ dark switches as one set at the
+    // midpoint, so card and text never meet in a grey where neither can be read
+    const lum = c => { const x = new THREE.Color(c); return .2126 * x.r + .7152 * x.g + .0722 * x.b; };
+    const flip = (lum(P[0]) > .5) !== (lum(Q[0]) > .5);
+    UI_VARS.forEach((v, j) => root.setProperty(v, '#' + (flip ? new THREE.Color(kk < .5 ? P[j] : Q[j]) : new THREE.Color(P[j]).lerp(new THREE.Color(Q[j]), kk)).getHexString()));
     root.setProperty('--ui-shadow', kk < .5 ? P[7] : Q[7]); }
   scene.background = sky; fog.color.copy(sky);
   document.documentElement.style.setProperty('--sky', '#' + sky.getHexString());
