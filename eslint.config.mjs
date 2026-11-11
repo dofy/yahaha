@@ -11,6 +11,10 @@ export default [
     files: ['**/*.{js,mjs}'],
     languageOptions: { globals: globals.node }
   },
+  {
+    files: ['src/scripts/**/*.js'],
+    languageOptions: { globals: globals.browser }
+  },
   ...tseslint.configs.recommended,
   ...astro.configs.recommended,
   ...astro.configs['jsx-a11y-recommended'],

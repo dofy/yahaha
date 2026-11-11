@@ -1,63 +1,297 @@
 ---
-import Base from '@/layouts/Base.astro'
-import '@/styles/home-redesign.css'
-import LinkBlock from '@/components/LinkBlock.astro'
-import AppShowcase from '@/components/AppShowcase.astro'
+import '@fontsource-variable/manrope'
+import '@fontsource-variable/jetbrains-mono'
+import '@fontsource/cormorant-garamond/500-italic.css'
+import '@fontsource/cormorant-garamond/600-italic.css'
+import keywords from '@/data/keywords.json'
 import allLinks from '@/data/links.json'
-import { version } from '../../package.json'
-import type { Links } from '@/types'
+import apps from '@/data/apps.json'
+import { pageMetadata, canonicalPath } from '@/lib/site'
+import type { GitHubLink, Links, NormalLink, SocialLink } from '@/types'
 
+// The homepage is a full-screen 3D map (src/scripts/middle-earth.js), so it
+// does not use Base: no header, footer or container, only the shared metadata.
+const metadata = pageMetadata['/']
+const canonical = new URL(canonicalPath('/'), Astro.site ?? 'https://yahaha.net')
+const image = new URL('/logo.png', canonical)
 const links = allLinks as Links
-const tools = links.find(({ cat }) => cat.name === 'tool')!
-const projects = links.find(({ cat }) => cat.name === 'github')!
+const fallback = [
+  { title: 'Apps', items: apps.map(({ name, url }) => ({ name, url })) },
+  ...links.map(({ cat, links }) => ({
+    title: cat.name,
+    items: (links as (NormalLink | SocialLink | GitHubLink)[]).map((l) => ({
+      name: l.name,
+      url: 'userId' in l ? `${l.url}${l.userId}` : cat.name === 'github' ? `https://github.com/dofy/${l.url}` : l.url
+    }))
+  }))
+]
 ---
 
-<Base>
-  <section class='home-hero' aria-labelledby='hero-heading'>
-    <div class='hero-copy'>
-      <p class='product-note'>A little corner of the internet, by Seven</p>
-      <h1 id='hero-heading'>The answer exists only in the Tao.</h1>
-      <p class='hero-description'>
-        A collection of small apps, useful tools and things made out of
-        curiosity.
-      </p>
-      <a href='#apps' class='site-button site-button-primary'>
-        Explore the collection
-      </a>
-      <a href='https://github.com/dofy/yahaha/releases' class='hero-version'>
-        v{version}
-      </a>
-    </div>
-    <div class='hero-art' aria-label='A collection of apps and tools'>
-      <div class='art-top'>
-        <span>Made by Seven</span>
-        <span>Apps, tools & ideas</span>
+<!doctype html>
+<html lang={metadata.lang}>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, viewport-fit=cover' />
+    <title>Seven</title>
+    <link rel='icon' href='/favicon.ico' />
+    <link rel='apple-touch-icon' href='/logo.png' />
+    <link rel='manifest' href='/manifest.json' />
+    <meta name='description' content={metadata.description} />
+    <meta name='keywords' content={keywords.join()} />
+    <link rel='canonical' href={canonical.href} />
+    <meta property='og:type' content='website' />
+    <meta property='og:url' content={canonical.href} />
+    <meta property='og:description' content={metadata.description} />
+    <meta property='og:image' content={image.href} />
+    <meta property='og:title' content='Seven' />
+    <meta property='og:site_name' content='Seven' />
+    <meta name='theme-color' content='#f1eadb' />
+    <meta name='twitter:card' content='summary' />
+    <meta name='twitter:title' content='Seven' />
+    <meta name='twitter:description' content={metadata.description} />
+    <meta name='twitter:image' content={image.href} />
+    <meta name='twitter:creator' content='@dofy' />
+    <meta name='twitter:site' content='@dofy' />
+    <meta name='generator' content={Astro.generator} />
+    <noscript><style is:inline>.loader { display: none; }</style></noscript>
+  </head>
+  <body>
+<div class="map intro" id="map">
+      <div class="loader" id="loader" role="status" aria-live="polite">
+        <div class="ld-paper" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <div class="ld-title" id="ld-title">正在折一片中洲</div>
+        <div class="ld-step" id="ld-step">准备纸张…</div>
+        <div class="ld-bar"><i id="ld-bar"></i></div>
       </div>
-      <img
-        class='art-face'
-        src='/logo-transparent.png'
-        alt=''
-        width='640'
-        height='640'
-      />
-      <div class='art-bottom'>
-        <span>
-          Make things.
-          <br />
-          Stay curious.
-        </span>
-        <span aria-hidden='true'>✳</span>
+      <div class="labels" id="labels"></div>
+      <header class="ui brand"><h1 class="site-h1"><a class="site" id="site" href="/">yahaha.net</a></h1><a class="about" id="about" href="https://github.com/dofy/dofy" target="_blank" rel="noopener">About me ↗</a></header>
+      <nav class="ui crumb" id="crumb" aria-label="位置"></nav>
+      <div class="ui tools" role="toolbar" aria-label="视角">
+        <button type="button" id="b-home">全图</button>
+        <button type="button" id="b-tour" aria-pressed="false">导览</button>
+        <button type="button" id="b-spin" aria-pressed="false">环绕</button>
+        <button type="button" id="b-top" aria-pressed="false">俯视</button>
+        <span class="sep" aria-hidden="true"></span>
+        <button type="button" id="b-lang" lang="en">EN</button>
+        <button type="button" id="b-keys" aria-haspopup="dialog" aria-controls="keys">?</button>
       </div>
+      <footer class="ui foot"><span class="clock" id="clock"></span><span class="copy">&copy; 2007&ndash;<span id="year">2026</span> Seven</span></footer>
+      <div class="ui compass" aria-hidden="true">
+        <svg viewBox="-17 -17 34 34"><circle r="15" fill="none" stroke="currentColor"/><circle r="11.5" fill="none" stroke="currentColor" stroke-dasharray="1 2.2" opacity=".6"/><g id="needle"><path d="M0 -13 L3.4 0 L0 2 L-3.4 0Z" fill="var(--coral)" stroke="currentColor"/><path d="M0 13 L3.4 0 L-3.4 0Z" fill="none" stroke="currentColor"/></g></svg>
+      </div>
+      <div class="ui keys" id="keys" role="dialog" aria-modal="false" aria-labelledby="keys-title" hidden><h2 id="keys-title">Keyboard shortcuts</h2><dl id="keys-list"></dl><p id="keys-close"></p></div>
+      <aside class="ui info" id="info" aria-label="说明">
+        <div class="info-head"><span class="eyebrow" id="info-eyebrow">yahaha.net</span><button type="button" class="fold" id="fold" aria-expanded="true" aria-controls="panel">收起</button></div>
+        <div class="panel" id="panel" aria-live="polite"></div>
+        <div class="hint" id="hint"></div>
+      </aside>
     </div>
-  </section>
-  <AppShowcase />
-  <LinkBlock cat={tools.cat} links={tools.links} />
-  <LinkBlock cat={projects.cat} links={projects.links} />
-  <div class='personal-links'>
-    {links
-      .filter(({ cat }) => ['social', 'heart'].includes(cat.name))
-      .map((link) => (
-        <LinkBlock cat={link.cat} links={link.links} />
-      ))}
-  </div>
-</Base>
+    <noscript>
+      <nav class='no-js' aria-label='All links'>
+        {fallback.map((group) => (
+          <section>
+            <h2>{group.title}</h2>
+            <ul>
+              {group.items.map((item) => (
+                <li><a href={item.url}>{item.name}</a></li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </nav>
+    </noscript>
+    <script>
+      import '@/scripts/middle-earth.js'
+    </script>
+  </body>
+</html>
+
+<style is:global>
+
+/* Layout: the map is the whole page — a folded-paper continent (three.js) with ink creases from a
+   normal+depth edge pass. Cities = categories, buildings = tools. All text lives in one corner info box. */
+:root {
+  --sky: #f1eadb;
+  --card: #fffdf8;
+  --paper: #fbf7ee;
+  --road: #eee2c6;
+  --kraft: #c59c6c;
+  --kraft-deep: #946b43;
+  --stone: #b9b3a7;
+  --slate: #8d99a2;
+  --snow: #fdfcf7;
+  --grass: #bcc58c;
+  --meadow: #d6cf8e;
+  --olive: #7c8b48;
+  --pine: #566a3f;
+  --mustard: #e0a22b;
+  --terra: #c56a42;
+  --roof-slate: #6f8598;
+  --wall-rose: #ecd0bf;
+  --wall-sage: #d7dfc4;
+  --wall-sky: #d2e0e3;
+  --water: #9fbcc3;
+  --water-ink: #5a7d86;
+  --ink: #3a2f25;
+  --ink-soft: #5b5046;
+  --ink-faint: #7d7266;
+  --line: #e2d8c8;
+  --coral: #ff6554;
+  --coral-deep: #b83d30;
+  --coral-wash: #ffd9cf;
+  --ui-card: #fffdf8; --ui-ink: #3a2f25; --ui-soft: #5b5046; --ui-faint: #7d7266; --ui-line: #e2d8c8; --ui-hot: #ffd9cf; --ui-water: #5a7d86; --ui-shadow: rgba(58, 47, 37, .16);
+  --font-sans: 'Manrope Variable', 'PingFang SC', 'Hiragino Sans GB', system-ui, sans-serif;
+  --font-map: 'Cormorant Garamond', 'Songti SC', 'STSong', Georgia, serif;
+  --font-mono: 'JetBrains Mono Variable', 'SFMono-Regular', Consolas, 'PingFang SC', monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--sky); color: var(--ui-ink); font-family: var(--font-sans); font-size: 15px; line-height: 1.55; overflow: hidden; }
+
+.map { position: fixed; inset: 0; overflow: hidden; background: var(--sky); user-select: none; -webkit-user-select: none; }
+.map canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+.map canvas:active { cursor: grabbing; }
+.map.pointing canvas { cursor: pointer; }
+.map.panning canvas { cursor: move; }
+.labels { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.ui { z-index: 2; }
+
+.ui { position: absolute; display: flex; gap: 6px; align-items: center; }
+.brand { top: calc(14px + env(safe-area-inset-top, 0px)); left: calc(14px + env(safe-area-inset-left, 0px)); gap: 0;
+  background: var(--ui-card); border: 1px solid var(--ui-ink); border-radius: 999px; padding: 3px; }
+.brand a { color: var(--ui-ink); text-decoration: none; border-radius: 999px; padding: 4px 12px; }
+.brand .site { font-family: var(--font-map); font-style: italic; font-weight: 600; font-size: 18px; line-height: 1.1; }
+.brand .about { font-family: var(--font-mono); font-size: 11.5px; color: var(--ui-soft); border-left: 1px solid var(--ui-line); border-radius: 0 999px 999px 0; }
+.brand a:hover { background: var(--ui-line); }
+.tools .sep { width: 1px; height: 16px; background: var(--ui-line); margin: 0 2px; }
+.foot { left: calc(70px + env(safe-area-inset-left, 0px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  font-family: var(--font-mono); font-size: 11px; color: var(--ui-soft); background: color-mix(in srgb, var(--ui-card) 85%, transparent);
+  padding: 2px 8px; border-radius: 6px; }
+.lang-en .place small { display: none; }
+.keys { left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(380px, calc(100vw - 32px)); flex-direction: column; align-items: stretch; gap: 10px;
+  background: var(--ui-card); color: var(--ui-ink); border: 1.5px solid var(--ui-ink); border-radius: 14px; padding: 18px 20px; box-shadow: 0 18px 50px var(--ui-shadow); z-index: 4; }
+[hidden] { display: none !important; }
+.keys h2 { margin: 0; font-family: var(--font-map); font-style: italic; font-weight: 600; font-size: 24px; }
+.keys dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 7px 14px; align-items: baseline; }
+.keys dt { display: flex; gap: 4px; justify-content: flex-end; }
+.keys .or { color: var(--ui-faint); font-family: var(--font-mono); font-size: 11px; align-self: center; }
+.keys dd { margin: 0; color: var(--ui-soft); font-size: 14px; }
+.keys kbd, .hint kbd { font-family: var(--font-mono); font-size: 11px; min-width: 22px; text-align: center; padding: 2px 6px; border: 1px solid var(--ui-ink);
+  border-bottom-width: 2px; border-radius: 5px; background: var(--ui-card); color: var(--ui-ink); }
+.keys p { margin: 0; font-family: var(--font-mono); font-size: 11px; color: var(--ui-faint); }
+.foot { gap: 10px; }
+.clock { color: var(--ui-ink); font-weight: 600; }
+.clock::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--sun, var(--mustard)); vertical-align: 0; border: 1px solid var(--ui-ink); }
+.crumb { top: calc(60px + env(safe-area-inset-top, 0px)); left: calc(14px + env(safe-area-inset-left, 0px));
+  font-family: var(--font-mono); font-size: 12px; background: var(--ui-card); border: 1px solid var(--ui-ink); border-radius: 999px; padding: 4px 6px; }
+.crumb button, .tools button { font: inherit; color: inherit; background: none; border: 0; padding: 3px 9px; border-radius: 999px; cursor: pointer; }
+.crumb button:hover, .tools button:hover { background: var(--ui-line); }
+.crumb .here { padding: 2px 8px; font-weight: 600; }
+.crumb .sep { color: var(--ui-faint); }
+.tools { top: calc(14px + env(safe-area-inset-top, 0px)); right: calc(14px + env(safe-area-inset-right, 0px));
+  font-family: var(--font-mono); font-size: 12px; background: var(--ui-card); border: 1px solid var(--ui-ink); border-radius: 999px; padding: 4px; }
+.tools button[aria-pressed="true"] { background: var(--ui-hot); }
+.compass { left: calc(14px + env(safe-area-inset-left, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  background: var(--ui-card); border: 1px solid var(--ui-ink); border-radius: 999px; padding: 4px; color: var(--ui-ink); }
+.compass svg { width: 40px; height: 40px; display: block; }
+
+.info { right: calc(14px + env(safe-area-inset-right, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  width: min(340px, calc(100vw - 28px)); max-height: calc(100% - 96px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  flex-direction: column; align-items: stretch; gap: 0;
+  background: var(--ui-card); border: 1.5px solid var(--ui-ink); border-radius: 14px; box-shadow: 0 18px 50px var(--ui-shadow); }
+.info-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 10px 0 16px; }
+.fold { font-family: var(--font-mono); font-size: 11px; color: var(--ui-soft); background: none; border: 1px solid var(--ui-line);
+  border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+.fold:hover { border-color: var(--ui-ink); }
+.info .panel { padding: 8px 16px 14px; overflow-y: auto; overscroll-behavior: contain; }
+.info .hint { padding: 8px 16px 10px; border-top: 1px solid var(--ui-line); font-family: var(--font-mono); font-size: 11px; color: var(--ui-faint); }
+.info.folded .panel, .info.folded .hint { display: none; }
+.info.folded .info-head { padding-bottom: 10px; }
+@media (max-width: 560px) {
+  .info { left: calc(10px + env(safe-area-inset-left, 0px)); right: calc(10px + env(safe-area-inset-right, 0px)); width: auto;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)); max-height: 52%; }
+  .compass { bottom: auto; top: calc(106px + env(safe-area-inset-top, 0px)); }
+  .foot { left: auto; right: calc(10px + env(safe-area-inset-right, 0px)); bottom: auto; top: calc(108px + env(safe-area-inset-top, 0px)); }
+  .tools { top: auto; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); right: calc(10px + env(safe-area-inset-right, 0px)); }
+}
+.loader { position: absolute; inset: 0; z-index: 5; display: grid; place-content: center; justify-items: center; gap: 10px;
+  background: var(--ui-card); transition: opacity .6s .2s, visibility 0s .8s; }
+.loader.done { opacity: 0; visibility: hidden; }
+.ld-paper { position: relative; width: 120px; height: 70px; perspective: 400px; margin-bottom: 8px; }
+.ld-paper i { position: absolute; bottom: 0; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
+  border-bottom: 52px solid var(--slate); transform-origin: 50% 100%; animation: fold 2.2s cubic-bezier(.5, 0, .2, 1) infinite; }
+.ld-paper i:nth-child(1) { left: 4px; border-bottom-color: var(--pine); border-bottom-width: 40px; }
+.ld-paper i:nth-child(2) { left: 30px; border-bottom-color: var(--slate); border-bottom-width: 66px; border-left-width: 22px; border-right-width: 22px; animation-delay: .15s; }
+.ld-paper i:nth-child(3) { left: 64px; border-bottom-color: var(--mustard); border-bottom-width: 46px; animation-delay: .3s; }
+.ld-paper i:nth-child(4) { left: 90px; border-bottom-color: var(--olive); border-bottom-width: 34px; animation-delay: .45s; }
+@keyframes fold { 0% { transform: rotateX(90deg); } 30%, 70% { transform: rotateX(0deg); } 100% { transform: rotateX(-90deg); } }
+.ld-title { font-family: var(--font-map); font-style: italic; font-weight: 600; font-size: 26px; color: var(--ui-ink); }
+.ld-step { font-family: var(--font-mono); font-size: 12px; color: var(--ui-faint); }
+.ld-bar { width: 180px; height: 3px; background: var(--ui-line); border-radius: 2px; overflow: hidden; }
+.ld-bar i { display: block; height: 100%; background: var(--coral); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
+.intro .labels, .intro .ui { opacity: 0; }
+.labels, .ui { transition: opacity .6s; }
+@media (prefers-reduced-motion: reduce) { .ld-paper i { animation: none; } }
+.fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--ui-soft); }
+
+/* 3D labels */
+.c-tag { pointer-events: auto; cursor: pointer; color: var(--ui-ink); background: var(--ui-card); border: 1px solid var(--ui-ink);
+  border-radius: 8px; padding: 2px 10px 4px; white-space: nowrap; display: grid; justify-items: center; line-height: 1.15;
+  transform: translateY(-50%); transition: background .15s; font: inherit; }
+.c-tag .en { font-family: var(--font-map); font-style: italic; font-weight: 600; font-size: 19px; letter-spacing: .01em; }
+.c-tag .zh { font-family: var(--font-mono); font-size: 10.5px; color: var(--ui-faint); }
+.c-tag:hover, .c-tag.hot { background: var(--ui-hot); }
+.c-tag::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 1px; height: 8px; background: var(--ui-ink); }
+.d-tag { pointer-events: auto; cursor: pointer; font-family: var(--font-mono); font-size: 11.5px; color: var(--ui-ink);
+  background: color-mix(in srgb, var(--ui-card) 90%, transparent); border: 1px solid var(--ui-line); border-radius: 6px;
+  padding: 1px 6px; white-space: nowrap; transform: translateY(-60%); }
+.d-tag b { font-weight: 400; color: var(--ui-faint); margin-right: 5px; }
+.d-tag:hover, .d-tag.hot { border-color: var(--ui-ink); }
+.d-tag.sel { background: var(--coral); border-color: var(--ui-ink); color: #171614; }
+.d-tag.sel b { color: #171614; }
+.place { font-family: var(--font-map); font-style: italic; font-weight: 500; font-size: 17px; letter-spacing: .14em;
+  color: var(--ui-soft); white-space: nowrap; text-shadow: 0 0 6px var(--ui-card), 0 0 3px var(--ui-card), 0 0 1px var(--ui-card); text-align: center; line-height: 1.1;
+  transition: opacity .4s; }
+.place small { display: block; font-family: var(--font-mono); font-style: normal; font-size: 10px; letter-spacing: .3em; color: var(--ui-faint); }
+.place.water { color: var(--ui-water); }
+.in-city .place { opacity: 0; }
+
+/* Panel */
+.panel { display: grid; gap: 12px; min-width: 0; }
+.eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ui-faint); }
+.panel h2 { margin: 0; font-family: var(--font-map); font-style: italic; font-weight: 600; font-size: 28px; line-height: 1.05; text-wrap: balance; }
+.panel h2 small { display: block; font-family: var(--font-sans); font-style: normal; font-weight: 600; font-size: 14px; color: var(--ui-soft); margin-top: 4px; }
+.panel p { margin: 0; color: var(--ui-soft); }
+.list { list-style: none; margin: 0; padding: 8px 0 0; display: grid; gap: 2px; border-top: 1px solid var(--ui-line); }
+.list button { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: baseline;
+  text-align: left; font: inherit; color: inherit; background: none; border: 0; border-radius: 8px; padding: 7px 8px; cursor: pointer; }
+.list button:hover { background: var(--ui-line); }
+.list button[aria-current="true"] { background: var(--ui-hot); }
+.code { font-family: var(--font-mono); font-size: 11px; color: var(--ui-faint); font-variant-numeric: tabular-nums; }
+.list button { align-items: center; }
+.emblem { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: #fffaf0;
+  font-family: var(--font-map); font-style: italic; font-weight: 600; font-size: 17px; line-height: 1; border: 1px solid var(--ui-ink); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .15); }
+.swatch { width: 14px; height: 14px; background: var(--c); border: 1px solid var(--ui-ink); transform: rotate(45deg); margin: 0 6px 0 4px; box-shadow: inset -3px -3px 0 rgba(0, 0, 0, .15); }
+.grid-ref { font-family: var(--font-mono); font-size: 10.5px; color: var(--ui-soft); border: 1px solid var(--ui-line); border-radius: 4px; padding: 1px 5px; letter-spacing: .05em; }
+.list .nm { font-weight: 600; min-width: 0; }
+.list .nm i { font-family: var(--font-map); font-weight: 600; font-size: 17px; }
+.list .nm em { display: block; font-style: normal; font-weight: 400; font-size: 13px; color: var(--ui-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list .meta { font-family: var(--font-mono); font-size: 11px; color: var(--ui-faint); }
+.card { border: 1px solid var(--ui-ink); border-radius: 12px; padding: 14px; display: grid; gap: 8px; }
+.card .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.card h3 { margin: 0; font-size: 17px; }
+.card .url { font-family: var(--font-mono); font-size: 12px; color: var(--ui-faint); word-break: break-all; }
+.go { justify-self: start; display: inline-flex; gap: 6px; align-items: center; text-decoration: none; font-weight: 600;
+  color: #171614; background: var(--coral); border: 1px solid var(--ui-ink); border-radius: 8px; padding: 6px 12px; }
+.go:hover { filter: brightness(1.05); }
+:focus-visible { outline: 2px solid var(--coral-deep); outline-offset: 2px; }
+.ui, .c-tag, .d-tag, .place, .panel, .list button { transition: background-color 1.5s, color 1.5s, border-color 1.5s; }
+
+.site-h1 { margin: 0; font: inherit; display: contents; }
+.no-js { position: fixed; inset: 0; overflow: auto; z-index: 6; background: var(--ui-card); color: var(--ui-ink); padding: 24px max(16px, env(safe-area-inset-left, 0px));
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; font-family: var(--font-sans); }
+.no-js h2 { font-family: var(--font-map); font-style: italic; text-transform: capitalize; margin: 0 0 8px; }
+.no-js ul { margin: 0; padding-left: 18px; }
+.no-js a { color: var(--ui-ink); }
+</style>

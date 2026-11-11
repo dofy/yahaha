@@ -34,7 +34,7 @@ Each page in `src/pages/` is a self-contained route with its own data + UI.
 ```
 src/
 ├── pages/          # Astro routes — each .astro file is a page
-│   ├── index.astro       # Homepage: hero + app showcase + toolbox + LinkBlock sections
+│   ├── index.astro       # Homepage: full-screen 3D map (no Base), script in src/scripts/middle-earth.js
 │   ├── 24points.astro    # 24-points solver
 │   ├── emoji.astro       # Emoji search (EmojiSearch island)
 │   ├── emoticon.astro    # Emoticon generator
@@ -79,6 +79,26 @@ src/
 - **Surfaces are solid.** `.panel`, `.panel-strong`, `.panel-solid` and `.chip`
   share theme-aware backgrounds and fine borders. Shadows are reserved for
   the homepage tool previews. Use rounded rectangular controls.
+
+### Homepage map
+
+- `src/pages/index.astro` is the one route that does **not** use `Base`: it renders
+  the same metadata itself, a static `<h1>` (site brand) and a `<noscript>` link list,
+  then loads `src/scripts/middle-earth.js` (plain JS, bundled `three` 0.170).
+- The map draws a folded-paper continent with `MeshLambertMaterial` flat shading and an
+  ink-line post pass (normal + depth edges), plus depth-of-field and tilt-shift blur.
+  Five cities (Minas Tirith = tools, Rivendell = Heart Sutra, Grey Havens = apps,
+  Erebor = GitHub, Bree = social) each give every item its own landmark building.
+- City and item data live in the script, not in `links.json`/`apps.json`; keep them in
+  step when tools change. English copy sits in `EN`/`EN_DESC`, interface strings in `T`.
+- There is no dark mode or theme toggle here: local time drives sky, sun, lamps and the
+  interface palette (`DAY`/`UIP` keyframes, eight phases). `?t=18.5` pins the hour for
+  previews. Language follows the system and is switchable (stored per browser).
+- Fonts are self-hosted (`@fontsource-variable/manrope`, `jetbrains-mono`,
+  `@fontsource/cormorant-garamond` italics); never load Google Fonts.
+- Keyboard: 1–5 cities, 0/H overview, ←/→ step, Enter open, Esc back, +/− zoom,
+  T/R/V tour/orbit/top, L language, I info card, ? help; Shift or Space + drag pans
+  within `PAN` bounds.
 
 ### Tokens and typography
 

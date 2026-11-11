@@ -5,7 +5,7 @@ type PageMetadata = { description: string; lang: string }
 export const pageMetadata: Record<string, PageMetadata> = {
   '/': {
     description:
-      'Discover Cruft, WordClip, LinguaDock, Tsudoi, Learning Vim and Brew Graph, plus browser tools for 24 points, emoji, kaomoji, Morse code and tarot.',
+      'A folded-paper 3D map of Seven’s corner of the internet: apps, browser tools, open-source projects and links, laid out as five cities.',
     lang: 'en'
   },
   '/24points': {
