@@ -44,9 +44,8 @@ src/
 │   ├── tarot.astro       # Tarot (TarotBrowser island)
 │   └── heart/[lang].astro# Heart Sutra, dynamic lang param
 ├── layouts/
-│   └── Base.astro        # Universal wrapper: <head> meta, theme FOUC guard, Header, ThemeToggle, Footer
+│   └── Base.astro        # Tool-page wrapper: <head> meta, theme FOUC guard, Header, ThemeToggle, Footer
 ├── components/
-│   ├── LinkBlock.astro   # Homepage toolbox, projects and personal links
 │   ├── Header.astro      # Shared navigation and theme control slot
 │   ├── SiteBrand.astro   # Original favicon + current domain label
 │   ├── Footer.astro      # domains.json nav + copyright
@@ -55,8 +54,9 @@ src/
 │   │   ├── ThemeToggle.tsx   # 3-state light→dark→auto cycle + theme-color meta
 │   │   └── Mascot.tsx        # Original pixel explorer (grid SVG) — pixel easter egg
 │   └── ui/               # shadcn-style primitives (Button, Input, Select, Tabs, Tooltip, Badge)
-├── data/           # Static JSON: links, domains, keywords, heart, morse, tarot, emoji/
+├── data/           # Static JSON: map (homepage), domains, keywords, heart, morse, tarot, face, emoji/
 ├── lib/            # Pure logic (solvers, generators)
+├── scripts/        # Homepage map engine, vendored from site-to-map
 └── styles/
     └── globals.css # @theme tokens + shared app-site layout + motion
 ```
@@ -68,17 +68,17 @@ src/
 - **`src/lib/identity.ts`** resolves the current hostname against `domains.json`.
   Base applies the domain name to both SiteBrand instances and the browser title;
   static share metadata and the manifest identify Seven's personal website.
-- **`Base.astro`** wraps every route with metadata, the theme FOUC guard,
+- **`Base.astro`** wraps every tool page with metadata, the theme FOUC guard,
   `Header` (with `ThemeToggle`), the original `Logo` image and `Footer`. Pass `title` and `wide` props.
-  The homepage uses a 1180px container; tool pages use narrower working areas.
+  The homepage does not use it (see *Homepage map*).
 - **Path alias `@/`** maps to `./src/*` in `tsconfig.json`.
-- **Visual style matches the app websites** in `../Cruft/website/styles.css`,
+- **Tool pages match the app websites' visual style** in `../Cruft/website/styles.css`,
   `../wordclip/website/styles.css` and `../LinguaDock/website/styles.css`:
   `#fffdfc` paper, `#171614` ink, `#ff6554` coral, `#eaf1f4` blue wash,
   rounded system fonts, subtle horizontal rules and generous spacing.
 - **Surfaces are solid.** `.panel`, `.panel-strong`, `.panel-solid` and `.chip`
-  share theme-aware backgrounds and fine borders. Shadows are reserved for
-  the homepage tool previews. Use rounded rectangular controls.
+  share theme-aware backgrounds and fine borders. Tool pages use no shadows.
+  Use rounded rectangular controls.
 
 ### Homepage map
 
@@ -99,9 +99,9 @@ src/
   Erebor = GitHub, Bree = social) each give every item its own landmark building.
 - All map content lives in `src/data/map.json` (schema: `references/site-schema.md` in
   site-to-map): towns, slots, shortcut keys, styles, every link with its building `kind`
-  and zh/en text, place names and interface overrides. The `<noscript>` list is generated
-  from the same file. `links.json`/`apps.json` no longer feed the homepage; add new tools
-  to `map.json`.
+  and text in all four languages, place names, the GitHub link (`site.links`) and
+  interface overrides. The `<noscript>` list is generated from the same file. Add new tools
+  to `map.json`; there is no other link list.
 - There is no dark mode or theme toggle here: local time drives sky, sun, lamps and the
   interface palette (`DAY`/`UIP` keyframes in the engine, eight phases). `?t=18.5` pins the hour for
   previews. The map is in four languages (`site.languages`: zh, zh-Hant, ja, en); the
@@ -125,13 +125,14 @@ src/
   self-hosted JetBrains Mono. No remote font imports.
 - `ThemeToggle`, the Base FOUC script, the theme-color metadata and the manifest
   must stay aligned with the light/dark paper colors.
-- The original `Mascot.tsx` is available but no longer appears in the homepage
-  hero. Preserve its dedicated `--color-pixel-*` tokens and static rendering.
+- The original `Mascot.tsx` is kept but not used on any page. Preserve its dedicated
+  `--color-pixel-*` tokens and static rendering.
 
 ### Motion
 
-- All sections remain visible without JavaScript; there is no scroll observer.
-- The page entrance and interactive transitions respect reduced motion.
+- Tool pages stay fully visible without JavaScript; there is no scroll observer.
+- The page entrance and interactive transitions respect reduced motion. Homepage map
+  motion (entrance, flights, panels) follows the same preference.
 - Theme changes retain the 750ms native View Transition polygon reveal and
   the light/dark/auto cycle. Keep storage handling and cross-tab sync intact.
   The animation's MIT notice remains in `public/theme-animation-license.txt`.
@@ -184,10 +185,6 @@ src/
   rebuilds data with `pnpm emoji:update`; `--refresh-apple` reads CoreEmoji only
   on macOS. Keep raw Apple weights and provenance in the checked-in snapshot.
   See `docs/emoji-data.md`. `pnpm test` also runs Python trie fixture tests.
-- **`LinkBlock`** renders the toolbox, projects and personal links. Each has a `cat` (category with
-  `name`) and a `links` array typed `NormalLink | SocialLink | GitHubLink` — see
-  `src/types`. `links.json` drives the homepage structure. Its shields.io badge
-  colours are literal hex (a remote image cannot read CSS tokens).
 
 ## Documentation and releases
 

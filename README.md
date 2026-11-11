@@ -39,7 +39,8 @@ Tools run entirely in the browser. There is no API, database or analytics. Socia
 favicons are local assets; GitHub star badges load from shields.io.
 
 The homepage is a 3D map built with the [site-to-map](https://github.com/dofy/site-to-map)
-engine. Five cities hold the apps, browser tools, open-source repositories, Heart Sutra
+engine. site-to-map is also an agent skill: give it any personal homepage or navigation
+site and it builds the same kind of map. Five cities hold the apps, browser tools, open-source repositories, Heart Sutra
 editions and social links, and every item has its own landmark building. Each domain grows
 its own generated land; light and colours follow the visitor's local time, and the map
 speaks Simplified and Traditional Chinese, Japanese and English. All of it is configured in
@@ -187,9 +188,9 @@ semantic aliases resolve through `var()` in both themes.
 filled control; `text-accent-text` is for links and text. The deeper light-mode
 text accent improves contrast without changing the shared coral fill.
 
-**Keep working surfaces solid.** `.panel`, `.panel-solid` and `.chip` use the
-same theme-aware backing and a fine border. Depth is reserved for the homepage
-tool previews; ordinary sections use whitespace and dividers.
+**Keep working surfaces solid.** On the tool pages `.panel`, `.panel-solid` and `.chip` use
+the same theme-aware backing and a fine border, without shadows; sections use whitespace
+and dividers.
 
 **Fonts follow the app websites.** Body text uses the rounded system stack;
 JetBrains Mono remains self-hosted for tool output. No font is fetched from a
@@ -198,7 +199,9 @@ third-party host.
 **Keep content visible.** Sections do not depend on scroll-reveal JavaScript.
 The page entrance and native theme-transition animation respect reduced motion.
 
-Longer architecture notes live in [`CLAUDE.md`](./CLAUDE.md).
+Longer architecture notes live in [`CLAUDE.md`](./CLAUDE.md). The map engine, its options
+and the skill that converts other sites are documented in
+[dofy/site-to-map](https://github.com/dofy/site-to-map).
 
 ---
 
