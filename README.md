@@ -22,6 +22,8 @@ Yahaha is Seven's personal website: a folded-paper map of apps, browser tools, o
 
 The map is available in Simplified Chinese, Traditional Chinese, Japanese and English.
 
+The map uses the [site-to-map skill](https://github.com/dofy/site-to-map), which turns personal sites and bookmarks into explorable 3D maps.
+
 ## Find your way around
 
 - **Apps and projects** — discover Seven's apps and open-source work.

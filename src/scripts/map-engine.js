@@ -1362,6 +1362,8 @@ function flyTo(v, dur) {
 const state = { city: null, sel: null, hover: null, hoverCity: null };
 const panel = document.getElementById('panel'), crumb = document.getElementById('crumb'), hint = document.getElementById('hint');
 const info = document.getElementById('info'), fold = document.getElementById('fold'), eyebrow = document.getElementById('info-eyebrow');
+const mobileBubble = document.getElementById('mobile-bubble');
+const bubbleLayout = matchMedia('(max-width: 1024px), (max-width: 1366px) and (pointer: coarse)');
 const esc = s => String(s).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
 function paint(id, on) {
   const d = districts[id]; if (!d) return;
@@ -1396,6 +1398,12 @@ function renderPanel() {
   const c = state.city && cityData[state.city].c, t = L();
   crumb.innerHTML = c ? `<button type="button" data-go="world">${t.worldName}</button><span class="sep">/</span><span class="here">${c.en}</span>` : `<span class="here">${t.worldName} · ${withN(t.townCount, CITIES.length)}</span>`;
   hint.innerHTML = `${c ? t.hintC : t.hintW}${UI.shortcuts ? ' · ' + t.keysHint.replace('?', '<kbd>?</kbd>') : ''}`;
+  const selected = state.sel && districts[state.sel]?.it;
+  if (mobileBubble) {
+    const title = selected ? selected.name : c?.name;
+    const description = selected ? selected.desc : c?.blurb;
+    mobileBubble.innerHTML = c ? `<div class="bubble-copy"><strong>${esc(title)}</strong>${description ? `<p>${esc(description)}</p>` : ''}</div>${selected ? `<a class="bubble-open" href="${esc(selected.url)}" target="_blank" rel="noopener" aria-label="${esc(t.open + ' ' + selected.name)}" title="${esc(t.open)}">${EXT_ICON}</a>` : ''}<button class="bubble-close" type="button" aria-label="${esc(t.hide)}" title="${esc(t.hide)}">×</button>` : '';
+  }
   if (!c) {
     eyebrow.textContent = `${DOMAIN} · ${t.map}`;
     panel.innerHTML = `<h2>${t.title}<small>${withN(t.sub, CITIES.length)}</small></h2><p>${t.intro}</p>
@@ -1403,10 +1411,8 @@ function renderPanel() {
     return;
   }
   eyebrow.textContent = `${DOMAIN} · ${c.role}`;
-  const d = state.sel && districts[state.sel], it = d && d.it;
   panel.innerHTML = `<h2>${c.en}<small>${c.name !== c.en ? c.name + ' · ' : ''}${c.role} · ${withN(t.plots, c.items.length)}</small></h2><p>${esc(c.blurb)}</p>
-    ${it ? `<div class="card"><div class="row"><h3>${esc(it.name)}</h3><span class="eyebrow">${t.plot} ${it.code}</span></div><p>${esc(it.desc)}</p><div class="url">${esc(it.url.replace(/^https:\/\//, ''))}</div><a class="go" href="${it.url}" target="_blank" rel="noopener">${t.open}${EXT_ICON}</a></div>` : ''}
-    <ul class="list">${c.items.map((x, i) => `<li><button type="button" data-sel="${c.id}-${i}" aria-current="${state.sel === c.id + '-' + i}"><span class="swatch" style="--c: var(${TOK[x.roof] || '--kraft'})" aria-hidden="true"></span><span class="nm">${esc(x.name)}<em>${esc(x.desc)}</em></span><span class="grid-ref">${x.code}</span></button></li>`).join('')}</ul>`;
+    <ul class="list">${c.items.map((x, i) => `<li><button type="button" data-sel="${c.id}-${i}" aria-current="${state.sel === c.id + '-' + i}"><span class="swatch" style="--c: var(${TOK[x.roof] || '--kraft'})" aria-hidden="true"></span><span class="nm">${esc(x.name)}<em>${esc(x.desc)}</em></span><span class="grid-ref">${x.code}</span></button><a class="go" href="${esc(x.url)}" target="_blank" rel="noopener" aria-label="${esc(t.open + ' ' + x.name)}">${t.open}${EXT_ICON}</a></li>`).join('')}</ul>`;
 }
 function applyLang() {
   const t = L();
@@ -1435,11 +1441,11 @@ function applyLang() {
 }
 function go(city, sel = null, fly = true) {
   const changed = city !== state.city;
-  state.city = city; state.sel = sel; state.hoverCity = null;
+  state.city = city; state.sel = sel; state.hoverCity = null; info.classList.remove('bubble-closed');
   if (changed && fly) flyTo(viewFor(city));
   try { history.replaceState(null, '', city ? '#' + city : location.pathname + location.search); } catch { /* file:// pages refuse replaceState */ }
   refresh(); renderPanel();
-  if (sel && info.classList.contains('folded')) setFold(false);
+  if (sel && info.classList.contains('folded') && !bubbleLayout.matches) setFold(false);
 }
 
 // ---------------- tour ----------------
@@ -1522,6 +1528,7 @@ function setFold(f) {
   updateSide(f);
 }
 fold.addEventListener('click', () => setFold(!info.classList.contains('folded')));
+mobileBubble?.addEventListener('click', e => { if (e.target.closest('.bubble-close')) info.classList.add('bubble-closed'); });
 const keysEl = document.getElementById('keys');
 const toggleKeys = (open = keysEl.hidden) => { keysEl.hidden = !open; document.getElementById('b-keys').setAttribute('aria-expanded', open); };
 document.getElementById('b-keys').addEventListener('click', () => toggleKeys());
@@ -1619,7 +1626,7 @@ setInterval(() => applyDaylight(nowHour()), 20000);
 // ---------------- size + loop ----------------
 // the map shifts left while the info card is open on wide screens; the shift eases in frame()
 let sideTarget = 0, sideNow = 0;
-function updateSide(folded = info.classList.contains('folded')) { sideTarget = mapEl.clientWidth > 560 && !folded ? (info.offsetWidth + 14) / 2 : 0; }
+function updateSide(folded = info.classList.contains('folded')) { sideTarget = !bubbleLayout.matches && !folded ? (info.offsetWidth + 14) / 2 : 0; }
 function applySide() {
   const w = mapEl.clientWidth, h = mapEl.clientHeight;
   if (Math.abs(sideNow) > .5) camera.setViewOffset(w, h, sideNow, 0, w, h); else camera.clearViewOffset();
@@ -1638,7 +1645,7 @@ function resize() {
   post.uniforms.tColor.value = colorRT.texture; post.uniforms.tNormal.value = normalRT.texture; post.uniforms.tDepth.value = normalRT.depthTexture;
   post.uniforms.res.value.set(W, H2); post.uniforms.thick.value = Math.max(1, pr * .65); post.uniforms.blurMax.value = UI.blur ? 7 * pr : 0;
 }
-if (matchMedia('(max-width: 560px)').matches || !UI.infoOpen) { info.classList.add('folded'); fold.setAttribute('aria-expanded', 'false'); fold.textContent = L().show; }
+if (bubbleLayout.matches || !UI.infoOpen) { info.classList.add('folded'); fold.setAttribute('aria-expanded', 'false'); fold.textContent = L().show; }
 new ResizeObserver(resize).observe(mapEl);
 resize();
 
