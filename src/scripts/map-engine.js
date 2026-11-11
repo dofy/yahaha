@@ -1489,7 +1489,23 @@ const spinBtn = document.getElementById('b-spin');
 spinBtn.addEventListener('click', () => { if (!controls) return; controls.autoRotate = !controls.autoRotate; spinBtn.setAttribute('aria-pressed', controls.autoRotate); });
 const topBtn = document.getElementById('b-top');
 topBtn.addEventListener('click', () => { topDown = !topDown; topBtn.setAttribute('aria-pressed', topDown); flyTo(viewFor(state.city), 900); });
-const setFold = f => { info.classList.toggle('folded', f); fold.setAttribute('aria-expanded', !f); fold.textContent = f ? L().show : L().hide; resize(); };
+// fold/unfold the info card with a height animation; the map eases its offset in frame()
+let foldAnim = null;
+function setFold(f) {
+  const set = () => { info.classList.toggle('folded', f); fold.setAttribute('aria-expanded', !f); fold.textContent = f ? L().show : L().hide; };
+  if (reduce || !UI.motion || info.classList.contains('folded') === f) { set(); updateSide(); return; }
+  if (foldAnim) foldAnim();
+  const h0 = info.getBoundingClientRect().height;
+  info.classList.toggle('folded', f); const h1 = info.getBoundingClientRect().height; info.classList.toggle('folded', !f);
+  if (!f) set(); // unfolding: show the content now and let the box grow over it
+  info.classList.add('folding'); info.style.height = h0 + 'px';
+  info.getBoundingClientRect();
+  info.style.height = h1 + 'px';
+  let done = false;
+  const end = () => { if (done) return; done = true; info.classList.remove('folding'); info.style.height = ''; if (f) set(); foldAnim = null; updateSide(); };
+  foldAnim = end; info.addEventListener('transitionend', e => { if (e.propertyName === 'height') end(); }, { once: true }); setTimeout(end, 520);
+  updateSide(f);
+}
 fold.addEventListener('click', () => setFold(!info.classList.contains('folded')));
 const keysEl = document.getElementById('keys');
 const toggleKeys = (open = keysEl.hidden) => { keysEl.hidden = !open; document.getElementById('b-keys').setAttribute('aria-expanded', open); };
@@ -1586,14 +1602,20 @@ applyDaylight(nowHour());
 setInterval(() => applyDaylight(nowHour()), 20000);
 
 // ---------------- size + loop ----------------
+// the map shifts left while the info card is open on wide screens; the shift eases in frame()
+let sideTarget = 0, sideNow = 0;
+function updateSide(folded = info.classList.contains('folded')) { sideTarget = mapEl.clientWidth > 560 && !folded ? (info.offsetWidth + 14) / 2 : 0; }
+function applySide() {
+  const w = mapEl.clientWidth, h = mapEl.clientHeight;
+  if (Math.abs(sideNow) > .5) camera.setViewOffset(w, h, sideNow, 0, w, h); else camera.clearViewOffset();
+  camera.updateProjectionMatrix();
+}
 function resize() {
   if (!renderer) return;
   const w = mapEl.clientWidth, h = mapEl.clientHeight;
   renderer.setSize(w, h, false); labelRenderer.setSize(w, h);
   camera.aspect = w / h;
-  const side = w > 560 && !info.classList.contains('folded') ? (info.offsetWidth + 14) / 2 : 0;
-  if (side) camera.setViewOffset(w, h, side, 0, w, h); else camera.clearViewOffset();
-  camera.updateProjectionMatrix();
+  updateSide(); sideNow = sideTarget; applySide();
   const pr = renderer.getPixelRatio(), W = Math.floor(w * pr), H2 = Math.floor(h * pr);
   colorRT?.dispose(); normalRT?.dispose();
   colorRT = new THREE.WebGLRenderTarget(W, H2, { samples: 4, type: THREE.HalfFloatType });
@@ -1629,6 +1651,7 @@ function frame() {
     if (p >= 1) tween = null;
   }
   controls.update();
+  if (Math.abs(sideTarget - sideNow) > .3) { sideNow += (sideTarget - sideNow) * Math.min(1, dt * 7); if (Math.abs(sideTarget - sideNow) <= .3) sideNow = sideTarget; applySide(); }
   post.uniforms.focus.value = camera.position.distanceTo(controls.target);
   // haze scales with the view so a bigger world (more towns, wider overview) is not washed out
   { const d = post.uniforms.focus.value; fog.near = Math.max(70, d * 1.15); fog.far = Math.max(FOG_FAR, d * 3.2); post.uniforms.fogFar.value = fog.far; }

@@ -216,6 +216,9 @@ body { transition: background-color .8s; background: var(--sky); color: var(--ui
 .info .panel { padding: 8px 16px 14px; overflow-y: auto; overscroll-behavior: contain; }
 .info .hint { padding: 8px 16px 10px; border-top: 1px solid var(--ui-line); font-family: var(--font-mono); font-size: 11px; color: var(--ui-faint); }
 .info.folded .panel, .info.folded .hint { display: none; }
+.info.folding { overflow: hidden; transition: height .38s cubic-bezier(.2, .8, .2, 1), opacity .7s, transform .8s; }
+.info.folding .panel, .info.folding .hint { transition: opacity .25s; }
+.info.folding.folded .panel, .info.folding.folded .hint { opacity: 0; }
 .info.folded .info-head { padding-bottom: 10px; }
 @media (max-width: 560px) {
   .info { left: calc(10px + env(safe-area-inset-left, 0px)); right: calc(10px + env(safe-area-inset-right, 0px)); width: auto;
