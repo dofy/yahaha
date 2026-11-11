@@ -4,28 +4,21 @@ import '@fontsource-variable/jetbrains-mono'
 import '@fontsource/cormorant-garamond/500-italic.css'
 import '@fontsource/cormorant-garamond/600-italic.css'
 import keywords from '@/data/keywords.json'
-import allLinks from '@/data/links.json'
-import apps from '@/data/apps.json'
+import site from '@/data/map.json'
 import { pageMetadata, canonicalPath } from '@/lib/site'
 import { version } from '../../package.json'
-import type { GitHubLink, Links, NormalLink, SocialLink } from '@/types'
 
-// The homepage is a full-screen 3D map (src/scripts/middle-earth.js), so it
+// The homepage is a full-screen 3D map (src/scripts/map-engine.js + src/data/map.json), so it
 // does not use Base: no header, footer or container, only the shared metadata.
 const metadata = pageMetadata['/']
 const canonical = new URL(canonicalPath('/'), Astro.site ?? 'https://yahaha.net')
 const image = new URL('/logo.png', canonical)
-const links = allLinks as Links
-const fallback = [
-  { title: 'Apps', items: apps.map(({ name, url }) => ({ name, url })) },
-  ...links.map(({ cat, links }) => ({
-    title: cat.name,
-    items: (links as (NormalLink | SocialLink | GitHubLink)[]).map((l) => ({
-      name: l.name,
-      url: 'userId' in l ? `${l.url}${l.userId}` : cat.name === 'github' ? `https://github.com/dofy/${l.url}` : l.url
-    }))
-  }))
-]
+// Static link list for browsers without JavaScript, from the same map data.
+const pick = (v: string | Record<string, string>) => (typeof v === 'string' ? v : v.en ?? Object.values(v)[0])
+const fallback = site.cities.map((c) => ({
+  title: pick(c.role as string | Record<string, string>),
+  items: c.items.map((it) => ({ name: pick(it.name as string | Record<string, string>), url: it.url }))
+}))
 ---
 
 <!doctype html>
@@ -102,7 +95,10 @@ const fallback = [
       </nav>
     </noscript>
     <script>
-      import '@/scripts/middle-earth.js'
+      import { mountMap } from '@/scripts/map-engine.js'
+      import site from '@/data/map.json'
+
+      mountMap(site)
     </script>
   </body>
 </html>

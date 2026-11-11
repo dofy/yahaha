@@ -1,0 +1,655 @@
+{
+  "site": {
+    "brand": "yahaha.net",
+    "domains": [
+      "dofy.net",
+      "PHPz.xyz",
+      "PHPz.org",
+      "yahaha.net"
+    ],
+    "storageKey": "yahaha-map",
+    "lang": "auto",
+    "about": {
+      "url": "https://github.com/dofy/dofy",
+      "label": {
+        "zh": "关于我",
+        "en": "About me"
+      }
+    },
+    "copyright": {
+      "since": 2007,
+      "owner": "Seven"
+    },
+    "releaseUrl": "https://github.com/dofy/yahaha/releases/tag/v{version}",
+    "description": "A folded-paper 3D map of Seven’s corner of the internet: apps, browser tools, open-source projects and links, laid out as five cities."
+  },
+  "text": {
+    "zh": {
+      "me": "中洲",
+      "five": "五座城",
+      "title": "Yahaha 中洲",
+      "sub": "五座城，一片大陆",
+      "fold": "正在折一片中洲",
+      "titleSuffix": "中洲地图",
+      "plots": "{n} 区"
+    },
+    "en": {
+      "me": "Middle-earth",
+      "five": "Five cities",
+      "title": "Yahaha Middle-earth",
+      "sub": "Five cities, one continent",
+      "fold": "Folding a Middle-earth",
+      "titleSuffix": "Middle-earth map",
+      "plots": "{n} plots"
+    }
+  },
+  "places": [
+    {
+      "at": "north",
+      "name": {
+        "en": "Misty Mountains",
+        "zh": "迷雾山脉"
+      }
+    },
+    {
+      "at": "riverA",
+      "name": {
+        "en": "Anduin",
+        "zh": "安都因河"
+      }
+    },
+    {
+      "at": "riverB",
+      "name": {
+        "en": "Brandywine",
+        "zh": "白兰地河"
+      }
+    },
+    {
+      "at": "forest",
+      "name": {
+        "en": "Fangorn",
+        "zh": "法贡森林"
+      }
+    },
+    {
+      "at": "fields",
+      "name": {
+        "en": "The Shire",
+        "zh": "夏尔"
+      }
+    },
+    {
+      "at": "sea",
+      "name": {
+        "en": "Belegaer",
+        "zh": "大海"
+      }
+    },
+    {
+      "at": "bay",
+      "name": {
+        "en": "Bay of Belfalas",
+        "zh": "贝尔法拉斯湾"
+      }
+    },
+    {
+      "at": "west",
+      "name": {
+        "en": "Ered Luin",
+        "zh": "蓝色山脉"
+      }
+    },
+    {
+      "at": "lake",
+      "name": {
+        "en": "Nenuial",
+        "zh": "暮暗湖"
+      }
+    }
+  ],
+  "cities": [
+    {
+      "id": "tool",
+      "slot": "center",
+      "key": "m",
+      "name": {
+        "en": "Minas Tirith",
+        "zh": "米那斯提力斯"
+      },
+      "role": {
+        "zh": "工具",
+        "en": "Tools"
+      },
+      "blurb": {
+        "zh": "白城。九个在浏览器里直接用的小工具，每座建筑一个。",
+        "en": "The White City. Nine tools that run right in your browser, one building each."
+      },
+      "style": {
+        "walls": [
+          "paper",
+          "wallSky",
+          "road",
+          "wallRose",
+          "stone"
+        ],
+        "roofs": [
+          "roofSlate",
+          "terra",
+          "slate",
+          "mustard",
+          "pine"
+        ],
+        "annex": [
+          "tower",
+          "lantern",
+          "tree",
+          "well",
+          "hut",
+          "banner"
+        ]
+      },
+      "features": {
+        "walls": true,
+        "hedge": false,
+        "lamps": true,
+        "centerpiece": "none"
+      },
+      "items": [
+        {
+          "name": "24 Points",
+          "url": "https://yahaha.net/24points",
+          "kind": "quad",
+          "desc": {
+            "zh": "给四个数，列出所有算出 24 的式子",
+            "en": "Every way four numbers can make 24"
+          }
+        },
+        {
+          "name": "Tarot",
+          "url": "https://yahaha.net/tarot",
+          "kind": "spire",
+          "desc": {
+            "zh": "浏览 78 张塔罗牌和牌义",
+            "en": "Browse all 78 tarot cards and their meanings"
+          }
+        },
+        {
+          "name": "Emoji",
+          "url": "https://yahaha.net/emoji",
+          "kind": "dome",
+          "desc": {
+            "zh": "用中文或英文关键词找 Emoji 17.0",
+            "en": "Search Emoji 17.0 in English or Chinese"
+          }
+        },
+        {
+          "name": "Emoticon",
+          "url": "https://yahaha.net/emoticon",
+          "kind": "theater",
+          "desc": {
+            "zh": "随机拼一个颜文字",
+            "en": "Roll a random kaomoji"
+          }
+        },
+        {
+          "name": "Morse Code",
+          "url": "https://yahaha.net/morse",
+          "kind": "radio",
+          "desc": {
+            "zh": "摩斯电码编码和解码",
+            "en": "Encode and decode Morse code"
+          }
+        },
+        {
+          "name": "ASCII Art",
+          "url": "https://yahaha.net/ascii-art",
+          "kind": "grid",
+          "desc": {
+            "zh": "把文字变成字符画",
+            "en": "Turn text into ASCII art"
+          }
+        },
+        {
+          "name": "Face Kit",
+          "url": "https://yahaha.net/face",
+          "kind": "face",
+          "desc": {
+            "zh": "按种子生成 SVG 头像",
+            "en": "Seeded SVG avatars"
+          }
+        },
+        {
+          "name": "Lock Kit",
+          "url": "https://yahaha.net/lock",
+          "kind": "vault",
+          "desc": {
+            "zh": "计算单排和双排钥匙牙花",
+            "en": "Key bitting codes for single and double rows"
+          }
+        },
+        {
+          "name": "Sync Text",
+          "url": "https://sync-text.phpz.org/",
+          "kind": "twin",
+          "desc": {
+            "zh": "在设备之间同步一段文字",
+            "en": "Sync a note between devices"
+          }
+        }
+      ]
+    },
+    {
+      "id": "heart",
+      "slot": "highland",
+      "key": "r",
+      "name": {
+        "en": "Rivendell",
+        "zh": "幽谷"
+      },
+      "role": {
+        "zh": "心经",
+        "en": "Heart Sutra"
+      },
+      "blurb": {
+        "zh": "迷雾山脉脚下的精灵居所。四座塔，各藏一版心经。",
+        "en": "An elven refuge under the Misty Mountains. Four towers, each keeping one edition of the Heart Sutra."
+      },
+      "style": {
+        "walls": [
+          "paper",
+          "wallRose",
+          "road",
+          "wallSage"
+        ],
+        "roofs": [
+          "mustard",
+          "terra",
+          "olive",
+          "pine"
+        ],
+        "annex": [
+          "tree",
+          "lantern",
+          "tree",
+          "well",
+          "stairs"
+        ]
+      },
+      "features": {
+        "walls": false,
+        "hedge": false,
+        "lamps": false,
+        "centerpiece": "pond",
+        "suburbs": 3
+      },
+      "items": [
+        {
+          "name": "心经",
+          "url": "https://yahaha.net/heart/hans",
+          "kind": "pagoda",
+          "desc": {
+            "zh": "简体中文版",
+            "en": "Simplified Chinese"
+          },
+          "t": 2
+        },
+        {
+          "name": "心經",
+          "url": "https://yahaha.net/heart/hant",
+          "kind": "pavilion",
+          "desc": {
+            "zh": "繁體中文版",
+            "en": "Traditional Chinese"
+          }
+        },
+        {
+          "name": "Heart",
+          "url": "https://yahaha.net/heart/en",
+          "kind": "elfhall",
+          "desc": {
+            "zh": "English translation",
+            "en": "English translation"
+          }
+        },
+        {
+          "name": "प्रज्ञापारमिता",
+          "url": "https://yahaha.net/heart/original",
+          "kind": "stupa",
+          "desc": {
+            "zh": "梵文原文",
+            "en": "Sanskrit original"
+          }
+        }
+      ]
+    },
+    {
+      "id": "github",
+      "slot": "south",
+      "key": "e",
+      "name": {
+        "en": "Erebor",
+        "zh": "孤山"
+      },
+      "role": {
+        "zh": "开源",
+        "en": "Open source"
+      },
+      "blurb": {
+        "zh": "矮人的熔炉。九个开源仓库，排成一片冒烟的工坊。",
+        "en": "The dwarven forges. Nine open-source repositories in a row of smoking workshops."
+      },
+      "style": {
+        "walls": [
+          "stone",
+          "kraft",
+          "wallRose",
+          "road",
+          "wallSage"
+        ],
+        "roofs": [
+          "kraftDeep",
+          "terra",
+          "slate",
+          "pine",
+          "mustard"
+        ],
+        "annex": [
+          "barrels",
+          "crates",
+          "anvil",
+          "hut",
+          "cart"
+        ],
+        "timber": true
+      },
+      "features": {
+        "walls": false,
+        "hedge": false,
+        "lamps": false,
+        "centerpiece": "none"
+      },
+      "items": [
+        {
+          "name": "The 7th Vim",
+          "url": "https://github.com/dofy/7th-vim",
+          "kind": "smithy",
+          "desc": {
+            "zh": "Vim 配置",
+            "en": "Vim configuration"
+          }
+        },
+        {
+          "name": "Learn Vim",
+          "url": "https://github.com/dofy/learn-vim",
+          "kind": "scriptorium",
+          "desc": {
+            "zh": "Vim 教程，三种语言",
+            "en": "Vim tutorial in three languages"
+          }
+        },
+        {
+          "name": "Emoji Database",
+          "url": "https://github.com/dofy/emojidb",
+          "kind": "warehouse",
+          "desc": {
+            "zh": "Emoji 数据 CLI",
+            "en": "Search Emoji 17.0 in English or Chinese"
+          }
+        },
+        {
+          "name": "Apple Emoji Dict",
+          "url": "https://github.com/dofy/apple-emoji-dict",
+          "kind": "watermill",
+          "desc": {
+            "zh": "Apple Emoji 关键词词典",
+            "en": "Apple emoji keyword dictionary"
+          }
+        },
+        {
+          "name": "PopClip Extensions",
+          "url": "https://github.com/dofy/PopClip-Extensions",
+          "kind": "kiln",
+          "desc": {
+            "zh": "自制 PopClip 扩展",
+            "en": "My PopClip extensions"
+          }
+        },
+        {
+          "name": "Alfred Workflows",
+          "url": "https://github.com/dofy/awf",
+          "kind": "mansion",
+          "desc": {
+            "zh": "自制 Alfred 工作流",
+            "en": "My Alfred workflows"
+          }
+        },
+        {
+          "name": "Tsudoi",
+          "url": "https://github.com/dofy/invite-maker",
+          "kind": "hobbit",
+          "desc": {
+            "zh": "邀请函生成器源码",
+            "en": "Source of the invitation maker"
+          }
+        },
+        {
+          "name": "Learning Vim",
+          "url": "https://github.com/dofy/learning-vim",
+          "kind": "mine",
+          "desc": {
+            "zh": "交互式 Vim 课程源码",
+            "en": "Source of the interactive Vim course"
+          }
+        },
+        {
+          "name": "Brew Graph",
+          "url": "https://github.com/dofy/brew-graph",
+          "kind": "still",
+          "desc": {
+            "zh": "Homebrew 依赖图源码",
+            "en": "Source of the Homebrew dependency graph"
+          }
+        }
+      ]
+    },
+    {
+      "id": "social",
+      "slot": "east",
+      "key": "b",
+      "name": {
+        "en": "Bree",
+        "zh": "布理"
+      },
+      "role": {
+        "zh": "社交",
+        "en": "Social"
+      },
+      "blurb": {
+        "zh": "旅人汇合的小镇。五个社交主页，围着中间的喷泉。",
+        "en": "A town where travellers meet. Five social profiles around the fountain."
+      },
+      "style": {
+        "walls": [
+          "paper",
+          "wallRose",
+          "wallSage",
+          "road",
+          "wallSky"
+        ],
+        "roofs": [
+          "terra",
+          "mustard",
+          "olive",
+          "roofSlate",
+          "kraftDeep"
+        ],
+        "annex": [
+          "stall",
+          "tree",
+          "barrels",
+          "hut",
+          "bench",
+          "lantern",
+          "stall"
+        ],
+        "timber": true
+      },
+      "features": {
+        "walls": false,
+        "hedge": true,
+        "lamps": true,
+        "centerpiece": "fountain"
+      },
+      "items": [
+        {
+          "name": "Plurk",
+          "url": "https://plurk.com/dofy",
+          "kind": "inn",
+          "desc": {
+            "zh": "plurk.com/dofy",
+            "en": "plurk.com/dofy"
+          }
+        },
+        {
+          "name": "豆瓣",
+          "url": "https://douban.com/people/dofy",
+          "kind": "teahouse",
+          "desc": {
+            "zh": "douban.com/people/dofy",
+            "en": "douban.com/people/dofy"
+          }
+        },
+        {
+          "name": "GitHub",
+          "url": "https://github.com/dofy",
+          "kind": "cattower",
+          "desc": {
+            "zh": "github.com/dofy",
+            "en": "github.com/dofy"
+          }
+        },
+        {
+          "name": "Twitter",
+          "url": "https://twitter.com/dofy",
+          "kind": "dovecote",
+          "desc": {
+            "zh": "twitter.com/dofy",
+            "en": "twitter.com/dofy"
+          }
+        },
+        {
+          "name": "Instagram",
+          "url": "https://instagram.com/dofyyu",
+          "kind": "camera",
+          "desc": {
+            "zh": "instagram.com/dofyyu",
+            "en": "instagram.com/dofyyu"
+          }
+        }
+      ]
+    },
+    {
+      "id": "apps",
+      "slot": "coast",
+      "key": "g",
+      "name": {
+        "en": "Grey Havens",
+        "zh": "灰港"
+      },
+      "role": {
+        "zh": "应用",
+        "en": "Apps"
+      },
+      "blurb": {
+        "zh": "从这里出海。六个独立应用，各自驶向自己的网站。",
+        "en": "Ships leave from here. Six standalone apps, each sailing to its own website."
+      },
+      "style": {
+        "walls": [
+          "paper",
+          "wallSky",
+          "stone",
+          "road",
+          "wallSage"
+        ],
+        "roofs": [
+          "slate",
+          "terra",
+          "roofSlate",
+          "mustard",
+          "olive"
+        ],
+        "annex": [
+          "crates",
+          "barrels",
+          "lantern",
+          "hut",
+          "crates"
+        ]
+      },
+      "features": {
+        "walls": false,
+        "hedge": false,
+        "lamps": false,
+        "centerpiece": "statue"
+      },
+      "items": [
+        {
+          "name": "Cruft",
+          "url": "https://cruft.phpz.org/",
+          "kind": "silo",
+          "desc": {
+            "zh": "macOS · 清理开发缓存和应用残留，先预览再删除",
+            "en": "macOS · Clear developer caches and app leftovers, with a preview first"
+          }
+        },
+        {
+          "name": "WordClip",
+          "url": "https://wordclip.phpz.org/",
+          "kind": "library",
+          "desc": {
+            "zh": "macOS / iOS · 边读边收集单词，离线查词，间隔复习",
+            "en": "macOS / iOS · Collect words as you read, look them up offline, review them later"
+          }
+        },
+        {
+          "name": "LinguaDock",
+          "url": "https://linguadock.phpz.org/",
+          "kind": "crane",
+          "desc": {
+            "zh": "macOS · 快捷键翻译任意应用里的选中文字",
+            "en": "macOS · Translate selected text in any app with a shortcut"
+          }
+        },
+        {
+          "name": "Tsudoi",
+          "url": "https://tsudoi.yahaha.net/",
+          "kind": "tent",
+          "desc": {
+            "zh": "Web · 可视化设计邀请函，批量导出 PNG",
+            "en": "Web · Design invitations visually and export PNGs in batches"
+          }
+        },
+        {
+          "name": "Learning Vim",
+          "url": "https://learning-vim.phpz.org/",
+          "kind": "school",
+          "desc": {
+            "zh": "Web · 交互课程，边学边练",
+            "en": "Web · Interactive lessons with hands-on practice"
+          }
+        },
+        {
+          "name": "Brew Graph",
+          "url": "https://brew-graph.yahaha.net/",
+          "kind": "tanks",
+          "desc": {
+            "zh": "Web · 查看 Homebrew 包和依赖关系",
+            "en": "Web · Explore Homebrew packages and their dependencies"
+          }
+        }
+      ]
+    }
+  ]
+}

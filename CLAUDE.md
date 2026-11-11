@@ -34,7 +34,7 @@ Each page in `src/pages/` is a self-contained route with its own data + UI.
 ```
 src/
 ├── pages/          # Astro routes — each .astro file is a page
-│   ├── index.astro       # Homepage: full-screen 3D map (no Base), script in src/scripts/middle-earth.js
+│   ├── index.astro       # Homepage: full-screen 3D map (no Base): map-engine.js + data/map.json
 │   ├── 24points.astro    # 24-points solver
 │   ├── emoji.astro       # Emoji search (EmojiSearch island)
 │   ├── emoticon.astro    # Emoticon generator
@@ -84,15 +84,21 @@ src/
 
 - `src/pages/index.astro` is the one route that does **not** use `Base`: it renders
   the same metadata itself, a static `<h1>` (site brand) and a `<noscript>` link list,
-  then loads `src/scripts/middle-earth.js` (plain JS, bundled `three` 0.170).
+  then calls `mountMap(site)` from `src/scripts/map-engine.js` with `src/data/map.json`.
+- **The engine is vendored** from [dofy/site-to-map](https://github.com/dofy/site-to-map)
+  (`skills/site-to-map/engine/map-engine.js`). Change it there, then copy it here; do not
+  fork it in place. It is plain JS on bundled `three` 0.170.
 - The map draws a folded-paper continent with `MeshLambertMaterial` flat shading and an
   ink-line post pass (normal + depth edges), plus depth-of-field and tilt-shift blur.
   Five cities (Minas Tirith = tools, Rivendell = Heart Sutra, Grey Havens = apps,
   Erebor = GitHub, Bree = social) each give every item its own landmark building.
-- City and item data live in the script, not in `links.json`/`apps.json`; keep them in
-  step when tools change. English copy sits in `EN`/`EN_DESC`, interface strings in `T`.
+- All map content lives in `src/data/map.json` (schema: `references/site-schema.md` in
+  site-to-map): towns, slots, shortcut keys, styles, every link with its building `kind`
+  and zh/en text, place names and interface overrides. The `<noscript>` list is generated
+  from the same file. `links.json`/`apps.json` no longer feed the homepage; add new tools
+  to `map.json`.
 - There is no dark mode or theme toggle here: local time drives sky, sun, lamps and the
-  interface palette (`DAY`/`UIP` keyframes, eight phases). `?t=18.5` pins the hour for
+  interface palette (`DAY`/`UIP` keyframes in the engine, eight phases). `?t=18.5` pins the hour for
   previews. Language follows the system and is switchable (stored per browser).
 - Fonts are self-hosted (`@fontsource-variable/manrope`, `jetbrains-mono`,
   `@fontsource/cormorant-garamond` italics); never load Google Fonts.

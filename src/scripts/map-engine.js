@@ -1,66 +1,54 @@
-// Middle-earth homepage map: a folded-paper continent drawn with three.js.
-// Cities are link categories, buildings are tools; see CLAUDE.md (Homepage map).
+// site-to-map engine: a folded-paper 3D map drawn with three.js.
+// Everything site-specific comes from a site.json object (see references/site-schema.md):
+// categories become towns on five fixed slots, links become landmark buildings or props.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-async function main() {
-// ---------------- data ----------------
-// grid coords; world = grid - CENTER
-const CITIES = [
-  { id: 'heart', en: 'Rivendell', name: '幽谷', role: '心经', blurb: '迷雾山脉脚下的精灵居所。四座塔，各藏一版心经。', ox: -11, oy: -1, cols: 2, rows: 2, y: 1.7, wall: 'paper', roof: 'mustard', items: [
-    { name: '心经', desc: '简体中文版', url: 'https://yahaha.net/heart/hans', kind: 'pagoda', t: 2 },
-    { name: '心經', desc: '繁體中文版', url: 'https://yahaha.net/heart/hant', kind: 'pavilion' },
-    { name: 'Heart', desc: 'English translation', url: 'https://yahaha.net/heart/en', kind: 'elfhall' },
-    { name: 'प्रज्ञापारमिता', desc: '梵文原文', url: 'https://yahaha.net/heart/original', kind: 'stupa' },
-  ]},
-  { id: 'tool', en: 'Minas Tirith', name: '米那斯提力斯', role: '工具', blurb: '白城。九个在浏览器里直接用的小工具，每座建筑一个。', ox: 0, oy: 0, cols: 3, rows: 3, y: .2, wall: 'paper', roof: 'roofSlate', walls: true, lamps: true, items: [
-    { name: '24 Points', desc: '给四个数，列出所有算出 24 的式子', url: 'https://yahaha.net/24points', kind: 'quad' },
-    { name: 'Tarot', desc: '浏览 78 张塔罗牌和牌义', url: 'https://yahaha.net/tarot', kind: 'spire' },
-    { name: 'Emoji', desc: '用中文或英文关键词找 Emoji 17.0', url: 'https://yahaha.net/emoji', kind: 'dome' },
-    { name: 'Emoticon', desc: '随机拼一个颜文字', url: 'https://yahaha.net/emoticon', kind: 'theater' },
-    { name: 'Morse Code', desc: '摩斯电码编码和解码', url: 'https://yahaha.net/morse', kind: 'radio' },
-    { name: 'ASCII Art', desc: '把文字变成字符画', url: 'https://yahaha.net/ascii-art', kind: 'grid' },
-    { name: 'Face Kit', desc: '按种子生成 SVG 头像', url: 'https://yahaha.net/face', kind: 'face' },
-    { name: 'Lock Kit', desc: '计算单排和双排钥匙牙花', url: 'https://yahaha.net/lock', kind: 'vault' },
-    { name: 'Sync Text', desc: '在设备之间同步一段文字', url: 'https://sync-text.phpz.org/', kind: 'twin' },
-  ]},
-  { id: 'apps', en: 'Grey Havens', name: '灰港', role: '应用', blurb: '从这里出海。六个独立应用，各自驶向自己的网站。', ox: 12, oy: -2, cols: 3, rows: 2, y: .2, wall: 'paper', roof: 'slate', harbor: true, items: [
-    { name: 'Cruft', desc: 'macOS · 清理开发缓存和应用残留，先预览再删除', url: 'https://cruft.phpz.org/', kind: 'silo' },
-    { name: 'WordClip', desc: 'macOS / iOS · 边读边收集单词，离线查词，间隔复习', url: 'https://wordclip.phpz.org/', kind: 'library' },
-    { name: 'LinguaDock', desc: 'macOS · 快捷键翻译任意应用里的选中文字', url: 'https://linguadock.phpz.org/', kind: 'crane' },
-    { name: 'Tsudoi', desc: 'Web · 可视化设计邀请函，批量导出 PNG', url: 'https://tsudoi.yahaha.net/', kind: 'tent' },
-    { name: 'Learning Vim', desc: 'Web · 交互课程，边学边练', url: 'https://learning-vim.phpz.org/', kind: 'school' },
-    { name: 'Brew Graph', desc: 'Web · 查看 Homebrew 包和依赖关系', url: 'https://brew-graph.yahaha.net/', kind: 'tanks' },
-  ]},
-  { id: 'github', en: 'Erebor', name: '孤山', role: '开源', blurb: '矮人的熔炉。九个开源仓库，排成一片冒烟的工坊。', ox: -2, oy: 12, cols: 3, rows: 3, y: .2, wall: 'stone', roof: 'kraftDeep', items: [
-    { name: 'The 7th Vim', desc: 'Vim 配置', url: 'https://github.com/dofy/7th-vim', kind: 'smithy' },
-    { name: 'Learn Vim', desc: 'Vim 教程，三种语言', url: 'https://github.com/dofy/learn-vim', kind: 'scriptorium' },
-    { name: 'Emoji Database', desc: 'Emoji 数据 CLI', url: 'https://github.com/dofy/emojidb', kind: 'warehouse' },
-    { name: 'Apple Emoji Dict', desc: 'Apple Emoji 关键词词典', url: 'https://github.com/dofy/apple-emoji-dict', kind: 'watermill' },
-    { name: 'PopClip Extensions', desc: '自制 PopClip 扩展', url: 'https://github.com/dofy/PopClip-Extensions', kind: 'kiln' },
-    { name: 'Alfred Workflows', desc: '自制 Alfred 工作流', url: 'https://github.com/dofy/awf', kind: 'mansion' },
-    { name: 'Tsudoi', desc: '邀请函生成器源码', url: 'https://github.com/dofy/invite-maker', kind: 'hobbit' },
-    { name: 'Learning Vim', desc: '交互式 Vim 课程源码', url: 'https://github.com/dofy/learning-vim', kind: 'mine' },
-    { name: 'Brew Graph', desc: 'Homebrew 依赖图源码', url: 'https://github.com/dofy/brew-graph', kind: 'still' },
-  ]},
-  { id: 'social', en: 'Bree', name: '布理', role: '社交', blurb: '旅人汇合的小镇。五个社交主页，围着中间的喷泉。', ox: 12, oy: 11, cols: 3, rows: 2, y: .2, wall: 'paper', roof: 'terra', lamps: true, hedge: true, items: [
-    { name: 'Plurk', desc: 'plurk.com/dofy', url: 'https://plurk.com/dofy', kind: 'inn' },
-    { name: '豆瓣', desc: 'douban.com/people/dofy', url: 'https://douban.com/people/dofy', kind: 'teahouse' },
-    { name: 'GitHub', desc: 'github.com/dofy', url: 'https://github.com/dofy', kind: 'cattower' },
-    { name: 'Twitter', desc: 'twitter.com/dofy', url: 'https://twitter.com/dofy', kind: 'dovecote' },
-    { name: 'Instagram', desc: 'instagram.com/dofyyu', url: 'https://instagram.com/dofyyu', kind: 'camera' },
-  ]},
-];
+export async function mountMap(SITE) {
+// ---------------- data from site.json ----------------
 const CENTER = { x: 4, z: 8.5 };
 const COLS = 'ABC';
 const WL = -0.3; // water level
-for (const c of CITIES) {
-  c.W = c.cols * 2 + 1; c.H = c.rows * 2 + 1;
-  c.cx = c.ox - CENTER.x + c.W / 2; c.cz = c.oy - CENTER.z + c.H / 2;
+// five town slots on the fixed continent; each slot keeps its own scenery
+const SLOTS = {
+  center: { cx: -.5, cz: -5, y: .2 },
+  highland: { cx: -12.5, cz: -7, y: 1.7, gate: true },
+  coast: { cx: 11.5, cz: -8, y: .2, harbor: true },
+  south: { cx: -2.5, cz: 7, y: .2 },
+  east: { cx: 11.5, cz: 5, y: .2 },
+};
+const SLOT_ORDER = ['center', 'south', 'coast', 'east', 'highland'];
+const PROP_KINDS = new Set(['oak', 'pine', 'birch', 'rock', 'boulders', 'signpost', 'flowerbed', 'statue', 'well', 'lamp', 'bench', 'stall']);
+const loc = (v, lang) => v == null ? '' : typeof v === 'string' ? v : (v[lang] ?? v.en ?? v.zh ?? Object.values(v)[0] ?? '');
+const CITIES = [];
+{
+  const taken = new Set((SITE.cities || []).map(c => c.slot).filter(s => SLOTS[s]));
+  const free = SLOT_ORDER.filter(s => !taken.has(s));
+  for (const src of (SITE.cities || []).slice(0, 5)) {
+    const slot = SLOTS[src.slot] ? src.slot : free.shift();
+    const S = SLOTS[slot];
+    const all = (src.items || []).map(it => ({ ...it }));
+    const builds = all.filter(it => !PROP_KINDS.has(it.kind)).slice(0, 9);
+    const props = all.filter(it => !builds.includes(it));
+    const n = builds.length, [cols, rows] = n <= 2 ? [2, 1] : n <= 4 ? [2, 2] : n <= 6 ? [3, 2] : [3, 3];
+    const f = src.features || {};
+    const c = {
+      id: src.id, slot, en: loc(src.name, 'en'), name: loc(src.name, 'zh'), nameRaw: src.name,
+      roleRaw: src.role, blurbRaw: src.blurb, key: (src.key || '').toLowerCase(),
+      cols, rows, y: S.y, gate: !!S.gate, harbor: !!S.harbor,
+      walls: !!f.walls, hedge: !!f.hedge, lamps: f.lamps !== false, centerpiece: f.centerpiece || (slot === 'east' ? 'fountain' : slot === 'coast' ? 'statue' : 'pond'),
+      roof: (src.style && src.style.roofs && src.style.roofs[0]) || 'terra',
+      style: { walls: ['paper', 'road', 'wallRose', 'wallSage'], roofs: ['terra', 'mustard', 'olive', 'roofSlate'], annex: ['tree', 'lantern', 'hut', 'barrels'], ...(src.style || {}) },
+      items: [...builds, ...props], nBuild: n, suburbs: f.suburbs ?? (slot === 'highland' ? 3 : 7),
+    };
+    c.W = cols * 2 + 1; c.H = rows * 2 + 1; c.cx = S.cx; c.cz = S.cz;
+    c.ox = c.cx + CENTER.x - c.W / 2; c.oy = c.cz + CENTER.z - c.H / 2;
+    CITIES.push(c);
+  }
 }
-const CT = Object.fromEntries(CITIES.map(c => [c.id, c]));
+const usedSlots = new Set(CITIES.map(c => c.slot));
 const SP = 2.15;
 for (const c of CITIES) {
   c.ph = hash(c.ox + 40, c.oy + 40) * 6.28; c.ang = (hash(c.oy + 9, c.ox + 9) - .5) * .7;
@@ -79,15 +67,23 @@ const RIVERS = [
   { name: 'Anduin', w: .8, pts: [[5.2, -21], [5.5, -13], [5.6, -8], [5.3, -3.5], [4.6, .5], [4.3, 5], [4.8, 9.5], [5.8, 13], [6.6, 18]] },
   { name: 'Brandywine', w: .55, pts: [[-8, -20], [-7.6, -13], [-7.2, -8], [-7, -3.5], [-5.6, .5], [-2, 1.6], [1.5, 1.4], [4.6, .7]] },
 ];
-const ROADS = [
-  [[-4.3, -5], [-7, -5.6], [-9.9, -6.6]],
-  [[3.3, -5.5], [5.5, -6.2], [7.9, -7.6]],
-  [[-1, -1.3], [-1.4, 1.5], [-2.5, 3.3]],
-  [[1.3, 6.6], [4.5, 5.6], [7.9, 5]],
-  [[11.5, -5.3], [11.9, -1.5], [11.5, 2.3]],
-  [[-12.5, -4.3], [-11.3, 0], [-8.6, 4.2], [-6.2, 7]],
-  [[15.2, 5], [16.4, 6.5]],
+const ROADS_ALL = [
+  { a: 'center', b: 'highland', pts: [[-4.3, -5], [-7, -5.6], [-9.9, -6.6]] },
+  { a: 'center', b: 'coast', pts: [[3.3, -5.5], [5.5, -6.2], [7.9, -7.6]] },
+  { a: 'center', b: 'south', pts: [[-1, -1.3], [-1.4, 1.5], [-2.5, 3.3]] },
+  { a: 'south', b: 'east', pts: [[1.3, 6.6], [4.5, 5.6], [7.9, 5]] },
+  { a: 'coast', b: 'east', pts: [[11.5, -5.3], [11.9, -1.5], [11.5, 2.3]] },
+  { a: 'highland', b: 'south', pts: [[-12.5, -4.3], [-11.3, 0], [-8.6, 4.2], [-6.2, 7]] },
+  { a: 'east', b: 'east', pts: [[15.2, 5], [16.4, 6.5]] },
 ];
+// keep roads whose towns exist; pull loose ends onto the edge of a smaller town
+const ROADS = ROADS_ALL.filter(r => usedSlots.has(r.a) && usedSlots.has(r.b)).map(r => r.pts.map(p => p.slice())).map(pts => {
+  for (const end of [pts[0], pts[pts.length - 1]]) {
+    const c = CITIES.slice().sort((p, q) => Math.hypot(p.cx - end[0], p.cz - end[1]) - Math.hypot(q.cx - end[0], q.cz - end[1]))[0];
+    if (c && blobSd(c, end[0], end[1]) > .8) { const th = Math.atan2((end[1] - c.cz) / c.rz, (end[0] - c.cx) / c.rx), [bx, bz] = blobPt(c, th, .96); end[0] = c.cx + bx; end[1] = c.cz + bz; }
+  }
+  return pts;
+});
 const FIELDS = [
   { x: -14.6, z: 4.4, w: 3.2, d: 2.4, rot: .15 },
   { x: 13.6, z: -1.6, w: 2.3, d: 2.4, rot: 0 },
@@ -97,62 +93,51 @@ const FIELDS = [
 ];
 
 // ---------------- language, domain, theme preference ----------------
-const DOMAINS = ['dofy.net', 'PHPz.xyz', 'PHPz.org', 'yahaha.net'];
+const SITEINFO = SITE.site || {};
+const DOMAINS = SITEINFO.domains || [location.hostname || 'localhost'];
 const host = location.hostname.replace(/^www\./, '').toLowerCase();
-const DOMAIN = DOMAINS.find(d => d.toLowerCase() === host) || 'yahaha.net';
+const DOMAIN = DOMAINS.find(d => d.toLowerCase() === host) || SITEINFO.brand || DOMAINS[DOMAINS.length - 1];
+const STORE_KEY = (SITEINFO.storageKey || 'site-map') + '-lang';
 const store = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* storage may be disabled */ } } };
-let LANG = store.get('yahaha-map-lang') || ((navigator.language || 'en').toLowerCase().startsWith('zh') ? 'zh' : 'en');
+let LANG = store.get(STORE_KEY) || (SITEINFO.lang && SITEINFO.lang !== 'auto' ? SITEINFO.lang : null) || ((navigator.language || 'en').toLowerCase().startsWith('zh') ? 'zh' : 'en');
 const T = {
-  zh: { me: '中洲', five: '五座城', map: '全图', tour: '导览', spin: '环绕', top: '俯视', hide: '收起', show: '展开', info: '说明', where: '位置', view: '视角',
-    hintW: '拖拽旋转 · Shift/空格+拖拽平移 · 滚轮缩放', hintC: '点建筑看详情 · Esc 返回', title: 'Yahaha 中洲', sub: '五座城，一片大陆',
+  zh: { me: '全图', five: n => `${n} 座城`, map: '全图', tour: '导览', spin: '环绕', top: '俯视', hide: '收起', show: '展开', info: '说明', where: '位置', view: '视角',
+    hintW: '拖拽旋转 · Shift/空格+拖拽平移 · 滚轮缩放', hintC: '点建筑看详情 · Esc 返回', title: '地图', sub: n => `${n} 座城，一片大陆`,
     intro: '每座城是一个分类，城里每座建筑是一个工具或链接。道路和桥把它们连在一起。点城名飞进去，或者按“导览”。',
-    plots: n => `${n} 区`, plot: '区', open: '进入', about: '关于我', fold: '正在折一片中洲', prep: '准备纸张…',
-    steps: ['铺开地形', '折起山脉', '修路架桥', '开垦农田', '盖五座城', '种一片森林', '放出行人和船'],
+    plots: n => `${n} 处`, plot: '区', open: '进入', about: '关于我', fold: '正在折这片地图', prep: '准备纸张…', titleSuffix: '地图',
+    steps: ['铺开地形', '折起山脉', '修路架桥', '开垦农田', '盖起城镇', '种一片森林', '放出行人和船'],
     phases: ['深夜', '日出', '早晨', '上午', '正午', '下午', '傍晚', '夜晚'], other: 'EN', otherLang: 'en',
     keysT: '快捷键', keysClose: '按 ? 或 Esc 关闭', keysHint: '按 ? 看快捷键',
-    keys: [['1–5', '按列表顺序飞到对应的城'], ['M E G B R', '米那斯提力斯 / 孤山 / 灰港 / 布理 / 幽谷'], ['0 / H', '回到全图'], ['← →', '上一个 / 下一个城或建筑'], ['Enter', '打开选中的建筑'], ['Esc', '返回上一级'], ['+ −', '拉近 / 拉远'], ['Shift 空格', '按住再拖拽可平移'], ['T', '开始或停止导览'], ['O', '开关环绕'], ['V', '开关俯视'], ['L', '切换中文 / English'], ['I', '收起或展开信息卡']],
+    keys: [['1–5', '按列表顺序飞到对应的城'], ['KEYS', '按城名首字母飞过去'], ['0 / H', '回到全图'], ['← →', '上一个 / 下一个城或建筑'], ['Enter', '打开选中的建筑'], ['Esc', '返回上一级'], ['+ −', '拉近 / 拉远'], ['Shift 空格', '按住再拖拽可平移'], ['T', '开始或停止导览'], ['O', '开关环绕'], ['V', '开关俯视'], ['L', '切换中文 / English'], ['I', '收起或展开信息卡']],
     nowebgl: '这个浏览器没法创建 WebGL，3D 地图无法显示。右下角列表仍然可以导航。' },
-  en: { me: 'Middle-earth', five: 'Five cities', map: 'Map', tour: 'Tour', spin: 'Orbit', top: 'Top', hide: 'Hide', show: 'Show', info: 'About this map', where: 'Location', view: 'View',
-    hintW: 'Drag to orbit · Shift/Space + drag to pan · Scroll to zoom', hintC: 'Click a building for details · Esc to go back', title: 'Yahaha Middle-earth', sub: 'Five cities, one continent',
+  en: { me: 'Map', five: n => `${n} towns`, map: 'Map', tour: 'Tour', spin: 'Orbit', top: 'Top', hide: 'Hide', show: 'Show', info: 'About this map', where: 'Location', view: 'View',
+    hintW: 'Drag to orbit · Shift/Space + drag to pan · Scroll to zoom', hintC: 'Click a building for details · Esc to go back', title: 'Map', sub: n => `${n} towns, one continent`,
     intro: 'Each city is a category and each building in it is a tool or a link. Roads and bridges join them up. Click a city name to fly in, or press Tour.',
-    plots: n => `${n} plots`, plot: 'Plot', open: 'Open', about: 'About me', fold: 'Folding a Middle-earth', prep: 'Preparing paper…',
-    steps: ['Laying out the land', 'Folding the mountains', 'Building roads and bridges', 'Ploughing the fields', 'Raising five cities', 'Planting a forest', 'Sending out travellers and boats'],
+    plots: n => `${n} places`, plot: 'Plot', open: 'Open', about: 'About me', fold: 'Folding the map', prep: 'Preparing paper…', titleSuffix: 'map',
+    steps: ['Laying out the land', 'Folding the mountains', 'Building roads and bridges', 'Ploughing the fields', 'Raising the towns', 'Planting a forest', 'Sending out travellers and boats'],
     phases: ['Late night', 'Sunrise', 'Morning', 'Forenoon', 'Noon', 'Afternoon', 'Dusk', 'Evening'], other: '中文', otherLang: 'zh',
     keysT: 'Keyboard shortcuts', keysClose: 'Press ? or Esc to close', keysHint: 'Press ? for shortcuts',
-    keys: [['1–5', 'Fly to a city in list order'], ['M E G B R', 'Minas Tirith / Erebor / Grey Havens / Bree / Rivendell'], ['0 / H', 'Back to the whole map'], ['← →', 'Previous / next city or building'], ['Enter', 'Open the selected building'], ['Esc', 'Go back one level'], ['+ −', 'Zoom in / out'], ['Shift Space', 'Hold and drag to pan'], ['T', 'Start or stop the tour'], ['O', 'Toggle orbit'], ['V', 'Toggle top view'], ['L', 'Switch 中文 / English'], ['I', 'Hide or show the info card']],
+    keys: [['1–5', 'Fly to a town in list order'], ['KEYS', 'Fly to a town by its initial'], ['0 / H', 'Back to the whole map'], ['← →', 'Previous / next city or building'], ['Enter', 'Open the selected building'], ['Esc', 'Go back one level'], ['+ −', 'Zoom in / out'], ['Shift Space', 'Hold and drag to pan'], ['T', 'Start or stop the tour'], ['O', 'Toggle orbit'], ['V', 'Toggle top view'], ['L', 'Switch 中文 / English'], ['I', 'Hide or show the info card']],
     nowebgl: 'This browser could not create WebGL, so the 3D map cannot be shown. The list in the corner still works.' },
 };
-const EN = {
-  heart: ['Heart Sutra', 'An elven refuge under the Misty Mountains. Four towers, each keeping one edition of the Heart Sutra.'],
-  tool: ['Tools', 'The White City. Nine tools that run right in your browser, one building each.'],
-  apps: ['Apps', 'Ships leave from here. Six standalone apps, each sailing to its own website.'],
-  github: ['Open source', 'The dwarven forges. Nine open-source repositories in a row of smoking workshops.'],
-  social: ['Social', 'A town where travellers meet. Five social profiles around the fountain.'],
-};
-const EN_DESC = {
-  '/heart/hans': 'Simplified Chinese', '/heart/hant': 'Traditional Chinese', '/heart/en': 'English translation', '/heart/original': 'Sanskrit original',
-  '/24points': 'Every way four numbers can make 24', '/tarot': 'Browse all 78 tarot cards and their meanings', '/emoji': 'Search Emoji 17.0 in English or Chinese',
-  '/emoticon': 'Roll a random kaomoji', '/morse': 'Encode and decode Morse code', '/ascii-art': 'Turn text into ASCII art', '/face': 'Seeded SVG avatars',
-  '/lock': 'Key bitting codes for single and double rows', 'sync-text': 'Sync a note between devices',
-  'cruft': 'macOS · Clear developer caches and app leftovers, with a preview first', 'wordclip': 'macOS / iOS · Collect words as you read, look them up offline, review them later',
-  'linguadock': 'macOS · Translate selected text in any app with a shortcut', 'tsudoi.': 'Web · Design invitations visually and export PNGs in batches',
-  'learning-vim.phpz': 'Web · Interactive lessons with hands-on practice', 'brew-graph.yahaha': 'Web · Explore Homebrew packages and their dependencies',
-  '7th-vim': 'Vim configuration', 'dofy/learn-vim': 'Vim tutorial in three languages', 'emojidb': 'Emoji data CLI', 'apple-emoji-dict': 'Apple emoji keyword dictionary',
-  'PopClip-Extensions': 'My PopClip extensions', 'dofy/awf': 'My Alfred workflows', 'invite-maker': 'Source of the invitation maker',
-  'dofy/learning-vim': 'Source of the interactive Vim course', 'dofy/brew-graph': 'Source of the Homebrew dependency graph',
-};
-for (const c of CITIES) { c.roleZh = c.role; c.blurbZh = c.blurb; [c.roleEn, c.blurbEn] = EN[c.id];
-  for (const it of c.items) { it.descZh = it.desc; const k = Object.keys(EN_DESC).find(k => it.url.includes(k)); it.descEn = k ? EN_DESC[k] : it.desc; } }
-function setLangData() { for (const c of CITIES) { c.role = LANG === 'zh' ? c.roleZh : c.roleEn; c.blurb = LANG === 'zh' ? c.blurbZh : c.blurbEn; for (const it of c.items) it.desc = LANG === 'zh' ? it.descZh : it.descEn; } }
+// site text overrides (SITE.text.zh / SITE.text.en)
+for (const lg of ['zh', 'en']) Object.assign(T[lg], (SITE.text || {})[lg] || {});
+const KEY_LIST = CITIES.filter(c => c.key).map(c => c.key.toUpperCase()).join(' ');
+for (const lg of ['zh', 'en']) T[lg].keys = T[lg].keys.filter(k => k[0] !== 'KEYS' || KEY_LIST).map(k => k[0] === 'KEYS' ? [KEY_LIST, k[1]] : k);
+function setLangData() { for (const c of CITIES) { c.role = loc(c.roleRaw, LANG); c.blurb = loc(c.blurbRaw, LANG); for (const it of c.items) { it.desc = loc(it.descRaw, LANG); it.name = loc(it.nameRaw, LANG); } } }
+for (const c of CITIES) for (const it of c.items) { it.descRaw = it.desc; it.nameRaw = it.name; }
 setLangData();
 const L = () => T[LANG];
 const EXT_ICON = '<svg class="ext" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M5.5 3.5h7v7M12.5 3.5 4 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
-document.getElementById('site').textContent = DOMAIN; document.getElementById('site').href = 'https://' + DOMAIN.toLowerCase();
-document.getElementById('year').textContent = new Date().getFullYear();
-{ const v = document.getElementById('version'); if (v && document.getElementById('map').dataset.version) { const ver = document.getElementById('map').dataset.version; v.textContent = 'v' + ver; v.href = `https://github.com/dofy/yahaha/releases/tag/v${ver}`; } }
+document.getElementById('site').textContent = DOMAIN; document.getElementById('site').href = SITEINFO.home || 'https://' + DOMAIN.toLowerCase();
+{ const a = document.getElementById('about'); if (SITEINFO.about && SITEINFO.about.url) a.href = SITEINFO.about.url; else a.remove(); }
+{ const cp = document.querySelector('.foot .copy'), co = SITEINFO.copyright || {}; if (cp && co.owner) cp.innerHTML = `&copy; ${co.since ? co.since + '&ndash;' : ''}<span id="year"></span> ${co.owner}`; else if (cp && !co.owner) cp.remove(); }
+if (!document.getElementById('map').dataset.version && SITEINFO.version) document.getElementById('map').dataset.version = SITEINFO.version;
+{ const y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear(); }
+{ const v = document.getElementById('version'); if (v && document.getElementById('map').dataset.version) { const ver = document.getElementById('map').dataset.version; v.textContent = 'v' + ver; v.href = SITEINFO.releaseUrl ? SITEINFO.releaseUrl.replace('{version}', ver) : '#'; if (!SITEINFO.releaseUrl) v.removeAttribute('href'); } }
 document.getElementById('ld-title').textContent = L().fold; document.getElementById('ld-step').textContent = L().prep;
-document.title = `${DOMAIN} · ${LANG === 'zh' ? '中洲地图' : 'Middle-earth map'}`;
+document.title = `${DOMAIN} · ${L().titleSuffix}`;
 
 // ---------------- loader ----------------
 const loadStart = performance.now();
@@ -304,13 +289,7 @@ function roofPrism(w, d, r) { // ridge along x, overhang
 }
 
 // ---------------- buildings ----------------
-const STYLE = {
-  tool:   { walls: ['paper', 'wallSky', 'road', 'wallRose', 'stone'], roofs: ['roofSlate', 'terra', 'slate', 'mustard', 'pine'], annex: ['tower', 'lantern', 'tree', 'well', 'hut', 'banner'] },
-  heart:  { walls: ['paper', 'wallRose', 'road', 'wallSage'], roofs: ['mustard', 'terra', 'olive', 'pine'], annex: ['tree', 'lantern', 'tree', 'well', 'stairs'] },
-  apps:   { walls: ['paper', 'wallSky', 'stone', 'road', 'wallSage'], roofs: ['slate', 'terra', 'roofSlate', 'mustard', 'olive'], annex: ['crates', 'barrels', 'lantern', 'hut', 'crates'] },
-  github: { walls: ['stone', 'kraft', 'wallRose', 'road', 'wallSage'], roofs: ['kraftDeep', 'terra', 'slate', 'pine', 'mustard'], annex: ['barrels', 'crates', 'anvil', 'hut', 'cart'], timber: true },
-  social: { walls: ['paper', 'wallRose', 'wallSage', 'road', 'wallSky'], roofs: ['terra', 'mustard', 'olive', 'roofSlate', 'kraftDeep'], annex: ['stall', 'tree', 'barrels', 'hut', 'bench', 'lantern', 'stall'], timber: true },
-};
+
 const pickS = (arr, s) => arr[Math.floor(hash(s, 99) * arr.length) % arr.length];
 // lit and dark window panes on the two camera-facing walls and their opposites
 function panes(target, w, h, d, y0, floors, cols, seed) {
@@ -376,7 +355,7 @@ function annex(kind, ROOF, WALL, seed) {
   return g;
 }
 function makeBuilding(it, c, seed, k = 0) {
-  const S = STYLE[c.id], wl = S.walls.length, rl = S.roofs.length;
+  const S = c.style, wl = S.walls.length, rl = S.roofs.length;
   const WALL = M[S.walls[k % wl]], WALL2 = M[S.walls[(k + 2) % wl]], ROOF = M[S.roofs[(k * 2 + 1) % rl]], ROOF2 = M[S.roofs[(k * 2 + 3) % rl]];
   it.roof = S.roofs[(k * 2 + 1) % rl];
   const root = new THREE.Group(), g = new THREE.Group(); root.add(g);
@@ -966,7 +945,7 @@ for (const c of CITIES) {
   const center = V(0, 0, 0), entries = [];
   for (const p of roadPaths) for (const e of [p[0], p.at(-1)]) if (blobSd(c, e.x, e.z) < 1.4) entries.push(toLocal(e));
   const streets = [];
-  c.slots.forEach(([x, z], k) => { if (!c.items[k]) return; const b = V(x, 0, z), d = b.length(); if (d < 1.1) return;
+  c.slots.forEach(([x, z], k) => { if (k >= c.nBuild) return; const b = V(x, 0, z), d = b.length(); if (d < 1.1) return;
     streets.push({ pts: bend(center, b.clone().multiplyScalar((d - .7) / d), k + c.oy), w: .4 }); });
   entries.forEach((e, i) => streets.push({ pts: bend(center, e, i * 7 + c.ox), w: .56 }));
   streets.forEach((s, i) => { const m = ribbon(s.pts, s.w, M.road, Gy + .02 + i * .0015); grp.add(m); pave.push(m);
@@ -988,7 +967,7 @@ for (const c of CITIES) {
         const cap = new THREE.Mesh(new THREE.ConeGeometry(.3, .42, 8), ROOF); cap.position.set(a.x, Gy + 1.06, a.z); grp.add(cap); }
     }
   }
-  if (c.id === 'heart') {
+  if (c.gate) {
     const e = entries.sort((a, b) => b.x - a.x)[0] || V(c.rx, 0, 0);
     const gate = new THREE.Group(); gate.position.set(e.x * .92, Gy, e.z * .92); gate.rotation.y = -Math.atan2(e.z, e.x) + Math.PI / 2; grp.add(gate);
     for (const xx of [-.45, .45]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.08, .9, .08), M.coral); p.position.set(xx, .45, 0); gate.add(p); }
@@ -997,17 +976,17 @@ for (const c of CITIES) {
     const fall = new THREE.Mesh(new THREE.BoxGeometry(.5, 1.9, .05), M.water); fall.position.set(wx, Gy - .9, wz); fall.rotation.y = Math.PI / 2; grp.add(fall);
   }
   // centrepiece on an empty square
-  if (!c.slots.some(([x, z], k) => c.items[k] && Math.hypot(x, z) < 1.1)) {
+  if (c.centerpiece !== 'none' && !c.slots.some(([x, z], k) => k < c.nBuild && Math.hypot(x, z) < 1.1)) {
     const f = new THREE.Group(); f.position.set(0, Gy + .03, 0); grp.add(f);
     const a = (geo, mat, yy) => { const m = new THREE.Mesh(geo, mat); m.position.y = yy; f.add(m); return m; };
-    if (c.id === 'social') {
+    if (c.centerpiece === 'fountain') {
       a(new THREE.CylinderGeometry(.62, .66, .18, 14), M.stone, .09); a(new THREE.CylinderGeometry(.54, .54, .05, 14), M.water, .18);
       a(new THREE.CylinderGeometry(.1, .14, .55, 8), M.paper, .42); a(new THREE.CylinderGeometry(.28, .24, .06, 12), M.paper, .72);
       const jet = a(new THREE.IcosahedronGeometry(.08, 0), M.water, .88);
       const ripple = onLines(new THREE.Mesh(new THREE.TorusGeometry(.3, .01, 6, 40), new THREE.MeshBasicMaterial({ color: css('--water-ink'), transparent: true })));
       ripple.rotation.x = Math.PI / 2; ripple.position.y = .22; f.add(ripple);
       anims.push(t => { jet.position.y = .88 + Math.abs(Math.sin(t * 3)) * .12; const p = (t * .6) % 1; ripple.scale.setScalar(.6 + p * .9); ripple.material.opacity = 1 - p; });
-    } else if (c.id === 'apps') {
+    } else if (c.centerpiece === 'statue') {
       a(new THREE.BoxGeometry(.5, .2, .5), M.stone, .1); a(new THREE.CylinderGeometry(.05, .1, 1.1, 4), M.paper, .75).rotation.y = Math.PI / 4;
       a(new THREE.TorusGeometry(.18, .03, 5, 12, Math.PI), M.slate, .45).rotation.z = Math.PI;
     } else {
@@ -1017,7 +996,7 @@ for (const c of CITIES) {
   }
   // buildings on loose plots
   for (let k = 0; k < c.cols * c.rows; k++) {
-    const it = c.items[k]; if (!it) continue;
+    const it = c.items[k]; if (!it || k >= c.nBuild) continue;
     const col = k % c.cols, row = Math.floor(k / c.cols), [x, z] = c.slots[k];
     it.code = COLS[col] + (row + 1);
     const { g, top } = makeBuilding(it, c, k * 131 + c.id.charCodeAt(0) * 7, k);
@@ -1033,6 +1012,24 @@ for (const c of CITIES) {
     const lab = new CSS2DObject(el); lab.position.set(x, Y + top + .3, z); lab.visible = false; grp.add(lab);
     districts[id] = { id, city: c.id, k, it, g, plot, lab, el, world: () => grp.localToWorld(V(x, Y + top + .7, z)) };
   }
+  // links beyond the buildings: props in a loose ring just outside town, clear of the roads
+  { const props = c.items.slice(c.nBuild), np = props.length, th0 = c.ph;
+    props.forEach((it, i) => {
+      const k = c.nBuild + i; let th = th0 + (i + .5) / Math.max(np, 1) * Math.PI * 2;
+      for (let tr = 0; tr < 8 && entries.some(e => { const [px, pz] = blobPt(c, th, 1.18); return Math.hypot(e.x - px, e.z - pz) < 1.1; }); tr++) th += .28;
+      const [x, z] = blobPt(c, th, 1.12 + hash(k, 71) * .14), wy = H(c.cx + x, c.cz + z);
+      it.code = '+' + (i + 1);
+      const { g, top } = makeProp(it, k * 97 + c.oy);
+      const id = `${c.id}-${k}`; g.position.set(x, wy, z); g.rotation.y = hash(k, 72) * 6; grp.add(g);
+      const plot = new THREE.Mesh(new THREE.CylinderGeometry(.55, .55, .02, 10), M.road); plot.visible = false; plot.position.set(x, wy + .02, z); grp.add(plot);
+      cityOcc.push([c.cx + x, c.cz + z, .7]);
+      buildOrder.push({ g, delay: CITIES.indexOf(c) * .35 + k * .09 });
+      g.traverse(o => { if (o.isMesh && o.layers.mask === 1) { o.userData.district = id; pickables.push(o); } });
+      plot.userData.district = id; pickables.push(plot);
+      const el = document.createElement('div'); el.className = 'd-tag prop'; el.innerHTML = `<b>${it.code}</b>${it.name}`; el.dataset.id = id;
+      const lab = new CSS2DObject(el); lab.position.set(x, wy + top + .25, z); lab.visible = false; grp.add(lab);
+      districts[id] = { id, city: c.id, k, it, g, plot, lab, el, world: () => grp.localToWorld(V(x, wy + top + .6, z)) };
+    }); }
   if (c.harbor) {
     const ex = blobPt(c, 0)[0];
     for (let p = 0; p < 3; p++) {
@@ -1058,10 +1055,32 @@ for (const c of CITIES) {
   cityData[c.id] = { c, grp, pave, lab, el, W: c.rx * 2, H: c.rz * 2, center: V(c.cx, y, c.cz) };
 }
 
+// ---------------- props: trees, rocks and signs for links beyond the buildings ----------------
+function makeProp(it, seed) {
+  const g = new THREE.Group();
+  const add = (geo, mat, x = 0, y = 0, z = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); g.add(m); return m; };
+  const r = k => hash(seed, k);
+  let top;
+  switch (it.kind) {
+    case 'oak': add(new THREE.CylinderGeometry(.05, .08, .5, 6), M.kraftDeep, 0, .25, 0); add(new THREE.IcosahedronGeometry(.42, 0), M.olive, 0, .78, 0).rotation.y = r(1) * 6; add(new THREE.IcosahedronGeometry(.3, 0), M.grass, .22, .62, .14); top = 1.2; break;
+    case 'pine': add(new THREE.CylinderGeometry(.04, .06, .3, 5), M.kraftDeep, 0, .15, 0); for (let i = 0; i < 3; i++) add(new THREE.ConeGeometry(.42 - i * .1, .55, 6), i % 2 ? M.olive : M.pine, 0, .45 + i * .3, 0); top = 1.4; break;
+    case 'birch': add(new THREE.CylinderGeometry(.03, .045, .4, 5), M.paper, 0, .2, 0); for (let i = 0; i < 4; i++) add(new THREE.ConeGeometry(.24 - i * .03, .45, 5), M.mustard, 0, .45 + i * .26, 0).rotation.y = i * .6; top = 1.5; break;
+    case 'rock': { const m = add(new THREE.IcosahedronGeometry(.4, 0), M.stone, 0, .2, 0); m.scale.set(1.2, .7, 1); m.rotation.y = r(2) * 6; top = .55; break; }
+    case 'boulders': for (let i = 0; i < 3; i++) { const m = add(new THREE.IcosahedronGeometry(.26 + r(i) * .14, 0), i ? M.stone : M.slate, (i - 1) * .3, .15, (r(i + 4) - .5) * .3); m.scale.y = .75; } top = .55; break;
+    case 'signpost': add(new THREE.BoxGeometry(.06, .9, .06), M.kraftDeep, 0, .45, 0); add(new THREE.BoxGeometry(.5, .14, .03), M.kraft, .18, .78, 0); add(new THREE.BoxGeometry(.42, .12, .03), M.road, -.14, .58, .02).rotation.y = .5; top = 1; break;
+    case 'flowerbed': add(new THREE.CylinderGeometry(.45, .48, .12, 9), M.stone, 0, .06, 0); add(new THREE.CylinderGeometry(.4, .4, .06, 9), M.olive, 0, .13, 0);
+      for (let i = 0; i < 9; i++) { const a = i / 9 * 6.28 + r(3); add(new THREE.IcosahedronGeometry(.06, 0), [M.coral, M.mustard, M.paper][i % 3], Math.cos(a) * .25, .2, Math.sin(a) * .25); } top = .45; break;
+    case 'statue': add(new THREE.BoxGeometry(.4, .3, .4), M.stone, 0, .15, 0); add(new THREE.ConeGeometry(.14, .5, 6), M.paper, 0, .55, 0); add(new THREE.IcosahedronGeometry(.09, 0), M.paper, 0, .88, 0); top = 1.05; break;
+    case 'lamp': add(new THREE.CylinderGeometry(.025, .035, .9, 5), M.ink, 0, .45, 0); add(new THREE.OctahedronGeometry(.1, 0), M.lamp, 0, .95, 0); halo(g, 0, .95, 0, .9); top = 1.15; break;
+    default: { const a = annex(it.kind === 'well' || it.kind === 'bench' || it.kind === 'stall' ? it.kind : 'tree', M.terra, M.paper, seed); a.scale.setScalar(1.7); g.add(a); top = .9; }
+  }
+  return { g, top };
+}
+
 // ---------------- suburbs: loose houses outside each city ----------------
 for (const c of CITIES) {
-  const S = STYLE[c.id]; let placed = 0;
-  for (let tries = 0; tries < 60 && placed < (c.id === 'heart' ? 3 : 7); tries++) {
+  const S = c.style; let placed = 0;
+  for (let tries = 0; tries < 60 && placed < c.suburbs; tries++) {
     const a = hash(tries, c.ox + 50) * Math.PI * 2, [bx, bz] = blobPt(c, a, 1.05 + hash(tries, c.oy + 60) * .45);
     const x = c.cx + bx, z = c.cz + bz, h = H(x, z);
     if (h < WL + .25 || h > 2.6) continue;
@@ -1192,7 +1211,7 @@ function boat(path, speed, phase, sailMat) {
 }
 const sailA = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide }), sailB = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide });
 recolorers.push(() => { sailA.color.copy(C.paper); sailB.color.copy(C.mustard); });
-const GH = CT.apps;
+const GH = SLOTS.coast;
 boat(u => V(GH.cx + 7.4 + Math.cos(u) * 1.4, 0, GH.cz + Math.sin(u) * 3.2), .25, 0, sailA);
 boat(u => V(GH.cx + 7.8 + Math.cos(u) * 2.6, 0, GH.cz + 1 + Math.sin(u) * 4.6), -.16, 2, sailB);
 boat(u => V(2 + Math.cos(u) * 6, 0, 17.4 + Math.sin(u) * 1.4), .09, 1, sailA);
@@ -1233,15 +1252,10 @@ function place(text, zh, x, y, z, cls = '') {
   const el = document.createElement('div'); el.className = 'place ' + cls; el.style.setProperty('--d', `${1100 + placeLabels.length * 90}ms`); el.innerHTML = `${text}<small>${zh}</small>`;
   const o = new CSS2DObject(el); o.position.set(x, y, z); world.add(o); placeLabels.push(o);
 }
-place('Misty Mountains', '迷雾山脉', -4, 7.8, -18);
-place('Anduin', '安都因河', 5.9, .4, -11.5, 'water');
-place('Brandywine', '白兰地河', -7.2, .6, -12.5, 'water');
-place('Fangorn', '法贡森林', -18, 2.4, -1.5);
-place('The Shire', '夏尔', -14.6, 1.6, 5.2);
-place('Belegaer', '大海', 24, .3, 2, 'water');
-place('Bay of Belfalas', '贝尔法拉斯湾', 2, .3, 21.5, 'water');
-place('Ered Luin', '蓝色山脉', -42, 8.5, -4);
-place('Nenuial', '暮暗湖', -31, .4, 11, 'water');
+const ANCHORS = { north: [-4, 7.8, -18], riverA: [5.9, .4, -11.5], riverB: [-7.2, .6, -12.5], forest: [-18, 2.4, -1.5], fields: [-14.6, 1.6, 5.2],
+  sea: [24, .3, 2], bay: [2, .3, 21.5], west: [-42, 8.5, -4], lake: [-31, .4, 11] };
+const WATERY = new Set(['riverA', 'riverB', 'sea', 'bay', 'lake']);
+for (const p of SITE.places || []) { const at = ANCHORS[p.at] || p.at; if (Array.isArray(at)) place(loc(p.name, 'en'), loc(p.name, 'zh') === loc(p.name, 'en') ? '' : loc(p.name, 'zh'), at[0], at[1], at[2], WATERY.has(p.at) ? 'water' : ''); }
 
 // selection pin
 const pin = new THREE.Group(); pin.visible = false; scene.add(pin);
@@ -1321,17 +1335,17 @@ function refresh() {
 }
 function renderPanel() {
   const c = state.city && cityData[state.city].c, t = L();
-  crumb.innerHTML = c ? `<button type="button" data-go="world">${t.me}</button><span class="sep">/</span><span class="here">${c.en}</span>` : `<span class="here">${t.me} · ${t.five}</span>`;
+  crumb.innerHTML = c ? `<button type="button" data-go="world">${t.me}</button><span class="sep">/</span><span class="here">${c.en}</span>` : `<span class="here">${t.me} · ${typeof t.five === 'function' ? t.five(CITIES.length) : t.five}</span>`;
   hint.innerHTML = `${c ? t.hintC : t.hintW} · ${t.keysHint.replace('?', '<kbd>?</kbd>')}`;
   if (!c) {
     eyebrow.textContent = `${DOMAIN} · ${t.map}`;
-    panel.innerHTML = `<h2>${t.title}<small>${t.sub}</small></h2><p>${t.intro}</p>
-      <ul class="list">${CITIES.slice().sort((a, b) => b.items.length - a.items.length).map(x => `<li><button type="button" data-city="${x.id}"><span class="emblem" style="--c: var(${TOK[STYLE[x.id].roofs[0]]})" aria-hidden="true">${x.en[0]}</span><span class="nm"><i>${x.en}</i> ${LANG === 'zh' ? x.name : ''}<em>${esc(x.blurb)}</em></span><span class="meta">${x.role} · ${x.items.length}</span></button></li>`).join('')}</ul>`;
+    panel.innerHTML = `<h2>${t.title}<small>${typeof t.sub === 'function' ? t.sub(CITIES.length) : t.sub}</small></h2><p>${t.intro}</p>
+      <ul class="list">${CITIES.slice().sort((a, b) => b.items.length - a.items.length).map(x => `<li><button type="button" data-city="${x.id}"><span class="emblem" style="--c: var(${TOK[x.style.roofs[0]] || '--terra'})" aria-hidden="true">${x.en[0]}</span><span class="nm"><i>${x.en}</i> ${LANG === 'zh' ? x.name : ''}<em>${esc(x.blurb)}</em></span><span class="meta">${x.role} · ${x.items.length}</span></button></li>`).join('')}</ul>`;
     return;
   }
   eyebrow.textContent = `${DOMAIN} · ${c.role}`;
   const d = state.sel && districts[state.sel], it = d && d.it;
-  panel.innerHTML = `<h2>${c.en}<small>${LANG === 'zh' ? c.name + ' · ' : ''}${c.role} · ${t.plots(c.items.length)}</small></h2><p>${esc(c.blurb)}</p>
+  panel.innerHTML = `<h2>${c.en}<small>${LANG === 'zh' ? c.name + ' · ' : ''}${c.role} · ${(typeof t.plots === 'function' ? t.plots(c.items.length) : String(t.plots).replace('{n}', c.items.length))}</small></h2><p>${esc(c.blurb)}</p>
     ${it ? `<div class="card"><div class="row"><h3>${esc(it.name)}</h3><span class="eyebrow">${t.plot} ${it.code}</span></div><p>${esc(it.desc)}</p><div class="url">${esc(it.url.replace(/^https:\/\//, ''))}</div><a class="go" href="${it.url}" target="_blank" rel="noopener">${t.open}${EXT_ICON}</a></div>` : ''}
     <ul class="list">${c.items.map((x, i) => `<li><button type="button" data-sel="${c.id}-${i}" aria-current="${state.sel === c.id + '-' + i}"><span class="swatch" style="--c: var(${TOK[x.roof] || '--kraft'})" aria-hidden="true"></span><span class="nm">${esc(x.name)}<em>${esc(x.desc)}</em></span><span class="grid-ref">${x.code}</span></button></li>`).join('')}</ul>`;
 }
@@ -1339,13 +1353,14 @@ function applyLang() {
   const t = L();
   document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
   mapEl.classList.toggle('lang-en', LANG === 'en');
-  document.title = `${DOMAIN} · ${LANG === 'zh' ? '中洲地图' : 'Middle-earth map'}`;
+  document.title = `${DOMAIN} · ${L().titleSuffix}`;
   for (const [id, k] of [['b-home', 'map'], ['b-tour', 'tour'], ['b-spin', 'spin'], ['b-top', 'top']]) document.getElementById(id).textContent = t[k];
   const lb = document.getElementById('b-lang'); lb.textContent = t.other; lb.lang = t.otherLang;
-  document.querySelector('#about .t').textContent = t.about;
+  { const a = document.querySelector('#about .t'); if (a) a.textContent = loc(SITEINFO.about && SITEINFO.about.label, LANG) || t.about; }
   fold.textContent = info.classList.contains('folded') ? t.show : t.hide;
   info.setAttribute('aria-label', t.info); crumb.setAttribute('aria-label', t.where); document.querySelector('.tools').setAttribute('aria-label', t.view);
   for (const d of Object.values(cityData)) d.el.innerHTML = cityTagHTML(d.c);
+  for (const d of Object.values(districts)) d.el.innerHTML = `<b>${d.it.code}</b>${esc(d.it.name)}`;
   updateClock();
   renderPanel();
   document.getElementById('keys-title').textContent = t.keysT;
@@ -1365,7 +1380,7 @@ function go(city, sel = null, fly = true) {
 // ---------------- tour ----------------
 const tourBtn = document.getElementById('b-tour');
 let tourTimer = null;
-const TOUR = ['tool', 'heart', 'github', 'social', 'apps', null];
+const TOUR = [...CITIES.map(c => c.id), null];
 function stopTour() { if (tourTimer) { clearTimeout(tourTimer); tourTimer = null; tourBtn.setAttribute('aria-pressed', 'false'); } }
 function tourStep(i) {
   const id = TOUR[i % TOUR.length];
@@ -1446,7 +1461,7 @@ document.addEventListener('keydown', e => {
     '+': () => zoom(.78), '=': () => zoom(.78), '-': () => zoom(1.28), '_': () => zoom(1.28),
     t: () => tourBtn.click(), o: () => spinBtn.click(), v: () => topBtn.click(), l: () => document.getElementById('b-lang').click(), i: () => fold.click(),
   };
-  const initial = { m: 'tool', e: 'github', g: 'apps', b: 'social', r: 'heart' }[k.toLowerCase?.()];
+  const initial = CITIES.find(c => c.key && c.key === k.toLowerCase?.())?.id;
   if (initial) { e.preventDefault(); stopTour(); go(initial); return; }
   const n = parseInt(k, 10);
   if (n >= 1 && n <= 5) { e.preventDefault(); stopTour(); go(LIST_ORDER()[n - 1]); return; }
@@ -1456,7 +1471,7 @@ document.addEventListener('keydown', e => {
 addEventListener('hashchange', () => { const h = location.hash.slice(1); if (cityData[h] && h !== state.city) go(h); });
 
 // ---------------- language control ----------------
-document.getElementById('b-lang').addEventListener('click', () => { LANG = LANG === 'zh' ? 'en' : 'zh'; store.set('yahaha-map-lang', LANG); setLangData(); applyLang(); });
+document.getElementById('b-lang').addEventListener('click', () => { LANG = LANG === 'zh' ? 'en' : 'zh'; store.set(STORE_KEY, LANG); setLangData(); applyLang(); });
 
 // ---------------- daylight: local time drives sky, sun and lamps ----------------
 // keyframes: hour, sky, sun colour, sun intensity, sun elevation (deg), hemi sky, hemi ground, hemi intensity, lamps 0-1, ink strength
@@ -1615,5 +1630,3 @@ if (renderer) {
 }
 document.getElementById('loader').classList.add('done');
 }
-
-main()
