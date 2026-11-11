@@ -47,37 +47,35 @@
   },
   "text": {
     "zh": {
-      "me": "中洲",
-      "five": "五座城",
+      "worldName": "中洲",
       "title": "Yahaha 中洲",
-      "sub": "五座城，一片大陆",
+      "sub": "{n} 座城，一片大陆",
       "fold": "正在折一片中洲",
       "titleSuffix": "中洲地图",
       "plots": "{n} 区"
     },
     "zh-Hant": {
-      "me": "中土",
-      "five": "五座城",
+      "worldName": "中土",
       "title": "Yahaha 中土",
-      "sub": "五座城，一片大陸",
+      "sub": "{n} 座城，一片大陸",
       "fold": "正在摺一片中土",
       "titleSuffix": "中土地圖",
       "plots": "{n} 區"
     },
     "ja": {
-      "me": "中つ国",
-      "five": "五つの都",
+      "worldName": "中つ国",
+      "townCount": "{n} つの都",
       "title": "Yahaha 中つ国",
-      "sub": "五つの都、ひとつの大陸",
+      "sub": "{n} つの都、ひとつの大陸",
       "fold": "中つ国を折っています",
       "titleSuffix": "中つ国の地図",
       "plots": "{n} 区画"
     },
     "en": {
-      "me": "Middle-earth",
-      "five": "Five cities",
+      "worldName": "Middle-earth",
+      "townCount": "{n} cities",
       "title": "Yahaha Middle-earth",
-      "sub": "Five cities, one continent",
+      "sub": "{n} cities, one continent",
       "fold": "Folding Middle-earth",
       "titleSuffix": "Middle-earth map",
       "plots": "{n} plots",

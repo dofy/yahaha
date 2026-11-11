@@ -118,37 +118,37 @@ let LANG = (UI.languageSwitch && LANGS.includes(store.get(STORE_KEY)) ? store.ge
   || browserLang() || (LANGS.includes('en') ? 'en' : LANGS[0])
   || ((navigator.language || 'en').toLowerCase().startsWith('zh') ? 'zh' : 'en');
 const T = {
-  zh: { me: '全图', homeTip: '回到全图，恢复默认视角', five: n => `${n} 座城`, map: '全图', tour: '导览', spin: '环绕', top: '俯视', hide: '收起', show: '展开', info: '说明', where: '位置', view: '视角',
-    hintW: '拖拽旋转 · Shift/空格+拖拽平移 · 滚轮缩放', hintC: '点建筑看详情 · Esc 返回', title: '地图', sub: n => `${n} 座城，一片大陆`,
+  zh: { worldName: '全图', homeTip: '回到全图，恢复默认视角', townCount: '{n} 座城', map: '全图', tour: '导览', spin: '环绕', top: '俯视', hide: '收起', show: '展开', info: '说明', where: '位置', view: '视角',
+    hintW: '拖拽旋转 · Shift/空格+拖拽平移 · 滚轮缩放', hintC: '点建筑看详情 · Esc 返回', title: '地图', sub: '{n} 座城，一片大陆',
     intro: '每座城是一个分类，城里每座建筑是一个工具或链接。道路和桥把它们连在一起。点城名飞进去，或者按“导览”。',
-    plots: n => `${n} 处`, plot: '区', open: '进入', about: '关于我', fold: '正在折这片地图', prep: '准备纸张…', titleSuffix: '地图',
+    plots: '{n} 处', plot: '区', open: '进入', about: '关于我', fold: '正在折这片地图', prep: '准备纸张…', titleSuffix: '地图',
     steps: ['铺开地形', '折起山脉', '修路架桥', '开垦农田', '盖起城镇', '种一片森林', '放出行人和船'],
     phases: ['深夜', '日出', '早晨', '上午', '正午', '下午', '傍晚', '夜晚'], langName: '简体中文', langShort: '简',
     keysT: '快捷键', keysClose: '按 ? 或 Esc 关闭', keysHint: '按 ? 看快捷键',
     keys: [[`1–${Math.min(9, CITIES.length)}`, '按列表顺序飞到对应的城'], ['KEYS', '按城名首字母飞过去'], ['0 / H', '回到全图，恢复默认视角'], ['← →', '上一个 / 下一个城或建筑'], ['Enter', '打开选中的建筑'], ['Esc', '返回上一级'], ['+ −', '拉近 / 拉远'], ['Shift 空格', '按住再拖拽可平移'], ['T', '开始或停止导览'], ['O', '开关环绕'], ['V', '开关俯视'], ['L', '切换语言'], ['I', '收起或展开信息卡']],
     nowebgl: '这个浏览器没法创建 WebGL，3D 地图无法显示。右下角列表仍然可以导航。' },
-  en: { me: 'Map', homeTip: 'Back to the whole map at the default angle', five: n => `${n} towns`, map: 'Map', tour: 'Tour', spin: 'Orbit', top: 'Top', hide: 'Hide', show: 'Show', info: 'About this map', where: 'Location', view: 'View',
-    hintW: 'Drag to orbit · Shift/Space + drag to pan · Scroll to zoom', hintC: 'Click a building for details · Esc to go back', title: 'Map', sub: n => `${n} towns, one continent`,
+  en: { worldName: 'Map', homeTip: 'Back to the whole map at the default angle', townCount: '{n} towns', map: 'Map', tour: 'Tour', spin: 'Orbit', top: 'Top', hide: 'Hide', show: 'Show', info: 'About this map', where: 'Location', view: 'View',
+    hintW: 'Drag to orbit · Shift/Space + drag to pan · Scroll to zoom', hintC: 'Click a building for details · Esc to go back', title: 'Map', sub: '{n} towns, one continent',
     intro: 'Each town is a category and each building in it is a tool or a link. Roads and bridges join them up. Click a town name to fly in, or press Tour.',
-    plots: n => `${n} places`, plot: 'Plot', open: 'Open', about: 'About me', fold: 'Folding the map', prep: 'Preparing paper…', titleSuffix: 'map',
+    plots: '{n} places', plot: 'Plot', open: 'Open', about: 'About me', fold: 'Folding the map', prep: 'Preparing paper…', titleSuffix: 'map',
     steps: ['Laying out the land', 'Folding the mountains', 'Building roads and bridges', 'Ploughing the fields', 'Raising the towns', 'Planting a forest', 'Sending out travellers and boats'],
     phases: ['Late night', 'Sunrise', 'Morning', 'Forenoon', 'Noon', 'Afternoon', 'Dusk', 'Evening'], langName: 'English', langShort: 'EN',
     keysT: 'Keyboard shortcuts', keysClose: 'Press ? or Esc to close', keysHint: 'Press ? for shortcuts',
     keys: [[`1–${Math.min(9, CITIES.length)}`, 'Fly to a town in list order'], ['KEYS', 'Fly to a town by its initial'], ['0 / H', 'Back to the whole map, default angle'], ['← →', 'Previous / next town or building'], ['Enter', 'Open the selected building'], ['Esc', 'Go back one level'], ['+ −', 'Zoom in / out'], ['Shift Space', 'Hold and drag to pan'], ['T', 'Start or stop the tour'], ['O', 'Toggle orbit'], ['V', 'Toggle top view'], ['L', 'Switch language'], ['I', 'Hide or show the info card']],
     nowebgl: 'This browser could not create WebGL, so the 3D map cannot be shown. The list in the corner still works.' },
-  'zh-Hant': { me: '全圖', homeTip: '回到全圖，恢復預設視角', five: n => `${n} 座城`, map: '全圖', tour: '導覽', spin: '環繞', top: '俯視', hide: '收起', show: '展開', info: '說明', where: '位置', view: '視角',
-    hintW: '拖曳旋轉 · Shift/空白鍵+拖曳平移 · 滾輪縮放', hintC: '點建築看詳情 · Esc 返回', title: '地圖', sub: n => `${n} 座城，一片大陸`,
+  'zh-Hant': { worldName: '全圖', homeTip: '回到全圖，恢復預設視角', townCount: '{n} 座城', map: '全圖', tour: '導覽', spin: '環繞', top: '俯視', hide: '收起', show: '展開', info: '說明', where: '位置', view: '視角',
+    hintW: '拖曳旋轉 · Shift/空白鍵+拖曳平移 · 滾輪縮放', hintC: '點建築看詳情 · Esc 返回', title: '地圖', sub: '{n} 座城，一片大陸',
     intro: '每座城是一個分類，城裡每座建築是一個工具或連結。道路和橋把它們連在一起。點城名飛進去，或者按「導覽」。',
-    plots: n => `${n} 處`, plot: '區', open: '進入', about: '關於我', fold: '正在摺這片地圖', prep: '準備紙張…', titleSuffix: '地圖',
+    plots: '{n} 處', plot: '區', open: '進入', about: '關於我', fold: '正在摺這片地圖', prep: '準備紙張…', titleSuffix: '地圖',
     steps: ['鋪開地形', '摺起山脈', '修路架橋', '開墾農田', '蓋起城鎮', '種一片森林', '放出行人和船'],
     phases: ['深夜', '日出', '清晨', '上午', '正午', '下午', '傍晚', '夜晚'], langName: '繁體中文', langShort: '繁',
     keysT: '快捷鍵', keysClose: '按 ? 或 Esc 關閉', keysHint: '按 ? 看快捷鍵',
     keys: [[`1–${Math.min(9, CITIES.length)}`, '依列表順序飛到對應的城'], ['KEYS', '按城名首字母飛過去'], ['0 / H', '回到全圖，恢復預設視角'], ['← →', '上一個 / 下一個城或建築'], ['Enter', '開啟選中的建築'], ['Esc', '返回上一層'], ['+ −', '拉近 / 拉遠'], ['Shift 空白鍵', '按住再拖曳可平移'], ['T', '開始或停止導覽'], ['O', '開關環繞'], ['V', '開關俯視'], ['L', '切換語言'], ['I', '收起或展開資訊卡']],
     nowebgl: '這個瀏覽器無法建立 WebGL，3D 地圖無法顯示。右下角的列表仍然可以導覽。' },
-  ja: { me: '全体図', homeTip: '全体図に戻り、視点を元に戻す', five: n => `${n} つの町`, map: '全体図', tour: 'ツアー', spin: '回転', top: '真上', hide: '閉じる', show: '開く', info: 'この地図について', where: '現在地', view: '視点',
-    hintW: 'ドラッグで回転 · Shift/スペース+ドラッグで移動 · ホイールでズーム', hintC: '建物をクリックで詳細 · Esc で戻る', title: '地図', sub: n => `${n} つの町、ひとつの大陸`,
+  ja: { worldName: '全体図', homeTip: '全体図に戻り、視点を元に戻す', townCount: '{n} つの町', map: '全体図', tour: 'ツアー', spin: '回転', top: '真上', hide: '閉じる', show: '開く', info: 'この地図について', where: '現在地', view: '視点',
+    hintW: 'ドラッグで回転 · Shift/スペース+ドラッグで移動 · ホイールでズーム', hintC: '建物をクリックで詳細 · Esc で戻る', title: '地図', sub: '{n} つの町、ひとつの大陸',
     intro: '町はひとつのカテゴリ、町の建物はひとつのツールやリンクです。町どうしは道と橋でつながっています。町の名前をクリックすると飛んでいきます。「ツアー」で一巡りもできます。',
-    plots: n => `${n} か所`, plot: '区画', open: '開く', about: '自己紹介', fold: '地図を折っています', prep: '紙を用意しています…', titleSuffix: '地図',
+    plots: '{n} か所', plot: '区画', open: '開く', about: '自己紹介', fold: '地図を折っています', prep: '紙を用意しています…', titleSuffix: '地図',
     steps: ['大地を広げる', '山を折る', '道と橋をつくる', '畑を耕す', '町を建てる', '森を植える', '旅人と船を送り出す'],
     phases: ['深夜', '日の出', '朝', '午前', '正午', '午後', '夕暮れ', '夜'], langName: '日本語', langShort: '日',
     keysT: 'キーボードショートカット', keysClose: '? か Esc で閉じる', keysHint: '? でショートカット一覧',
@@ -156,7 +156,10 @@ const T = {
     nowebgl: 'このブラウザでは WebGL を作れないため、3D 地図を表示できません。右下の一覧からは移動できます。' },
 };
 // site text overrides (SITE.text.zh / SITE.text.en)
-// interface strings: built-in zh and en, any other language starts from English; site.text overrides
+// interface strings: built-in zh, zh-Hant, ja and en; any other language starts from English; site.text
+// overrides. Old key names (me, five) are still read as worldName and townCount.
+const OLD_KEYS = { me: 'worldName', five: 'townCount' };
+for (const v of Object.values(SITE.text || {})) for (const [o, n] of Object.entries(OLD_KEYS)) if (v && o in v && !(n in v)) v[n] = v[o];
 for (const lg of new Set([...LANGS, LANG, ...Object.keys(SITE.text || {})])) { const own = T[lg]; T[lg] = { ...T.en, ...(own || {}), ...((SITE.text || {})[lg] || {}) }; if (!own && !(SITE.text || {})[lg]?.langName) { delete T[lg].langName; delete T[lg].langShort; } }
 const KEY_LIST = CITIES.filter(c => c.key).map(c => c.key.toUpperCase()).join(' ');
 for (const lg of Object.keys(T)) T[lg].keys = T[lg].keys.filter(k => k[0] !== 'KEYS' || KEY_LIST).filter(k => !(k[0] === 'L' && !UI.languageSwitch) && !(k[0] === 'T' && !UI.tour) && !(['O', 'V'].includes(k[0]) && !UI.views)).map(k => k[0] === 'KEYS' ? [KEY_LIST, k[1]] : k);
@@ -164,6 +167,7 @@ function setLangData() { for (const c of CITIES) { c.name = loc(c.nameRaw, LANG)
 for (const c of CITIES) for (const it of c.items) { it.descRaw = it.desc; it.nameRaw = it.name; }
 setLangData();
 const L = () => T[LANG];
+const withN = (v, n) => typeof v === 'function' ? v(n) : String(v ?? '').replaceAll('{n}', n);
 const langLabel = l => T[l]?.langName || (() => { try { return new Intl.DisplayNames([l], { type: 'language' }).of(l); } catch { return l.toUpperCase(); } })();
 const langMenu = document.createElement('div'); langMenu.className = 'lang-menu'; langMenu.setAttribute('role', 'menu'); langMenu.hidden = true;
 document.querySelector('.tools')?.append(langMenu);
@@ -1390,17 +1394,17 @@ function refresh() {
 }
 function renderPanel() {
   const c = state.city && cityData[state.city].c, t = L();
-  crumb.innerHTML = c ? `<button type="button" data-go="world">${t.me}</button><span class="sep">/</span><span class="here">${c.en}</span>` : `<span class="here">${t.me} · ${typeof t.five === 'function' ? t.five(CITIES.length) : t.five}</span>`;
+  crumb.innerHTML = c ? `<button type="button" data-go="world">${t.worldName}</button><span class="sep">/</span><span class="here">${c.en}</span>` : `<span class="here">${t.worldName} · ${withN(t.townCount, CITIES.length)}</span>`;
   hint.innerHTML = `${c ? t.hintC : t.hintW}${UI.shortcuts ? ' · ' + t.keysHint.replace('?', '<kbd>?</kbd>') : ''}`;
   if (!c) {
     eyebrow.textContent = `${DOMAIN} · ${t.map}`;
-    panel.innerHTML = `<h2>${t.title}<small>${typeof t.sub === 'function' ? t.sub(CITIES.length) : t.sub}</small></h2><p>${t.intro}</p>
+    panel.innerHTML = `<h2>${t.title}<small>${withN(t.sub, CITIES.length)}</small></h2><p>${t.intro}</p>
       <ul class="list">${CITIES.slice().sort((a, b) => b.items.length - a.items.length).map(x => `<li><button type="button" data-city="${x.id}"><span class="emblem" style="--c: var(${TOK[x.style.roofs[0]] || '--terra'})" aria-hidden="true">${x.en[0]}</span><span class="nm"><i>${x.en}</i> ${x.name !== x.en ? x.name : ''}<em>${esc(x.blurb)}</em></span><span class="meta">${x.role} · ${x.items.length}</span></button></li>`).join('')}</ul>`;
     return;
   }
   eyebrow.textContent = `${DOMAIN} · ${c.role}`;
   const d = state.sel && districts[state.sel], it = d && d.it;
-  panel.innerHTML = `<h2>${c.en}<small>${c.name !== c.en ? c.name + ' · ' : ''}${c.role} · ${(typeof t.plots === 'function' ? t.plots(c.items.length) : String(t.plots).replace('{n}', c.items.length))}</small></h2><p>${esc(c.blurb)}</p>
+  panel.innerHTML = `<h2>${c.en}<small>${c.name !== c.en ? c.name + ' · ' : ''}${c.role} · ${withN(t.plots, c.items.length)}</small></h2><p>${esc(c.blurb)}</p>
     ${it ? `<div class="card"><div class="row"><h3>${esc(it.name)}</h3><span class="eyebrow">${t.plot} ${it.code}</span></div><p>${esc(it.desc)}</p><div class="url">${esc(it.url.replace(/^https:\/\//, ''))}</div><a class="go" href="${it.url}" target="_blank" rel="noopener">${t.open}${EXT_ICON}</a></div>` : ''}
     <ul class="list">${c.items.map((x, i) => `<li><button type="button" data-sel="${c.id}-${i}" aria-current="${state.sel === c.id + '-' + i}"><span class="swatch" style="--c: var(${TOK[x.roof] || '--kraft'})" aria-hidden="true"></span><span class="nm">${esc(x.name)}<em>${esc(x.desc)}</em></span><span class="grid-ref">${x.code}</span></button></li>`).join('')}</ul>`;
 }
