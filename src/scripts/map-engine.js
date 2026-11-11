@@ -1532,7 +1532,11 @@ addEventListener('hashchange', () => { const h = location.hash.slice(1); if (cit
 // ---------------- language control ----------------
 const setLang = l => { if (!l || l === LANG) return; LANG = l; store.set(STORE_KEY, LANG); setLangData(); applyLang(); };
 document.getElementById('b-lang').addEventListener('click', e => {
-  if (LANGS.length > 2) { e.stopPropagation(); langMenu.hidden = !langMenu.hidden; document.getElementById('b-lang').setAttribute('aria-expanded', !langMenu.hidden); return; }
+  if (LANGS.length > 2) { e.stopPropagation(); langMenu.hidden = !langMenu.hidden; document.getElementById('b-lang').setAttribute('aria-expanded', !langMenu.hidden);
+    // open upward when the toolbar sits low (phones put it near the bottom edge)
+    if (!langMenu.hidden) { langMenu.classList.remove('up'); const r = langMenu.getBoundingClientRect(), t = document.querySelector('.tools').getBoundingClientRect();
+      if (r.bottom > innerHeight - 8 && t.top > r.height + 16) langMenu.classList.add('up'); }
+    return; }
   setLang(LANGS[(LANGS.indexOf(LANG) + 1) % LANGS.length]);
 });
 langMenu.addEventListener('click', e => { const b = e.target.closest('[data-lang]'); if (!b) return; e.stopPropagation(); langMenu.hidden = true; setLang(b.dataset.lang); });

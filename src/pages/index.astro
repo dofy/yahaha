@@ -302,6 +302,7 @@ body { transition: background-color .8s; background: var(--sky); color: var(--ui
 .tools:has(.lang-menu:not([hidden])) { z-index: 6; }
 .lang-menu { position: absolute; top: calc(100% + 6px); right: 0; display: grid; min-width: 140px; padding: 4px; gap: 2px;
   background: var(--ui-card); border: 1px solid var(--ui-ink); border-radius: 10px; box-shadow: 0 12px 30px var(--ui-shadow); z-index: 5; }
+.lang-menu.up { top: auto; bottom: calc(100% + 6px); }
 .lang-menu button { text-align: left; border-radius: 6px; padding: 6px 10px; font-family: var(--font-sans); font-size: 13px; }
 .lang-menu button[aria-checked="true"] { background: var(--ui-hot); font-weight: 600; }
 .tools button { display: inline-flex; align-items: center; gap: 5px; }
