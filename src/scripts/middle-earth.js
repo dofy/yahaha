@@ -106,20 +106,20 @@ const T = {
   zh: { me: '中洲', five: '五座城', map: '全图', tour: '导览', spin: '环绕', top: '俯视', hide: '收起', show: '展开', info: '说明', where: '位置', view: '视角',
     hintW: '拖拽旋转 · Shift/空格+拖拽平移 · 滚轮缩放', hintC: '点建筑看详情 · Esc 返回', title: 'Yahaha 中洲', sub: '五座城，一片大陆',
     intro: '每座城是一个分类，城里每座建筑是一个工具或链接。道路和桥把它们连在一起。点城名飞进去，或者按“导览”。',
-    plots: n => `${n} 区`, plot: '区', open: '进入 ↗', about: '关于我 ↗', fold: '正在折一片中洲', prep: '准备纸张…',
+    plots: n => `${n} 区`, plot: '区', open: '进入 ↗', about: '关于我', fold: '正在折一片中洲', prep: '准备纸张…',
     steps: ['铺开地形', '折起山脉', '修路架桥', '开垦农田', '盖五座城', '种一片森林', '放出行人和船'],
     phases: ['深夜', '日出', '早晨', '上午', '正午', '下午', '傍晚', '夜晚'], other: 'EN', otherLang: 'en',
     keysT: '快捷键', keysClose: '按 ? 或 Esc 关闭', keysHint: '按 ? 看快捷键',
-    keys: [['1–5', '飞到对应的城'], ['0 / H', '回到全图'], ['← →', '上一个 / 下一个城或建筑'], ['Enter', '打开选中的建筑'], ['Esc', '返回上一级'], ['+ −', '拉近 / 拉远'], ['Shift 空格', '按住再拖拽可平移'], ['T', '开始或停止导览'], ['R', '开关环绕'], ['V', '开关俯视'], ['L', '切换中文 / English'], ['I', '收起或展开信息卡']],
+    keys: [['1–5', '按列表顺序飞到对应的城'], ['M E G B R', '米那斯提力斯 / 孤山 / 灰港 / 布理 / 幽谷'], ['0 / H', '回到全图'], ['← →', '上一个 / 下一个城或建筑'], ['Enter', '打开选中的建筑'], ['Esc', '返回上一级'], ['+ −', '拉近 / 拉远'], ['Shift 空格', '按住再拖拽可平移'], ['T', '开始或停止导览'], ['O', '开关环绕'], ['V', '开关俯视'], ['L', '切换中文 / English'], ['I', '收起或展开信息卡']],
     nowebgl: '这个浏览器没法创建 WebGL，3D 地图无法显示。右下角列表仍然可以导航。' },
   en: { me: 'Middle-earth', five: 'Five cities', map: 'Map', tour: 'Tour', spin: 'Orbit', top: 'Top', hide: 'Hide', show: 'Show', info: 'About this map', where: 'Location', view: 'View',
     hintW: 'Drag to orbit · Shift/Space + drag to pan · Scroll to zoom', hintC: 'Click a building for details · Esc to go back', title: 'Yahaha Middle-earth', sub: 'Five cities, one continent',
     intro: 'Each city is a category and each building in it is a tool or a link. Roads and bridges join them up. Click a city name to fly in, or press Tour.',
-    plots: n => `${n} plots`, plot: 'Plot', open: 'Open ↗', about: 'About me ↗', fold: 'Folding a Middle-earth', prep: 'Preparing paper…',
+    plots: n => `${n} plots`, plot: 'Plot', open: 'Open ↗', about: 'About me', fold: 'Folding a Middle-earth', prep: 'Preparing paper…',
     steps: ['Laying out the land', 'Folding the mountains', 'Building roads and bridges', 'Ploughing the fields', 'Raising five cities', 'Planting a forest', 'Sending out travellers and boats'],
     phases: ['Late night', 'Sunrise', 'Morning', 'Forenoon', 'Noon', 'Afternoon', 'Dusk', 'Evening'], other: '中文', otherLang: 'zh',
     keysT: 'Keyboard shortcuts', keysClose: 'Press ? or Esc to close', keysHint: 'Press ? for shortcuts',
-    keys: [['1–5', 'Fly to a city'], ['0 / H', 'Back to the whole map'], ['← →', 'Previous / next city or building'], ['Enter', 'Open the selected building'], ['Esc', 'Go back one level'], ['+ −', 'Zoom in / out'], ['Shift Space', 'Hold and drag to pan'], ['T', 'Start or stop the tour'], ['R', 'Toggle orbit'], ['V', 'Toggle top view'], ['L', 'Switch 中文 / English'], ['I', 'Hide or show the info card']],
+    keys: [['1–5', 'Fly to a city in list order'], ['M E G B R', 'Minas Tirith / Erebor / Grey Havens / Bree / Rivendell'], ['0 / H', 'Back to the whole map'], ['← →', 'Previous / next city or building'], ['Enter', 'Open the selected building'], ['Esc', 'Go back one level'], ['+ −', 'Zoom in / out'], ['Shift Space', 'Hold and drag to pan'], ['T', 'Start or stop the tour'], ['O', 'Toggle orbit'], ['V', 'Toggle top view'], ['L', 'Switch 中文 / English'], ['I', 'Hide or show the info card']],
     nowebgl: 'This browser could not create WebGL, so the 3D map cannot be shown. The list in the corner still works.' },
 };
 const EN = {
@@ -149,6 +149,7 @@ const L = () => T[LANG];
 document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
 document.getElementById('site').textContent = DOMAIN; document.getElementById('site').href = 'https://' + DOMAIN.toLowerCase();
 document.getElementById('year').textContent = new Date().getFullYear();
+{ const v = document.getElementById('version'); if (v && document.getElementById('map').dataset.version) { const ver = document.getElementById('map').dataset.version; v.textContent = 'v' + ver; v.href = `https://github.com/dofy/yahaha/releases/tag/v${ver}`; } }
 document.getElementById('ld-title').textContent = L().fold; document.getElementById('ld-step').textContent = L().prep;
 document.title = `${DOMAIN} · ${LANG === 'zh' ? '中洲地图' : 'Middle-earth map'}`;
 
@@ -1050,7 +1051,7 @@ for (const c of CITIES) {
     cityOcc.push([c.cx + lx, c.cz + lz, .5]); void ex;
   }
   const el = document.createElement('button');
-  el.type = 'button'; el.className = 'c-tag'; el.dataset.city = c.id;
+  el.type = 'button'; el.className = 'c-tag'; el.dataset.city = c.id; el.style.setProperty('--d', `${520 + CITIES.indexOf(c) * 110}ms`);
   el.innerHTML = cityTagHTML(c);
   const lab = new CSS2DObject(el); lab.position.set(0, y + 3.9, 0); grp.add(lab);
   cityData[c.id] = { c, grp, pave, lab, el, W: c.rx * 2, H: c.rz * 2, center: V(c.cx, y, c.cz) };
@@ -1228,7 +1229,7 @@ anims.push((t, dt) => clouds.forEach(c => { c.position.x += c.userData.v * dt; i
 // ---------------- place names ----------------
 const placeLabels = [];
 function place(text, zh, x, y, z, cls = '') {
-  const el = document.createElement('div'); el.className = 'place ' + cls; el.innerHTML = `${text}<small>${zh}</small>`;
+  const el = document.createElement('div'); el.className = 'place ' + cls; el.style.setProperty('--d', `${1100 + placeLabels.length * 90}ms`); el.innerHTML = `${text}<small>${zh}</small>`;
   const o = new CSS2DObject(el); o.position.set(x, y, z); world.add(o); placeLabels.push(o);
 }
 place('Misty Mountains', '迷雾山脉', -4, 7.8, -18);
@@ -1340,7 +1341,7 @@ function applyLang() {
   document.title = `${DOMAIN} · ${LANG === 'zh' ? '中洲地图' : 'Middle-earth map'}`;
   for (const [id, k] of [['b-home', 'map'], ['b-tour', 'tour'], ['b-spin', 'spin'], ['b-top', 'top']]) document.getElementById(id).textContent = t[k];
   const lb = document.getElementById('b-lang'); lb.textContent = t.other; lb.lang = t.otherLang;
-  document.getElementById('about').textContent = t.about;
+  document.querySelector('#about .t').textContent = t.about;
   fold.textContent = info.classList.contains('folded') ? t.show : t.hide;
   info.setAttribute('aria-label', t.info); crumb.setAttribute('aria-label', t.where); document.querySelector('.tools').setAttribute('aria-label', t.view);
   for (const d of Object.values(cityData)) d.el.innerHTML = cityTagHTML(d.c);
@@ -1442,8 +1443,10 @@ document.addEventListener('keydown', e => {
     ArrowRight: () => { stopTour(); step2(1); }, ArrowLeft: () => { stopTour(); step2(-1); },
     Enter: () => { const d = state.sel && districts[state.sel]; if (d) window.open(d.it.url, '_blank', 'noopener'); },
     '+': () => zoom(.78), '=': () => zoom(.78), '-': () => zoom(1.28), '_': () => zoom(1.28),
-    t: () => tourBtn.click(), r: () => spinBtn.click(), v: () => topBtn.click(), l: () => document.getElementById('b-lang').click(), i: () => fold.click(),
+    t: () => tourBtn.click(), o: () => spinBtn.click(), v: () => topBtn.click(), l: () => document.getElementById('b-lang').click(), i: () => fold.click(),
   };
+  const initial = { m: 'tool', e: 'github', g: 'apps', b: 'social', r: 'heart' }[k.toLowerCase?.()];
+  if (initial) { e.preventDefault(); stopTour(); go(initial); return; }
   const n = parseInt(k, 10);
   if (n >= 1 && n <= 5) { e.preventDefault(); stopTour(); go(LIST_ORDER()[n - 1]); return; }
   const f = act[k] || act[k.toLowerCase?.()];
@@ -1591,6 +1594,8 @@ if (renderer) {
   camera.position.copy(v.target.clone().add(new THREE.Vector3().setFromSphericalCoords(reduce ? v.pos.distanceTo(v.target) : 140, reduce ? .9 : .35, .35 - (reduce ? 0 : .9))));
   controls.target.copy(v.target); controls.update();
   flyTo(viewFor(state.city), 2600);
+  // interface enters in layers once the town is built; panel content only animates this once
+  function reveal() { mapEl.classList.remove('intro'); mapEl.classList.add('revealing'); setTimeout(() => mapEl.classList.remove('revealing'), 2800); }
   // pop-up-book intro: land unfolds, then buildings rise city by city
   if (!reduce) {
     world.scale.y = .01; buildOrder.forEach(b => b.g.scale.set(1, .001, 1));
@@ -1601,10 +1606,10 @@ if (renderer) {
       world.scale.y = .01 + .99 * back(Math.min(1, e / 1.1));
       let done = e > 1.1;
       for (const b of buildOrder) { const k = Math.min(1, Math.max(0, (e - .9 - b.delay) / .55)); b.g.scale.set(1, Math.max(.001, back(k)), 1); if (k < 1) done = false; }
-      if (!done) requestAnimationFrame(intro); else mapEl.classList.remove('intro');
+      if (!done) requestAnimationFrame(intro); else reveal();
     };
     requestAnimationFrame(intro);
-  } else mapEl.classList.remove('intro');
+  } else reveal();
   frame();
 }
 document.getElementById('loader').classList.add('done');

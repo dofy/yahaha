@@ -7,6 +7,7 @@ import keywords from '@/data/keywords.json'
 import allLinks from '@/data/links.json'
 import apps from '@/data/apps.json'
 import { pageMetadata, canonicalPath } from '@/lib/site'
+import { version } from '../../package.json'
 import type { GitHubLink, Links, NormalLink, SocialLink } from '@/types'
 
 // The homepage is a full-screen 3D map (src/scripts/middle-earth.js), so it
@@ -56,7 +57,7 @@ const fallback = [
     <noscript><style is:inline>.loader { display: none; }</style></noscript>
   </head>
   <body>
-<div class="map intro" id="map">
+<div class="map intro" id="map" data-version={version}>
       <div class="loader" id="loader" role="status" aria-live="polite">
         <div class="ld-paper" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
         <div class="ld-title" id="ld-title">正在折一片中洲</div>
@@ -64,7 +65,7 @@ const fallback = [
         <div class="ld-bar"><i id="ld-bar"></i></div>
       </div>
       <div class="labels" id="labels"></div>
-      <header class="ui brand"><h1 class="site-h1"><a class="site" id="site" href="/">yahaha.net</a></h1><a class="about" id="about" href="https://github.com/dofy/dofy" target="_blank" rel="noopener">About me ↗</a></header>
+      <header class="ui brand"><h1 class="site-h1"><a class="site" id="site" href="/">yahaha.net</a></h1><a class="about" id="about" href="https://github.com/dofy/dofy" target="_blank" rel="noopener"><span class="t">About me</span><svg class="ext" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M5.5 3.5h7v7M12.5 3.5 4 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></header>
       <nav class="ui crumb" id="crumb" aria-label="位置"></nav>
       <div class="ui tools" role="toolbar" aria-label="视角">
         <button type="button" id="b-home">全图</button>
@@ -75,7 +76,7 @@ const fallback = [
         <button type="button" id="b-lang" lang="en">EN</button>
         <button type="button" id="b-keys" aria-haspopup="dialog" aria-controls="keys">?</button>
       </div>
-      <footer class="ui foot"><span class="clock" id="clock"></span><span class="copy">&copy; 2007&ndash;<span id="year">2026</span> Seven</span></footer>
+      <footer class="ui foot"><span class="clock" id="clock"></span><span class="copy">&copy; 2007&ndash;<span id="year">2026</span> Seven</span><a class="ver" id="version" href={`https://github.com/dofy/yahaha/releases/tag/v${version}`}>v{version}</a></footer>
       <div class="ui compass" aria-hidden="true">
         <svg viewBox="-17 -17 34 34"><circle r="15" fill="none" stroke="currentColor"/><circle r="11.5" fill="none" stroke="currentColor" stroke-dasharray="1 2.2" opacity=".6"/><g id="needle"><path d="M0 -13 L3.4 0 L0 2 L-3.4 0Z" fill="var(--coral)" stroke="currentColor"/><path d="M0 13 L3.4 0 L-3.4 0Z" fill="none" stroke="currentColor"/></g></svg>
       </div>
@@ -230,8 +231,6 @@ body { background: var(--sky); color: var(--ui-ink); font-family: var(--font-san
 .ld-step { font-family: var(--font-mono); font-size: 12px; color: var(--ui-faint); }
 .ld-bar { width: 180px; height: 3px; background: var(--ui-line); border-radius: 2px; overflow: hidden; }
 .ld-bar i { display: block; height: 100%; background: var(--coral); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
-.intro .labels, .intro .ui { opacity: 0; }
-.labels, .ui { transition: opacity .6s; }
 @media (prefers-reduced-motion: reduce) { .ld-paper i { animation: none; } }
 .fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--ui-soft); }
 
@@ -288,10 +287,46 @@ body { background: var(--sky); color: var(--ui-ink); font-family: var(--font-san
 :focus-visible { outline: 2px solid var(--coral-deep); outline-offset: 2px; }
 .ui, .c-tag, .d-tag, .place, .panel, .list button { transition: background-color 1.5s, color 1.5s, border-color 1.5s; }
 
+.foot .ver { color: var(--ui-faint); text-decoration: none; }
+.foot .ver:hover { color: var(--ui-ink); text-decoration: underline; }
+.brand .about { display: inline-flex; align-items: center; gap: 5px; }
+.brand .about .ext { opacity: .6; transition: transform .2s, opacity .2s; }
+.brand .about:hover .ext { opacity: 1; transform: translate(1px, -1px); }
 .site-h1 { margin: 0; font: inherit; display: contents; }
 .no-js { position: fixed; inset: 0; overflow: auto; z-index: 6; background: var(--ui-card); color: var(--ui-ink); padding: 24px max(16px, env(safe-area-inset-left, 0px));
   display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; font-family: var(--font-sans); }
 .no-js h2 { font-family: var(--font-map); font-style: italic; text-transform: capitalize; margin: 0 0 8px; }
 .no-js ul { margin: 0; padding-left: 18px; }
 .no-js a { color: var(--ui-ink); }
+/* entrance: chrome slides in from its own edge, labels and panel content follow in steps */
+.brand { --d: 0ms; } .crumb { --d: 90ms; } .tools { --d: 170ms; } .compass { --d: 270ms; } .foot { --d: 330ms; } .info { --d: 400ms; }
+.brand, .crumb, .tools, .compass, .foot, .info {
+  transition: opacity .7s cubic-bezier(.2, .8, .2, 1) var(--d), transform .8s cubic-bezier(.2, .8, .2, 1) var(--d),
+    background-color 1.5s, color 1.5s, border-color 1.5s; }
+.intro .brand, .intro .crumb, .intro .tools { opacity: 0; transform: translateY(-14px); }
+.intro .compass, .intro .foot { opacity: 0; transform: translateY(14px); }
+.intro .info { opacity: 0; transform: translateX(28px) scale(.985); }
+.c-tag, .place { transition: opacity .6s ease var(--d, 0s), background-color .15s, color 1.5s, border-color 1.5s; }
+.intro .labels .c-tag, .intro .labels .place { opacity: 0; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+.revealing .panel > *, .revealing .panel .list li { animation: rise .6s cubic-bezier(.2, .8, .2, 1) both; }
+.revealing .panel > :nth-child(1) { animation-delay: .5s; }
+.revealing .panel > :nth-child(2) { animation-delay: .6s; }
+.revealing .panel > :nth-child(3) { animation-delay: .7s; }
+.revealing .panel > .list { animation: none; }
+.revealing .panel .list li:nth-child(1) { animation-delay: 0.84s; }
+.revealing .panel .list li:nth-child(2) { animation-delay: 0.90s; }
+.revealing .panel .list li:nth-child(3) { animation-delay: 0.96s; }
+.revealing .panel .list li:nth-child(4) { animation-delay: 1.02s; }
+.revealing .panel .list li:nth-child(5) { animation-delay: 1.08s; }
+.revealing .panel .list li:nth-child(6) { animation-delay: 1.14s; }
+.revealing .panel .list li:nth-child(7) { animation-delay: 1.20s; }
+.revealing .panel .list li:nth-child(8) { animation-delay: 1.26s; }
+.revealing .panel .list li:nth-child(9) { animation-delay: 1.32s; }
+.revealing .panel .list li:nth-child(10) { animation-delay: 1.38s; }
+.revealing .panel .list li:nth-child(11) { animation-delay: 1.44s; }
+@media (prefers-reduced-motion: reduce) {
+  .brand, .crumb, .tools, .compass, .foot, .info, .c-tag, .place { transition: none; }
+  .revealing .panel > *, .revealing .panel .list li { animation: none; }
+}
 </style>

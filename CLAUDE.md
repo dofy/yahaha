@@ -96,9 +96,10 @@ src/
   previews. Language follows the system and is switchable (stored per browser).
 - Fonts are self-hosted (`@fontsource-variable/manrope`, `jetbrains-mono`,
   `@fontsource/cormorant-garamond` italics); never load Google Fonts.
-- Keyboard: 1–5 cities, 0/H overview, ←/→ step, Enter open, Esc back, +/− zoom,
-  T/R/V tour/orbit/top, L language, I info card, ? help; Shift or Space + drag pans
-  within `PAN` bounds.
+- Keyboard: 1–5 or M/E/G/B/R cities, 0/H overview, ←/→ step, Enter open, Esc back, +/− zoom,
+  T/O/V tour/orbit/top, L language, I info card, ? help; Shift or Space + drag pans
+  within `PAN` bounds. The footer shows `package.json` `version`; bump it with each
+  release tag so `vX.Y.Z` tags and the page match.
 
 ### Tokens and typography
 
