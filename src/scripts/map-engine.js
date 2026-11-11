@@ -13,23 +13,24 @@ const CENTER = { x: 4, z: 8.5 };
 const COLS = 'ABC';
 const WL = -0.3; // water level
 // five town roles; the world generator decides where each one sits
-const SLOTS = { center: {}, highland: {}, coast: {}, south: {}, east: {} };
+const SLOTS = { center: {}, highland: {}, coast: {}, south: {}, east: {}, town: {} }; // town: any extra, repeatable
 const SLOT_ORDER = ['center', 'south', 'coast', 'east', 'highland'];
 const PROP_KINDS = new Set(['oak', 'pine', 'birch', 'rock', 'boulders', 'signpost', 'flowerbed', 'statue', 'well', 'lamp', 'bench', 'stall']);
-const loc = (v, lang) => v == null ? '' : typeof v === 'string' ? v : (v[lang] ?? v.en ?? v.zh ?? Object.values(v)[0] ?? '');
+// text fields are a string or { <lang>: string, … } with any language codes
+const loc = (v, lang) => v == null ? '' : typeof v === 'string' ? v : (v[lang] ?? v.en ?? Object.values(v)[0] ?? '');
 const CITIES = [];
 {
   const taken = new Set((SITE.cities || []).map(c => c.slot).filter(s => SLOTS[s]));
   const free = SLOT_ORDER.filter(s => !taken.has(s));
-  for (const src of (SITE.cities || []).slice(0, 5)) {
-    const slot = SLOTS[src.slot] ? src.slot : free.shift();
+  for (const src of (SITE.cities || []).slice(0, 9)) {
+    const slot = SLOTS[src.slot] ? src.slot : free.shift() || 'town';
     const all = (src.items || []).map(it => ({ ...it }));
     const builds = all.filter(it => !PROP_KINDS.has(it.kind)).slice(0, 9);
     const props = all.filter(it => !builds.includes(it));
     const n = builds.length, [cols, rows] = n <= 2 ? [2, 1] : n <= 4 ? [2, 2] : n <= 6 ? [3, 2] : [3, 3];
     const f = src.features || {};
     const c = {
-      id: src.id, slot, en: loc(src.name, 'en'), name: loc(src.name, 'zh'), nameRaw: src.name,
+      id: src.id, slot, en: loc(src.name, 'en'), name: loc(src.name, 'en'), nameRaw: src.name,
       roleRaw: src.role, blurbRaw: src.blurb, key: (src.key || '').toLowerCase(),
       cols, rows, y: .2, gate: false, harbor: false,
       walls: !!f.walls, hedge: !!f.hedge, lamps: f.lamps !== false, centerpiece: f.centerpiece || (slot === 'east' ? 'fountain' : slot === 'coast' ? 'statue' : 'pond'),
@@ -90,7 +91,7 @@ const FIELDS = WORLD.fields.map(f => ({ ...f }));
 
 // ---------------- language, domain, theme preference ----------------
 const SITEINFO = SITE.site || {};
-const DOMAINS = SITEINFO.domains || [location.hostname || 'localhost'];
+const DOMAINS = SITEINFO.domains || [SITEINFO.brand || location.hostname || 'localhost'];
 const host = location.hostname.replace(/^www\./, '').toLowerCase();
 const DOMAIN = DOMAINS.find(d => d.toLowerCase() === host) || SITEINFO.brand || DOMAINS[DOMAINS.length - 1];
 const STORE_KEY = (SITEINFO.storageKey || 'site-map') + '-lang';
@@ -98,37 +99,75 @@ const STORE_KEY = (SITEINFO.storageKey || 'site-map') + '-lang';
 const UI = { languageSwitch: false, shortcuts: false, tour: true, views: true, clock: true, compass: true,
   daylight: 'auto', intro: true, motion: true, blur: true, infoOpen: true, ...(SITE.ui || {}) };
 const store = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* storage may be disabled */ } } };
-let LANG = (UI.languageSwitch ? store.get(STORE_KEY) : null) || (SITEINFO.lang && SITEINFO.lang !== 'auto' ? SITEINFO.lang : null) || ((navigator.language || 'en').toLowerCase().startsWith('zh') ? 'zh' : 'en');
+// languages: site.languages, or every language code used in the content
+const LANGS = (() => {
+  if (Array.isArray(SITEINFO.languages) && SITEINFO.languages.length) return SITEINFO.languages;
+  const seen = new Set(), add = v => { if (v && typeof v === 'object') Object.keys(v).forEach(k => seen.add(k)); };
+  for (const c of SITE.cities || []) { add(c.name); add(c.role); add(c.blurb); (c.items || []).forEach(it => { add(it.name); add(it.desc); }); }
+  return [...seen];
+})();
+const ZH_HANT = /^zh-(hant|tw|hk|mo)\b/i, ZH_HANS = /^zh-(hans|cn|sg|my)\b/i;
+const matchLang = b => { const p = b.toLowerCase();
+  return LANGS.find(l => l.toLowerCase() === p)
+    || (ZH_HANT.test(p) && LANGS.find(l => /^zh-(hant|tw|hk)/i.test(l))) || (ZH_HANS.test(p) && LANGS.find(l => /^zh(-(hans|cn))?$/i.test(l)))
+    || LANGS.find(l => p.startsWith(l.toLowerCase() + '-') && !(/^zh$/i.test(l) && ZH_HANT.test(p))) || null; };
+const browserLang = () => { for (const b of navigator.languages || [navigator.language || 'en']) { const hit = matchLang(b); if (hit) return hit; } return null; };
+let LANG = (UI.languageSwitch && LANGS.includes(store.get(STORE_KEY)) ? store.get(STORE_KEY) : null)
+  || (SITEINFO.lang && SITEINFO.lang !== 'auto' ? SITEINFO.lang : null)
+  || browserLang() || (LANGS.includes('en') ? 'en' : LANGS[0])
+  || ((navigator.language || 'en').toLowerCase().startsWith('zh') ? 'zh' : 'en');
 const T = {
   zh: { me: '全图', five: n => `${n} 座城`, map: '全图', tour: '导览', spin: '环绕', top: '俯视', hide: '收起', show: '展开', info: '说明', where: '位置', view: '视角',
     hintW: '拖拽旋转 · Shift/空格+拖拽平移 · 滚轮缩放', hintC: '点建筑看详情 · Esc 返回', title: '地图', sub: n => `${n} 座城，一片大陆`,
     intro: '每座城是一个分类，城里每座建筑是一个工具或链接。道路和桥把它们连在一起。点城名飞进去，或者按“导览”。',
     plots: n => `${n} 处`, plot: '区', open: '进入', about: '关于我', fold: '正在折这片地图', prep: '准备纸张…', titleSuffix: '地图',
     steps: ['铺开地形', '折起山脉', '修路架桥', '开垦农田', '盖起城镇', '种一片森林', '放出行人和船'],
-    phases: ['深夜', '日出', '早晨', '上午', '正午', '下午', '傍晚', '夜晚'], other: 'EN', otherLang: 'en',
+    phases: ['深夜', '日出', '早晨', '上午', '正午', '下午', '傍晚', '夜晚'], langName: '简体中文', langShort: '简',
     keysT: '快捷键', keysClose: '按 ? 或 Esc 关闭', keysHint: '按 ? 看快捷键',
-    keys: [['1–5', '按列表顺序飞到对应的城'], ['KEYS', '按城名首字母飞过去'], ['0 / H', '回到全图'], ['← →', '上一个 / 下一个城或建筑'], ['Enter', '打开选中的建筑'], ['Esc', '返回上一级'], ['+ −', '拉近 / 拉远'], ['Shift 空格', '按住再拖拽可平移'], ['T', '开始或停止导览'], ['O', '开关环绕'], ['V', '开关俯视'], ['L', '切换中文 / English'], ['I', '收起或展开信息卡']],
+    keys: [[`1–${Math.min(9, CITIES.length)}`, '按列表顺序飞到对应的城'], ['KEYS', '按城名首字母飞过去'], ['0 / H', '回到全图'], ['← →', '上一个 / 下一个城或建筑'], ['Enter', '打开选中的建筑'], ['Esc', '返回上一级'], ['+ −', '拉近 / 拉远'], ['Shift 空格', '按住再拖拽可平移'], ['T', '开始或停止导览'], ['O', '开关环绕'], ['V', '开关俯视'], ['L', '切换语言'], ['I', '收起或展开信息卡']],
     nowebgl: '这个浏览器没法创建 WebGL，3D 地图无法显示。右下角列表仍然可以导航。' },
   en: { me: 'Map', five: n => `${n} towns`, map: 'Map', tour: 'Tour', spin: 'Orbit', top: 'Top', hide: 'Hide', show: 'Show', info: 'About this map', where: 'Location', view: 'View',
     hintW: 'Drag to orbit · Shift/Space + drag to pan · Scroll to zoom', hintC: 'Click a building for details · Esc to go back', title: 'Map', sub: n => `${n} towns, one continent`,
-    intro: 'Each city is a category and each building in it is a tool or a link. Roads and bridges join them up. Click a city name to fly in, or press Tour.',
+    intro: 'Each town is a category and each building in it is a tool or a link. Roads and bridges join them up. Click a town name to fly in, or press Tour.',
     plots: n => `${n} places`, plot: 'Plot', open: 'Open', about: 'About me', fold: 'Folding the map', prep: 'Preparing paper…', titleSuffix: 'map',
     steps: ['Laying out the land', 'Folding the mountains', 'Building roads and bridges', 'Ploughing the fields', 'Raising the towns', 'Planting a forest', 'Sending out travellers and boats'],
-    phases: ['Late night', 'Sunrise', 'Morning', 'Forenoon', 'Noon', 'Afternoon', 'Dusk', 'Evening'], other: '中文', otherLang: 'zh',
+    phases: ['Late night', 'Sunrise', 'Morning', 'Forenoon', 'Noon', 'Afternoon', 'Dusk', 'Evening'], langName: 'English', langShort: 'EN',
     keysT: 'Keyboard shortcuts', keysClose: 'Press ? or Esc to close', keysHint: 'Press ? for shortcuts',
-    keys: [['1–5', 'Fly to a town in list order'], ['KEYS', 'Fly to a town by its initial'], ['0 / H', 'Back to the whole map'], ['← →', 'Previous / next city or building'], ['Enter', 'Open the selected building'], ['Esc', 'Go back one level'], ['+ −', 'Zoom in / out'], ['Shift Space', 'Hold and drag to pan'], ['T', 'Start or stop the tour'], ['O', 'Toggle orbit'], ['V', 'Toggle top view'], ['L', 'Switch 中文 / English'], ['I', 'Hide or show the info card']],
+    keys: [[`1–${Math.min(9, CITIES.length)}`, 'Fly to a town in list order'], ['KEYS', 'Fly to a town by its initial'], ['0 / H', 'Back to the whole map'], ['← →', 'Previous / next town or building'], ['Enter', 'Open the selected building'], ['Esc', 'Go back one level'], ['+ −', 'Zoom in / out'], ['Shift Space', 'Hold and drag to pan'], ['T', 'Start or stop the tour'], ['O', 'Toggle orbit'], ['V', 'Toggle top view'], ['L', 'Switch language'], ['I', 'Hide or show the info card']],
     nowebgl: 'This browser could not create WebGL, so the 3D map cannot be shown. The list in the corner still works.' },
+  'zh-Hant': { me: '全圖', five: n => `${n} 座城`, map: '全圖', tour: '導覽', spin: '環繞', top: '俯視', hide: '收起', show: '展開', info: '說明', where: '位置', view: '視角',
+    hintW: '拖曳旋轉 · Shift/空白鍵+拖曳平移 · 滾輪縮放', hintC: '點建築看詳情 · Esc 返回', title: '地圖', sub: n => `${n} 座城，一片大陸`,
+    intro: '每座城是一個分類，城裡每座建築是一個工具或連結。道路和橋把它們連在一起。點城名飛進去，或者按「導覽」。',
+    plots: n => `${n} 處`, plot: '區', open: '進入', about: '關於我', fold: '正在摺這片地圖', prep: '準備紙張…', titleSuffix: '地圖',
+    steps: ['鋪開地形', '摺起山脈', '修路架橋', '開墾農田', '蓋起城鎮', '種一片森林', '放出行人和船'],
+    phases: ['深夜', '日出', '清晨', '上午', '正午', '下午', '傍晚', '夜晚'], langName: '繁體中文', langShort: '繁',
+    keysT: '快捷鍵', keysClose: '按 ? 或 Esc 關閉', keysHint: '按 ? 看快捷鍵',
+    keys: [[`1–${Math.min(9, CITIES.length)}`, '依列表順序飛到對應的城'], ['KEYS', '按城名首字母飛過去'], ['0 / H', '回到全圖'], ['← →', '上一個 / 下一個城或建築'], ['Enter', '開啟選中的建築'], ['Esc', '返回上一層'], ['+ −', '拉近 / 拉遠'], ['Shift 空白鍵', '按住再拖曳可平移'], ['T', '開始或停止導覽'], ['O', '開關環繞'], ['V', '開關俯視'], ['L', '切換語言'], ['I', '收起或展開資訊卡']],
+    nowebgl: '這個瀏覽器無法建立 WebGL，3D 地圖無法顯示。右下角的列表仍然可以導覽。' },
+  ja: { me: '全体図', five: n => `${n} つの町`, map: '全体図', tour: 'ツアー', spin: '回転', top: '真上', hide: '閉じる', show: '開く', info: 'この地図について', where: '現在地', view: '視点',
+    hintW: 'ドラッグで回転 · Shift/スペース+ドラッグで移動 · ホイールでズーム', hintC: '建物をクリックで詳細 · Esc で戻る', title: '地図', sub: n => `${n} つの町、ひとつの大陸`,
+    intro: '町はひとつのカテゴリ、町の建物はひとつのツールやリンクです。町どうしは道と橋でつながっています。町の名前をクリックすると飛んでいきます。「ツアー」で一巡りもできます。',
+    plots: n => `${n} か所`, plot: '区画', open: '開く', about: '自己紹介', fold: '地図を折っています', prep: '紙を用意しています…', titleSuffix: '地図',
+    steps: ['大地を広げる', '山を折る', '道と橋をつくる', '畑を耕す', '町を建てる', '森を植える', '旅人と船を送り出す'],
+    phases: ['深夜', '日の出', '朝', '午前', '正午', '午後', '夕暮れ', '夜'], langName: '日本語', langShort: '日',
+    keysT: 'キーボードショートカット', keysClose: '? か Esc で閉じる', keysHint: '? でショートカット一覧',
+    keys: [[`1–${Math.min(9, CITIES.length)}`, '一覧の順に町へ飛ぶ'], ['KEYS', '町の頭文字で飛ぶ'], ['0 / H', '全体図に戻る'], ['← →', '前 / 次の町・建物'], ['Enter', '選んだ建物を開く'], ['Esc', 'ひとつ前に戻る'], ['+ −', 'ズームイン / アウト'], ['Shift スペース', '押したままドラッグで移動'], ['T', 'ツアーの開始 / 停止'], ['O', '回転のオン / オフ'], ['V', '真上視点のオン / オフ'], ['L', '言語を切り替える'], ['I', '情報カードを開く / 閉じる']],
+    nowebgl: 'このブラウザでは WebGL を作れないため、3D 地図を表示できません。右下の一覧からは移動できます。' },
 };
 // site text overrides (SITE.text.zh / SITE.text.en)
-for (const lg of ['zh', 'en']) Object.assign(T[lg], (SITE.text || {})[lg] || {});
+// interface strings: built-in zh and en, any other language starts from English; site.text overrides
+for (const lg of new Set([...LANGS, LANG, ...Object.keys(SITE.text || {})])) { const own = T[lg]; T[lg] = { ...T.en, ...(own || {}), ...((SITE.text || {})[lg] || {}) }; if (!own && !(SITE.text || {})[lg]?.langName) { delete T[lg].langName; delete T[lg].langShort; } }
 const KEY_LIST = CITIES.filter(c => c.key).map(c => c.key.toUpperCase()).join(' ');
-for (const lg of ['zh', 'en']) T[lg].keys = T[lg].keys.filter(k => k[0] !== 'KEYS' || KEY_LIST).filter(k => !(k[0] === 'L' && !UI.languageSwitch) && !(k[0] === 'T' && !UI.tour) && !(['O', 'V'].includes(k[0]) && !UI.views)).map(k => k[0] === 'KEYS' ? [KEY_LIST, k[1]] : k);
-function setLangData() { for (const c of CITIES) { c.role = loc(c.roleRaw, LANG); c.blurb = loc(c.blurbRaw, LANG); for (const it of c.items) { it.desc = loc(it.descRaw, LANG); it.name = loc(it.nameRaw, LANG); } } }
+for (const lg of Object.keys(T)) T[lg].keys = T[lg].keys.filter(k => k[0] !== 'KEYS' || KEY_LIST).filter(k => !(k[0] === 'L' && !UI.languageSwitch) && !(k[0] === 'T' && !UI.tour) && !(['O', 'V'].includes(k[0]) && !UI.views)).map(k => k[0] === 'KEYS' ? [KEY_LIST, k[1]] : k);
+function setLangData() { for (const c of CITIES) { c.name = loc(c.nameRaw, LANG); c.role = loc(c.roleRaw, LANG); c.blurb = loc(c.blurbRaw, LANG); for (const it of c.items) { it.desc = loc(it.descRaw, LANG); it.name = loc(it.nameRaw, LANG); } } }
 for (const c of CITIES) for (const it of c.items) { it.descRaw = it.desc; it.nameRaw = it.name; }
 setLangData();
 const L = () => T[LANG];
+const langLabel = l => T[l]?.langName || (() => { try { return new Intl.DisplayNames([l], { type: 'language' }).of(l); } catch { return l.toUpperCase(); } })();
+const langMenu = document.createElement('div'); langMenu.className = 'lang-menu'; langMenu.setAttribute('role', 'menu'); langMenu.hidden = true;
+document.querySelector('.tools')?.append(langMenu);
 const EXT_ICON = '<svg class="ext" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M5.5 3.5h7v7M12.5 3.5 4 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
+document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : LANG;
 { const hide = (sel, off) => { if (off) document.querySelectorAll(sel).forEach(el => { el.hidden = true; }); };
   hide('#b-lang', !UI.languageSwitch); hide('#b-keys', !UI.shortcuts); hide('.tools .sep', !UI.languageSwitch && !UI.shortcuts);
   hide('#b-tour', !UI.tour); hide('#b-spin, #b-top', !UI.views); hide('#clock', !UI.clock); hide('.compass', !UI.compass); }
@@ -903,7 +942,7 @@ anims.push(t => sheep.forEach(s => { const d = s.userData, a = d.a + t * d.sp, x
 
 await step(4, L().steps[4]);
 // ---------------- cities ----------------
-const cityTagHTML = c => `<span class="en">${c.en}</span><span class="zh">${LANG === 'zh' ? c.name + ' · ' : ''}${c.role} · ${c.items.length}</span>`;
+const cityTagHTML = c => `<span class="en">${c.en}</span><span class="zh">${c.name !== c.en ? c.name + ' · ' : ''}${c.role} · ${c.items.length}</span>`;
 const cityData = {}, pickables = [], districts = {}, buildOrder = [], cityOcc = [], streetPaths = [];
 function ribbon(pts, w, mat, y) {
   const L = [], R = [];
@@ -1233,13 +1272,13 @@ anims.push((t, dt) => clouds.forEach(c => { c.position.x += c.userData.v * dt; i
 
 // ---------------- place names ----------------
 const placeLabels = [];
-function place(text, zh, x, y, z, cls = '') {
+function place(text, zh, x, y, z, cls = '', raw = null) {
   const el = document.createElement('div'); el.className = 'place ' + cls; el.style.setProperty('--d', `${1100 + placeLabels.length * 90}ms`); el.innerHTML = `${text}<small>${zh}</small>`;
-  const o = new CSS2DObject(el); o.position.set(x, y, z); world.add(o); placeLabels.push(o);
+  const o = new CSS2DObject(el); o.position.set(x, y, z); o.userData.raw = raw ?? text; world.add(o); placeLabels.push(o);
 }
 const ANCHORS = WORLD.anchors;
 const WATERY = new Set(['riverA', 'riverB', 'sea', 'bay', 'lake']);
-for (const p of SITE.places || []) { const at = ANCHORS[p.at] || (Array.isArray(p.at) ? p.at : null); if (Array.isArray(at)) place(loc(p.name, 'en'), loc(p.name, 'zh') === loc(p.name, 'en') ? '' : loc(p.name, 'zh'), at[0], at[1], at[2], WATERY.has(p.at) ? 'water' : ''); }
+for (const p of SITE.places || []) { const at = ANCHORS[p.at] || (Array.isArray(p.at) ? p.at : null); if (Array.isArray(at)) place(loc(p.name, 'en'), '', at[0], at[1], at[2], WATERY.has(p.at) ? 'water' : '', p.name); }
 
 // selection pin
 const pin = new THREE.Group(); pin.visible = false; scene.add(pin);
@@ -1324,22 +1363,27 @@ function renderPanel() {
   if (!c) {
     eyebrow.textContent = `${DOMAIN} · ${t.map}`;
     panel.innerHTML = `<h2>${t.title}<small>${typeof t.sub === 'function' ? t.sub(CITIES.length) : t.sub}</small></h2><p>${t.intro}</p>
-      <ul class="list">${CITIES.slice().sort((a, b) => b.items.length - a.items.length).map(x => `<li><button type="button" data-city="${x.id}"><span class="emblem" style="--c: var(${TOK[x.style.roofs[0]] || '--terra'})" aria-hidden="true">${x.en[0]}</span><span class="nm"><i>${x.en}</i> ${LANG === 'zh' ? x.name : ''}<em>${esc(x.blurb)}</em></span><span class="meta">${x.role} · ${x.items.length}</span></button></li>`).join('')}</ul>`;
+      <ul class="list">${CITIES.slice().sort((a, b) => b.items.length - a.items.length).map(x => `<li><button type="button" data-city="${x.id}"><span class="emblem" style="--c: var(${TOK[x.style.roofs[0]] || '--terra'})" aria-hidden="true">${x.en[0]}</span><span class="nm"><i>${x.en}</i> ${x.name !== x.en ? x.name : ''}<em>${esc(x.blurb)}</em></span><span class="meta">${x.role} · ${x.items.length}</span></button></li>`).join('')}</ul>`;
     return;
   }
   eyebrow.textContent = `${DOMAIN} · ${c.role}`;
   const d = state.sel && districts[state.sel], it = d && d.it;
-  panel.innerHTML = `<h2>${c.en}<small>${LANG === 'zh' ? c.name + ' · ' : ''}${c.role} · ${(typeof t.plots === 'function' ? t.plots(c.items.length) : String(t.plots).replace('{n}', c.items.length))}</small></h2><p>${esc(c.blurb)}</p>
+  panel.innerHTML = `<h2>${c.en}<small>${c.name !== c.en ? c.name + ' · ' : ''}${c.role} · ${(typeof t.plots === 'function' ? t.plots(c.items.length) : String(t.plots).replace('{n}', c.items.length))}</small></h2><p>${esc(c.blurb)}</p>
     ${it ? `<div class="card"><div class="row"><h3>${esc(it.name)}</h3><span class="eyebrow">${t.plot} ${it.code}</span></div><p>${esc(it.desc)}</p><div class="url">${esc(it.url.replace(/^https:\/\//, ''))}</div><a class="go" href="${it.url}" target="_blank" rel="noopener">${t.open}${EXT_ICON}</a></div>` : ''}
     <ul class="list">${c.items.map((x, i) => `<li><button type="button" data-sel="${c.id}-${i}" aria-current="${state.sel === c.id + '-' + i}"><span class="swatch" style="--c: var(${TOK[x.roof] || '--kraft'})" aria-hidden="true"></span><span class="nm">${esc(x.name)}<em>${esc(x.desc)}</em></span><span class="grid-ref">${x.code}</span></button></li>`).join('')}</ul>`;
 }
 function applyLang() {
   const t = L();
-  document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
-  mapEl.classList.toggle('lang-en', LANG === 'en');
+  document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : LANG;
+  mapEl.classList.toggle('lang-en', false);
+  for (const o of placeLabels) { const r = o.userData.raw, big = loc(r, 'en'), small = loc(r, LANG); o.element.innerHTML = `${big}<small>${small !== big ? small : ''}</small>`; }
   document.title = `${DOMAIN} · ${L().titleSuffix}`;
   for (const [id, k] of [['b-home', 'map'], ['b-tour', 'tour'], ['b-spin', 'spin'], ['b-top', 'top']]) document.getElementById(id).textContent = t[k];
-  const lb = document.getElementById('b-lang'); lb.textContent = t.other; lb.lang = t.otherLang;
+  { const lb = document.getElementById('b-lang');
+    if (LANGS.length < 2) lb.hidden = true;
+    else if (LANGS.length === 2) { const next = LANGS[(LANGS.indexOf(LANG) + 1) % 2]; lb.textContent = next === 'en' ? 'EN' : langLabel(next); lb.lang = next; lb.removeAttribute('aria-haspopup'); }
+    else { lb.textContent = (T[LANG]?.langShort || LANG.toUpperCase()) + ' ▾'; lb.lang = LANG; lb.setAttribute('aria-haspopup', 'menu'); lb.setAttribute('aria-label', langLabel(LANG));
+      langMenu.innerHTML = LANGS.map(l => `<button type="button" role="menuitemradio" aria-checked="${l === LANG}" lang="${l}" data-lang="${l}">${langLabel(l)}</button>`).join(''); } }
   { const a = document.querySelector('#about .t'); if (a) a.textContent = loc(SITEINFO.about && SITEINFO.about.label, LANG) || t.about; }
   fold.textContent = info.classList.contains('folded') ? t.show : t.hide;
   info.setAttribute('aria-label', t.info); crumb.setAttribute('aria-label', t.where); document.querySelector('.tools').setAttribute('aria-label', t.view);
@@ -1444,19 +1488,25 @@ document.addEventListener('keydown', e => {
     ArrowRight: () => { stopTour(); step2(1); }, ArrowLeft: () => { stopTour(); step2(-1); },
     Enter: () => { const d = state.sel && districts[state.sel]; if (d) window.open(d.it.url, '_blank', 'noopener'); },
     '+': () => zoom(.78), '=': () => zoom(.78), '-': () => zoom(1.28), '_': () => zoom(1.28),
-    t: () => { if (UI.tour) tourBtn.click(); }, o: () => { if (UI.views) spinBtn.click(); }, v: () => { if (UI.views) topBtn.click(); }, l: () => { if (UI.languageSwitch) document.getElementById('b-lang').click(); }, i: () => fold.click(),
+    t: () => { if (UI.tour) tourBtn.click(); }, o: () => { if (UI.views) spinBtn.click(); }, v: () => { if (UI.views) topBtn.click(); }, l: () => { if (UI.languageSwitch && LANGS.length > 1) setLang(LANGS[(LANGS.indexOf(LANG) + 1) % LANGS.length]); }, i: () => fold.click(),
   };
   const initial = CITIES.find(c => c.key && c.key === k.toLowerCase?.())?.id;
   if (initial) { e.preventDefault(); stopTour(); go(initial); return; }
   const n = parseInt(k, 10);
-  if (n >= 1 && n <= 5) { e.preventDefault(); stopTour(); go(LIST_ORDER()[n - 1]); return; }
+  if (n >= 1 && n <= Math.min(9, CITIES.length)) { e.preventDefault(); stopTour(); go(LIST_ORDER()[n - 1]); return; }
   const f = act[k] || act[k.toLowerCase?.()];
   if (f) { e.preventDefault(); f(); }
 });
 addEventListener('hashchange', () => { const h = location.hash.slice(1); if (cityData[h] && h !== state.city) go(h); });
 
 // ---------------- language control ----------------
-document.getElementById('b-lang').addEventListener('click', () => { LANG = LANG === 'zh' ? 'en' : 'zh'; store.set(STORE_KEY, LANG); setLangData(); applyLang(); });
+const setLang = l => { if (!l || l === LANG) return; LANG = l; store.set(STORE_KEY, LANG); setLangData(); applyLang(); };
+document.getElementById('b-lang').addEventListener('click', e => {
+  if (LANGS.length > 2) { e.stopPropagation(); langMenu.hidden = !langMenu.hidden; document.getElementById('b-lang').setAttribute('aria-expanded', !langMenu.hidden); return; }
+  setLang(LANGS[(LANGS.indexOf(LANG) + 1) % LANGS.length]);
+});
+langMenu.addEventListener('click', e => { const b = e.target.closest('[data-lang]'); if (!b) return; e.stopPropagation(); langMenu.hidden = true; setLang(b.dataset.lang); });
+document.addEventListener('click', () => { langMenu.hidden = true; });
 
 // ---------------- daylight: local time drives sky, sun and lamps ----------------
 // keyframes: hour, sky, sun colour, sun intensity, sun elevation (deg), hemi sky, hemi ground, hemi intensity, lamps 0-1, ink strength
@@ -1571,6 +1621,8 @@ function frame() {
   }
   controls.update();
   post.uniforms.focus.value = camera.position.distanceTo(controls.target);
+  // haze scales with the view so a bigger world (more towns, wider overview) is not washed out
+  { const d = post.uniforms.focus.value; fog.near = Math.max(70, d * 1.15); fog.far = Math.max(FOG_FAR, d * 3.2); post.uniforms.fogFar.value = fog.far; }
   { const far = camera.position.distanceTo(controls.target) > 36; for (const c of clouds) c.visible = far; }
   needle.setAttribute('transform', `rotate(${(controls.getAzimuthalAngle() * 180 / Math.PI).toFixed(1)})`);
   camera.layers.enableAll();

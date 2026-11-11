@@ -103,7 +103,10 @@ src/
   to `map.json`.
 - There is no dark mode or theme toggle here: local time drives sky, sun, lamps and the
   interface palette (`DAY`/`UIP` keyframes in the engine, eight phases). `?t=18.5` pins the hour for
-  previews. Language follows the system and is switchable (stored per browser).
+  previews. The map is in four languages (`site.languages`: zh, zh-Hant, ja, en); the
+  browser language picks one (zh-TW/HK → zh-Hant, others without a match → en) and a menu
+  switches it. Every text field in `map.json` carries all four; keep them together when
+  editing.
 - Fonts are self-hosted (`@fontsource-variable/manrope`, `jetbrains-mono`,
   `@fontsource/cormorant-garamond` italics); never load Google Fonts.
 - Keyboard: 1–5 or M/E/G/B/R cities, 0/H overview, ←/→ step, Enter open, Esc back, +/− zoom,

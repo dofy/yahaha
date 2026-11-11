@@ -290,6 +290,11 @@ body { background: var(--sky); color: var(--ui-ink); font-family: var(--font-san
 .brand .about:hover .ext { opacity: 1; transform: translate(1px, -1px); }
 .go .ext { transition: transform .2s; }
 .go:hover .ext { transform: translate(1px, -1px); }
+.tools:has(.lang-menu:not([hidden])) { z-index: 6; }
+.lang-menu { position: absolute; top: calc(100% + 6px); right: 0; display: grid; min-width: 140px; padding: 4px; gap: 2px;
+  background: var(--ui-card); border: 1px solid var(--ui-ink); border-radius: 10px; box-shadow: 0 12px 30px var(--ui-shadow); z-index: 5; }
+.lang-menu button { text-align: left; border-radius: 6px; padding: 6px 10px; font-family: var(--font-sans); font-size: 13px; }
+.lang-menu button[aria-checked="true"] { background: var(--ui-hot); font-weight: 600; }
 .site-h1 { margin: 0; font: inherit; display: contents; }
 .no-js { position: fixed; inset: 0; overflow: auto; z-index: 6; background: var(--ui-card); color: var(--ui-ink); padding: 24px max(16px, env(safe-area-inset-left, 0px));
   display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; font-family: var(--font-sans); }

@@ -29,8 +29,35 @@ export const WORLD_TYPES = ['coast', 'twoCoasts', 'island', 'gulf', 'lakeland'];
 
 // towns: [{ slot, rx, rz }] in site order. noise: { vnoise, fbm, ridge }.
 export function makeWorld(cfg, towns, noise) {
-  if (cfg.layout === 'classic') return classicWorld(towns, noise);
-  return autoWorld(cfg, towns, noise);
+  // classic only has the five hand-placed spots; more towns need a generated world
+  if (cfg.layout === 'classic' && towns.length <= 5 && towns.every(t => t.slot !== 'town')) return classicWorld(towns, noise);
+  // more than five towns: generate the land at the usual size with towns shrunk, then stretch
+  // it so towns keep their real size and the continent grows around them
+  const S = Math.max(1, 1 + (towns.length - 5) * .2); // 6 towns ×1.2 … 9 towns ×1.8
+  if (S === 1) return autoWorld(cfg, towns, noise);
+  return scaleWorld(autoWorld(cfg, towns.map(t => ({ ...t, rx: t.rx / S, rz: t.rz / S })), noise), S);
+}
+
+function scaleWorld(w, S) {
+  const P = ([x, z, ...rest]) => [x * S, z * S, ...rest];
+  const sea = w.sea, natural = w.natural, farness = w.farness, dens = w.forestDens, pine = w.pineZone;
+  return {
+    ...w,
+    townPos: w.townPos.map(p => ({ ...p, cx: p.cx * S, cz: p.cz * S })),
+    roadsSpec: w.roadsSpec.map(r => ({ ...r, end: r.end && P(r.end) })),
+    rivers: w.rivers.map(r => ({ ...r, pts: r.pts.map(P) })),
+    fields: w.fields.map(f => ({ ...f, x: f.x * S, z: f.z * S })),
+    farms: w.farms.map(P), windmill: w.windmill && P(w.windmill), sheep: w.sheep.map(P),
+    sea: (x, z) => sea(x / S, z / S) * S, natural: (x, z) => natural(x / S, z / S), farness: (x, z) => farness(x / S, z / S),
+    forestDens: (x, z) => dens(x / S, z / S), pineZone: (x, z, h) => pine(x / S, z / S, h),
+    peaks: w.peaks.map(([x, z, r, h, sd]) => [x * S, z * S, r * S, h * (1 + (S - 1) * .5), sd]),
+    near: w.near.map(v => v * S),
+    strokes: { ...w.strokes, x0: w.strokes.x0 * S, x1: w.strokes.x1 * S, z0: w.strokes.z0 * S, z1: w.strokes.z1 * S, n: Math.round(w.strokes.n * S * S) },
+    boats: w.boats.map(b => ({ ...b, cx: b.cx * S, cz: b.cz * S, a: b.a * S, b: b.b * S })),
+    anchors: Object.fromEntries(Object.entries(w.anchors).map(([k, v]) => [k, v && [v[0] * S, v[1], v[2] * S]])),
+    pan: { x0: w.pan.x0 * S, x1: w.pan.x1 * S, z0: w.pan.z0 * S, z1: w.pan.z1 * S },
+    view: { x: w.view.x * S, z: w.view.z * S, dist: w.view.dist * S },
+  };
 }
 
 // ------------------------------------------------------------------ classic (yahaha.net)
@@ -165,7 +192,8 @@ function autoWorld(cfg, towns, { vnoise, fbm, ridge }) {
     if (t.slot !== 'highland' && mountK(x, z) > .15) return false;
     return pos.every((p, i) => !p || Math.hypot(p.cx - x, p.cz - z) > rad + Math.max(towns[i].rx, towns[i].rz) + gap);
   };
-  const order = towns.map((t, i) => i).sort((a, b) => ['center', 'highland', 'coast', 'south', 'east'].indexOf(towns[a].slot) - ['center', 'highland', 'coast', 'south', 'east'].indexOf(towns[b].slot));
+  const ROLE_ORDER = ['center', 'highland', 'coast', 'south', 'east', 'town'];
+  const order = towns.map((t, i) => i).sort((a, b) => ROLE_ORDER.indexOf(towns[a].slot) - ROLE_ORDER.indexOf(towns[b].slot));
   for (const i of order) {
     const t = towns[i], rad = Math.max(t.rx, t.rz);
     let got = null;
@@ -179,10 +207,18 @@ function autoWorld(cfg, towns, { vnoise, fbm, ridge }) {
       } else if (t.slot === 'highland') {
         const g = ranges[0], a = g.th + rr(-g.span * .7, g.span * .7), r = rangeR(g, a) - rr(5.5, 6.8);
         x = Math.cos(a) * r; z = Math.sin(a) * r;
-      } else { const a = rr(0, TAU), r = rr(8.5, 14); x = Math.cos(a) * r; z = Math.sin(a) * r; }
+      } else { const a = rr(0, TAU), r = towns.length > 5 ? rr(6.5, 15) : rr(8.5, 14); x = Math.cos(a) * r; z = Math.sin(a) * r; }
       if (fits(x, z, t, gap)) got = { cx: x, cz: z };
     }
-    if (!got) { const a = i / towns.length * TAU; got = { cx: Math.cos(a) * 12, cz: Math.sin(a) * 12 }; }
+    if (!got) { // best candidate: the land point farthest from every placed town
+      let best = -1;
+      for (let gx = -22; gx <= 22; gx += 1) for (let gz = -22; gz <= 22; gz += 1) {
+        if (coastSd(gx, gz) < rad + 2.5 || (t.slot !== 'highland' && mountK(gx, gz) > .15)) continue;
+        const d = pos.reduce((m, p, j) => p ? Math.min(m, Math.hypot(p.cx - gx, p.cz - gz) - Math.max(towns[j].rx, towns[j].rz)) : m, 99) - rad - Math.hypot(gx, gz) * .02;
+        if (d > best) { best = d; got = { cx: gx + rr(-.3, .3), cz: gz + rr(-.3, .3) }; }
+      }
+      if (!got) { const a = i / towns.length * TAU; got = { cx: Math.cos(a) * 12, cz: Math.sin(a) * 12 }; }
+    }
     got.y = t.slot === 'highland' ? 1.7 : .2; got.gate = t.slot === 'highland'; got.harbor = t.slot === 'coast' && type !== 'lakeland';
     pos[i] = got;
   }

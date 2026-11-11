@@ -29,6 +29,8 @@
       "url": "https://github.com/dofy/dofy",
       "label": {
         "zh": "关于我",
+        "zh-Hant": "關於我",
+        "ja": "自己紹介",
         "en": "About me"
       }
     },
@@ -37,7 +39,13 @@
       "owner": "Seven"
     },
     "releaseUrl": "https://github.com/dofy/yahaha/releases/tag/v{version}",
-    "description": "A folded-paper 3D map of Seven’s corner of the internet: apps, browser tools, open-source projects and links, laid out as five cities."
+    "description": "A folded-paper 3D map of Seven’s corner of the internet: apps, browser tools, open-source projects and links, laid out as five cities.",
+    "languages": [
+      "zh",
+      "zh-Hant",
+      "ja",
+      "en"
+    ]
   },
   "text": {
     "zh": {
@@ -49,14 +57,33 @@
       "titleSuffix": "中洲地图",
       "plots": "{n} 区"
     },
+    "zh-Hant": {
+      "me": "中土",
+      "five": "五座城",
+      "title": "Yahaha 中土",
+      "sub": "五座城，一片大陸",
+      "fold": "正在摺一片中土",
+      "titleSuffix": "中土地圖",
+      "plots": "{n} 區"
+    },
+    "ja": {
+      "me": "中つ国",
+      "five": "五つの都",
+      "title": "Yahaha 中つ国",
+      "sub": "五つの都、ひとつの大陸",
+      "fold": "中つ国を折っています",
+      "titleSuffix": "中つ国の地図",
+      "plots": "{n} 区画"
+    },
     "en": {
       "me": "Middle-earth",
       "five": "Five cities",
       "title": "Yahaha Middle-earth",
       "sub": "Five cities, one continent",
-      "fold": "Folding a Middle-earth",
+      "fold": "Folding Middle-earth",
       "titleSuffix": "Middle-earth map",
-      "plots": "{n} plots"
+      "plots": "{n} plots",
+      "intro": "Each city is a category and each building in it is a tool or a link. Roads and bridges join them up. Click a city name to fly in, or press Tour."
     }
   },
   "places": [
@@ -64,63 +91,81 @@
       "at": "north",
       "name": {
         "en": "Misty Mountains",
-        "zh": "迷雾山脉"
+        "zh": "迷雾山脉",
+        "zh-Hant": "迷霧山脈",
+        "ja": "霧ふり山脈"
       }
     },
     {
       "at": "riverA",
       "name": {
         "en": "Anduin",
-        "zh": "安都因河"
+        "zh": "安都因河",
+        "zh-Hant": "安都因河",
+        "ja": "アンドゥイン大河"
       }
     },
     {
       "at": "riverB",
       "name": {
         "en": "Brandywine",
-        "zh": "白兰地河"
+        "zh": "白兰地河",
+        "zh-Hant": "烈酒河",
+        "ja": "ブランディワイン川"
       }
     },
     {
       "at": "forest",
       "name": {
         "en": "Fangorn",
-        "zh": "法贡森林"
+        "zh": "法贡森林",
+        "zh-Hant": "法貢森林",
+        "ja": "ファンゴルンの森"
       }
     },
     {
       "at": "fields",
       "name": {
         "en": "The Shire",
-        "zh": "夏尔"
+        "zh": "夏尔",
+        "zh-Hant": "夏爾",
+        "ja": "ホビット庄"
       }
     },
     {
       "at": "sea",
       "name": {
         "en": "Belegaer",
-        "zh": "大海"
+        "zh": "贝烈盖尔海",
+        "zh-Hant": "貝烈蓋爾海",
+        "ja": "ベレガエア"
       }
     },
     {
       "at": "bay",
       "name": {
         "en": "Bay of Belfalas",
-        "zh": "贝尔法拉斯湾"
+        "zh": "贝尔法拉斯湾",
+        "zh-Hant": "貝爾法拉斯灣",
+        "ja": "ベルファラス湾"
       }
     },
     {
       "at": "west",
       "name": {
         "en": "Ered Luin",
-        "zh": "蓝色山脉"
+        "zh": "蓝色山脉",
+        "zh-Hant": "藍色山脈",
+        "ja": "エレド・ルイン"
       }
     },
     {
       "at": "lake",
       "name": {
         "en": "Nenuial",
-        "zh": "暮暗湖"
+        "zh": "暮暗湖",
+        "zh-Hant": "暮暗湖",
+        "ja": "ネヌイアル湖"
       }
     }
   ],
@@ -131,15 +176,21 @@
       "key": "m",
       "name": {
         "en": "Minas Tirith",
-        "zh": "米那斯提力斯"
+        "zh": "米那斯提力斯",
+        "zh-Hant": "米那斯提力斯",
+        "ja": "ミナス・ティリス"
       },
       "role": {
+        "en": "Tools",
         "zh": "工具",
-        "en": "Tools"
+        "zh-Hant": "工具",
+        "ja": "ツール"
       },
       "blurb": {
-        "zh": "白城。九个在浏览器里直接用的小工具，每座建筑一个。",
-        "en": "The White City. Nine tools that run right in your browser, one building each."
+        "en": "The White City. Nine tools that run right in your browser, one building each.",
+        "zh": "白城。九个直接在浏览器里用的小工具，每座建筑一个。",
+        "zh-Hant": "白城。九個直接在瀏覽器裡使用的小工具，每座建築一個。",
+        "ja": "白の都。ブラウザでそのまま使える九つのツールが、一棟にひとつずつ。"
       },
       "style": {
         "walls": [
@@ -177,8 +228,10 @@
           "url": "https://yahaha.net/24points",
           "kind": "quad",
           "desc": {
+            "en": "Every way four numbers can make 24",
             "zh": "给四个数，列出所有算出 24 的式子",
-            "en": "Every way four numbers can make 24"
+            "zh-Hant": "給四個數，列出所有算出 24 的算式",
+            "ja": "四つの数から 24 を作る式をすべて出す"
           }
         },
         {
@@ -186,8 +239,10 @@
           "url": "https://yahaha.net/tarot",
           "kind": "spire",
           "desc": {
-            "zh": "浏览 78 张塔罗牌和牌义",
-            "en": "Browse all 78 tarot cards and their meanings"
+            "en": "Browse the 22 Major Arcana, upright and reversed",
+            "zh": "浏览大阿尔卡纳 22 张牌的正位与逆位释义",
+            "zh-Hant": "瀏覽大阿爾克納 22 張牌的正位與逆位釋義",
+            "ja": "大アルカナ 22 枚の正位置と逆位置の意味"
           }
         },
         {
@@ -195,8 +250,10 @@
           "url": "https://yahaha.net/emoji",
           "kind": "dome",
           "desc": {
-            "zh": "用中文或英文关键词找 Emoji 17.0",
-            "en": "Search Emoji 17.0 in English or Chinese"
+            "en": "Search Emoji 17.0 in Chinese or English",
+            "zh": "用简体、繁体中文或英文关键词找 Emoji 17.0",
+            "zh-Hant": "用簡體、繁體中文或英文關鍵字找 Emoji 17.0",
+            "ja": "中国語や英語のキーワードで Emoji 17.0 を探す"
           }
         },
         {
@@ -204,8 +261,10 @@
           "url": "https://yahaha.net/emoticon",
           "kind": "theater",
           "desc": {
+            "en": "Roll a random kaomoji",
             "zh": "随机拼一个颜文字",
-            "en": "Roll a random kaomoji"
+            "zh-Hant": "隨機拼一個顏文字",
+            "ja": "ランダムに顔文字を作る"
           }
         },
         {
@@ -213,8 +272,10 @@
           "url": "https://yahaha.net/morse",
           "kind": "radio",
           "desc": {
+            "en": "Encode and decode Morse code",
             "zh": "摩斯电码编码和解码",
-            "en": "Encode and decode Morse code"
+            "zh-Hant": "摩斯密碼編碼與解碼",
+            "ja": "モールス信号の変換と解読"
           }
         },
         {
@@ -222,8 +283,10 @@
           "url": "https://yahaha.net/ascii-art",
           "kind": "grid",
           "desc": {
+            "en": "Turn text into ASCII art",
             "zh": "把文字变成字符画",
-            "en": "Turn text into ASCII art"
+            "zh-Hant": "把文字變成字元畫",
+            "ja": "文字をアスキーアートに"
           }
         },
         {
@@ -231,8 +294,10 @@
           "url": "https://yahaha.net/face",
           "kind": "face",
           "desc": {
-            "zh": "按种子生成 SVG 头像",
-            "en": "Seeded SVG avatars"
+            "en": "Turn any name into an SVG avatar",
+            "zh": "用任意名字生成一个 SVG 头像",
+            "zh-Hant": "用任何名字產生一個 SVG 頭像",
+            "ja": "好きな名前から SVG アバターを作る"
           }
         },
         {
@@ -240,8 +305,10 @@
           "url": "https://yahaha.net/lock",
           "kind": "vault",
           "desc": {
-            "zh": "计算单排和双排钥匙牙花",
-            "en": "Key bitting codes for single and double rows"
+            "en": "Key bitting codes for single and double rows",
+            "zh": "计算单排和双排钥匙的牙花",
+            "zh-Hant": "計算單排和雙排鑰匙的齒花",
+            "ja": "片側・両側の鍵の刻みを計算する"
           }
         },
         {
@@ -249,8 +316,10 @@
           "url": "https://sync-text.phpz.org/",
           "kind": "twin",
           "desc": {
+            "en": "Sync a note between devices",
             "zh": "在设备之间同步一段文字",
-            "en": "Sync a note between devices"
+            "zh-Hant": "在裝置之間同步一段文字",
+            "ja": "端末どうしでメモを同期する"
           }
         }
       ]
@@ -261,15 +330,21 @@
       "key": "r",
       "name": {
         "en": "Rivendell",
-        "zh": "幽谷"
+        "zh": "幽谷",
+        "zh-Hant": "瑞文戴爾",
+        "ja": "裂け谷"
       },
       "role": {
+        "en": "Heart Sutra",
         "zh": "心经",
-        "en": "Heart Sutra"
+        "zh-Hant": "心經",
+        "ja": "般若心経"
       },
       "blurb": {
+        "en": "An elven refuge under the Misty Mountains. Four towers, each keeping one edition of the Heart Sutra.",
         "zh": "迷雾山脉脚下的精灵居所。四座塔，各藏一版心经。",
-        "en": "An elven refuge under the Misty Mountains. Four towers, each keeping one edition of the Heart Sutra."
+        "zh-Hant": "迷霧山脈腳下的精靈居所。四座塔，各藏一版心經。",
+        "ja": "霧ふり山脈のふもとのエルフの隠れ里。四つの塔に、般若心経の四つの版がひとつずつ。"
       },
       "style": {
         "walls": [
@@ -305,8 +380,10 @@
           "url": "https://yahaha.net/heart/hans",
           "kind": "pagoda",
           "desc": {
+            "en": "Simplified Chinese",
             "zh": "简体中文版",
-            "en": "Simplified Chinese"
+            "zh-Hant": "簡體中文版",
+            "ja": "簡体字版"
           },
           "t": 2
         },
@@ -315,8 +392,10 @@
           "url": "https://yahaha.net/heart/hant",
           "kind": "pavilion",
           "desc": {
-            "zh": "繁體中文版",
-            "en": "Traditional Chinese"
+            "en": "Traditional Chinese",
+            "zh": "繁体中文版",
+            "zh-Hant": "繁體中文版",
+            "ja": "繁体字版"
           }
         },
         {
@@ -324,8 +403,10 @@
           "url": "https://yahaha.net/heart/en",
           "kind": "elfhall",
           "desc": {
-            "zh": "English translation",
-            "en": "English translation"
+            "en": "English translation",
+            "zh": "英文译本",
+            "zh-Hant": "英文譯本",
+            "ja": "英訳"
           }
         },
         {
@@ -333,8 +414,10 @@
           "url": "https://yahaha.net/heart/original",
           "kind": "stupa",
           "desc": {
+            "en": "Sanskrit original",
             "zh": "梵文原文",
-            "en": "Sanskrit original"
+            "zh-Hant": "梵文原文",
+            "ja": "サンスクリット原典"
           }
         }
       ]
@@ -345,15 +428,21 @@
       "key": "e",
       "name": {
         "en": "Erebor",
-        "zh": "孤山"
+        "zh": "孤山",
+        "zh-Hant": "孤山",
+        "ja": "はなれ山"
       },
       "role": {
+        "en": "Open source",
         "zh": "开源",
-        "en": "Open source"
+        "zh-Hant": "開源",
+        "ja": "オープンソース"
       },
       "blurb": {
+        "en": "The dwarven forges. Nine open-source repositories in a row of smoking workshops.",
         "zh": "矮人的熔炉。九个开源仓库，排成一片冒烟的工坊。",
-        "en": "The dwarven forges. Nine open-source repositories in a row of smoking workshops."
+        "zh-Hant": "矮人的熔爐。九個開源倉庫，排成一片冒煙的工坊。",
+        "ja": "ドワーフの鍛冶場。九つのオープンソースのリポジトリが、煙を上げる工房に並んでいます。"
       },
       "style": {
         "walls": [
@@ -391,8 +480,10 @@
           "url": "https://github.com/dofy/7th-vim",
           "kind": "smithy",
           "desc": {
-            "zh": "Vim 配置",
-            "en": "Vim configuration"
+            "en": "My Vim configuration",
+            "zh": "我的 Vim 配置",
+            "zh-Hant": "我的 Vim 設定",
+            "ja": "私の Vim 設定"
           }
         },
         {
@@ -400,8 +491,10 @@
           "url": "https://github.com/dofy/learn-vim",
           "kind": "scriptorium",
           "desc": {
-            "zh": "Vim 教程，三种语言",
-            "en": "Vim tutorial in three languages"
+            "en": "A Vim tutorial in three languages",
+            "zh": "三种语言的 Vim 教程",
+            "zh-Hant": "三種語言的 Vim 教學",
+            "ja": "三か国語の Vim チュートリアル"
           }
         },
         {
@@ -409,8 +502,10 @@
           "url": "https://github.com/dofy/emojidb",
           "kind": "warehouse",
           "desc": {
-            "zh": "Emoji 数据 CLI",
-            "en": "Search Emoji 17.0 in English or Chinese"
+            "en": "An emoji data CLI",
+            "zh": "Emoji 数据命令行工具",
+            "zh-Hant": "Emoji 資料命令列工具",
+            "ja": "絵文字データの CLI"
           }
         },
         {
@@ -418,8 +513,10 @@
           "url": "https://github.com/dofy/apple-emoji-dict",
           "kind": "watermill",
           "desc": {
+            "en": "Apple emoji keyword dictionary",
             "zh": "Apple Emoji 关键词词典",
-            "en": "Apple emoji keyword dictionary"
+            "zh-Hant": "Apple Emoji 關鍵字字典",
+            "ja": "Apple 絵文字のキーワード辞書"
           }
         },
         {
@@ -427,8 +524,10 @@
           "url": "https://github.com/dofy/PopClip-Extensions",
           "kind": "kiln",
           "desc": {
+            "en": "My PopClip extensions",
             "zh": "自制 PopClip 扩展",
-            "en": "My PopClip extensions"
+            "zh-Hant": "自製 PopClip 擴充功能",
+            "ja": "自作の PopClip 拡張"
           }
         },
         {
@@ -436,8 +535,10 @@
           "url": "https://github.com/dofy/awf",
           "kind": "mansion",
           "desc": {
+            "en": "My Alfred workflows",
             "zh": "自制 Alfred 工作流",
-            "en": "My Alfred workflows"
+            "zh-Hant": "自製 Alfred 工作流程",
+            "ja": "自作の Alfred ワークフロー"
           }
         },
         {
@@ -445,8 +546,10 @@
           "url": "https://github.com/dofy/invite-maker",
           "kind": "hobbit",
           "desc": {
-            "zh": "邀请函生成器源码",
-            "en": "Source of the invitation maker"
+            "en": "Source of the Tsudoi invitation maker",
+            "zh": "邀请函工具 Tsudoi 的源码",
+            "zh-Hant": "邀請函工具 Tsudoi 的原始碼",
+            "ja": "招待状メーカー Tsudoi のソース"
           }
         },
         {
@@ -454,8 +557,10 @@
           "url": "https://github.com/dofy/learning-vim",
           "kind": "mine",
           "desc": {
-            "zh": "交互式 Vim 课程源码",
-            "en": "Source of the interactive Vim course"
+            "en": "Source of the interactive Vim course",
+            "zh": "交互式 Vim 课程的源码",
+            "zh-Hant": "互動式 Vim 課程的原始碼",
+            "ja": "対話型 Vim 講座のソース"
           }
         },
         {
@@ -463,8 +568,10 @@
           "url": "https://github.com/dofy/brew-graph",
           "kind": "still",
           "desc": {
-            "zh": "Homebrew 依赖图源码",
-            "en": "Source of the Homebrew dependency graph"
+            "en": "Source of the Homebrew dependency graph",
+            "zh": "Homebrew 依赖图的源码",
+            "zh-Hant": "Homebrew 依賴圖的原始碼",
+            "ja": "Homebrew 依存グラフのソース"
           }
         }
       ]
@@ -475,15 +582,21 @@
       "key": "b",
       "name": {
         "en": "Bree",
-        "zh": "布理"
+        "zh": "布理",
+        "zh-Hant": "布理",
+        "ja": "ブリー村"
       },
       "role": {
+        "en": "Social",
         "zh": "社交",
-        "en": "Social"
+        "zh-Hant": "社群",
+        "ja": "SNS"
       },
       "blurb": {
-        "zh": "旅人汇合的小镇。五个社交主页，围着中间的喷泉。",
-        "en": "A town where travellers meet. Five social profiles around the fountain."
+        "en": "A town where travellers meet. Five social profiles around the fountain.",
+        "zh": "旅人汇合的小镇。五个社交主页围着中间的喷泉。",
+        "zh-Hant": "旅人相會的小鎮。五個社群主頁圍著中間的噴泉。",
+        "ja": "旅人が行き交う村。噴水を囲んで、五つの SNS のページ。"
       },
       "style": {
         "walls": [
@@ -522,46 +635,36 @@
           "name": "Plurk",
           "url": "https://plurk.com/dofy",
           "kind": "inn",
-          "desc": {
-            "zh": "plurk.com/dofy",
-            "en": "plurk.com/dofy"
-          }
+          "desc": "plurk.com/dofy"
         },
         {
-          "name": "豆瓣",
+          "name": {
+            "zh": "豆瓣",
+            "zh-Hant": "豆瓣",
+            "ja": "豆瓣",
+            "en": "Douban"
+          },
           "url": "https://douban.com/people/dofy",
           "kind": "teahouse",
-          "desc": {
-            "zh": "douban.com/people/dofy",
-            "en": "douban.com/people/dofy"
-          }
+          "desc": "douban.com/people/dofy"
         },
         {
           "name": "GitHub",
           "url": "https://github.com/dofy",
           "kind": "cattower",
-          "desc": {
-            "zh": "github.com/dofy",
-            "en": "github.com/dofy"
-          }
+          "desc": "github.com/dofy"
         },
         {
           "name": "Twitter",
           "url": "https://twitter.com/dofy",
           "kind": "dovecote",
-          "desc": {
-            "zh": "twitter.com/dofy",
-            "en": "twitter.com/dofy"
-          }
+          "desc": "twitter.com/dofy"
         },
         {
           "name": "Instagram",
           "url": "https://instagram.com/dofyyu",
           "kind": "camera",
-          "desc": {
-            "zh": "instagram.com/dofyyu",
-            "en": "instagram.com/dofyyu"
-          }
+          "desc": "instagram.com/dofyyu"
         }
       ]
     },
@@ -571,15 +674,21 @@
       "key": "g",
       "name": {
         "en": "Grey Havens",
-        "zh": "灰港"
+        "zh": "灰港",
+        "zh-Hant": "灰港",
+        "ja": "灰色港"
       },
       "role": {
+        "en": "Apps",
         "zh": "应用",
-        "en": "Apps"
+        "zh-Hant": "應用程式",
+        "ja": "アプリ"
       },
       "blurb": {
+        "en": "Ships set sail from here. Six standalone apps, each bound for its own website.",
         "zh": "从这里出海。六个独立应用，各自驶向自己的网站。",
-        "en": "Ships leave from here. Six standalone apps, each sailing to its own website."
+        "zh-Hant": "從這裡出海。六個獨立應用程式，各自駛向自己的網站。",
+        "ja": "ここから船出します。六つのアプリが、それぞれのサイトへ。"
       },
       "style": {
         "walls": [
@@ -616,8 +725,10 @@
           "url": "https://cruft.phpz.org/",
           "kind": "silo",
           "desc": {
-            "zh": "macOS · 清理开发缓存和应用残留，先预览再删除",
-            "en": "macOS · Clear developer caches and app leftovers, with a preview first"
+            "en": "macOS · Clear developer caches and app leftovers, with a preview first",
+            "zh": "macOS · 清理开发缓存和应用残留，删除前先预览",
+            "zh-Hant": "macOS · 清理開發快取和應用程式殘留，刪除前先預覽",
+            "ja": "macOS · 開発キャッシュやアプリの残りを、確認してから削除"
           }
         },
         {
@@ -625,8 +736,10 @@
           "url": "https://wordclip.phpz.org/",
           "kind": "library",
           "desc": {
+            "en": "macOS / iOS · Collect words as you read, look them up offline, review them later",
             "zh": "macOS / iOS · 边读边收集单词，离线查词，间隔复习",
-            "en": "macOS / iOS · Collect words as you read, look them up offline, review them later"
+            "zh-Hant": "macOS / iOS · 邊讀邊收集單字，離線查詢，間隔複習",
+            "ja": "macOS / iOS · 読みながら単語を集め、オフラインで調べ、あとで復習"
           }
         },
         {
@@ -634,8 +747,10 @@
           "url": "https://linguadock.phpz.org/",
           "kind": "crane",
           "desc": {
-            "zh": "macOS · 快捷键翻译任意应用里的选中文字",
-            "en": "macOS · Translate selected text in any app with a shortcut"
+            "en": "macOS · Translate selected text in any app with a shortcut",
+            "zh": "macOS · 用快捷键翻译任意应用里选中的文字",
+            "zh-Hant": "macOS · 用快捷鍵翻譯任何應用程式裡選取的文字",
+            "ja": "macOS · どのアプリでも、選んだ文字をショートカットで翻訳"
           }
         },
         {
@@ -643,8 +758,10 @@
           "url": "https://tsudoi.yahaha.net/",
           "kind": "tent",
           "desc": {
+            "en": "Web · Design invitations visually and export PNGs in batches",
             "zh": "Web · 可视化设计邀请函，批量导出 PNG",
-            "en": "Web · Design invitations visually and export PNGs in batches"
+            "zh-Hant": "Web · 視覺化設計邀請函，批次匯出 PNG",
+            "ja": "Web · 招待状を見ながらデザインし、PNG をまとめて書き出す"
           }
         },
         {
@@ -652,8 +769,10 @@
           "url": "https://learning-vim.phpz.org/",
           "kind": "school",
           "desc": {
+            "en": "Web · Interactive lessons with hands-on practice",
             "zh": "Web · 交互课程，边学边练",
-            "en": "Web · Interactive lessons with hands-on practice"
+            "zh-Hant": "Web · 互動課程，邊學邊練",
+            "ja": "Web · 手を動かしながら学ぶ対話型レッスン"
           }
         },
         {
@@ -661,8 +780,10 @@
           "url": "https://brew-graph.yahaha.net/",
           "kind": "tanks",
           "desc": {
-            "zh": "Web · 查看 Homebrew 包和依赖关系",
-            "en": "Web · Explore Homebrew packages and their dependencies"
+            "en": "Web · Explore Homebrew packages and their dependencies",
+            "zh": "Web · 浏览 Homebrew 软件包和依赖关系",
+            "zh-Hant": "Web · 瀏覽 Homebrew 套件與依賴關係",
+            "ja": "Web · Homebrew のパッケージと依存関係を見る"
           }
         }
       ]
