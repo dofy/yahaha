@@ -106,7 +106,7 @@ const T = {
   zh: { me: '中洲', five: '五座城', map: '全图', tour: '导览', spin: '环绕', top: '俯视', hide: '收起', show: '展开', info: '说明', where: '位置', view: '视角',
     hintW: '拖拽旋转 · Shift/空格+拖拽平移 · 滚轮缩放', hintC: '点建筑看详情 · Esc 返回', title: 'Yahaha 中洲', sub: '五座城，一片大陆',
     intro: '每座城是一个分类，城里每座建筑是一个工具或链接。道路和桥把它们连在一起。点城名飞进去，或者按“导览”。',
-    plots: n => `${n} 区`, plot: '区', open: '进入 ↗', about: '关于我', fold: '正在折一片中洲', prep: '准备纸张…',
+    plots: n => `${n} 区`, plot: '区', open: '进入', about: '关于我', fold: '正在折一片中洲', prep: '准备纸张…',
     steps: ['铺开地形', '折起山脉', '修路架桥', '开垦农田', '盖五座城', '种一片森林', '放出行人和船'],
     phases: ['深夜', '日出', '早晨', '上午', '正午', '下午', '傍晚', '夜晚'], other: 'EN', otherLang: 'en',
     keysT: '快捷键', keysClose: '按 ? 或 Esc 关闭', keysHint: '按 ? 看快捷键',
@@ -115,7 +115,7 @@ const T = {
   en: { me: 'Middle-earth', five: 'Five cities', map: 'Map', tour: 'Tour', spin: 'Orbit', top: 'Top', hide: 'Hide', show: 'Show', info: 'About this map', where: 'Location', view: 'View',
     hintW: 'Drag to orbit · Shift/Space + drag to pan · Scroll to zoom', hintC: 'Click a building for details · Esc to go back', title: 'Yahaha Middle-earth', sub: 'Five cities, one continent',
     intro: 'Each city is a category and each building in it is a tool or a link. Roads and bridges join them up. Click a city name to fly in, or press Tour.',
-    plots: n => `${n} plots`, plot: 'Plot', open: 'Open ↗', about: 'About me', fold: 'Folding a Middle-earth', prep: 'Preparing paper…',
+    plots: n => `${n} plots`, plot: 'Plot', open: 'Open', about: 'About me', fold: 'Folding a Middle-earth', prep: 'Preparing paper…',
     steps: ['Laying out the land', 'Folding the mountains', 'Building roads and bridges', 'Ploughing the fields', 'Raising five cities', 'Planting a forest', 'Sending out travellers and boats'],
     phases: ['Late night', 'Sunrise', 'Morning', 'Forenoon', 'Noon', 'Afternoon', 'Dusk', 'Evening'], other: '中文', otherLang: 'zh',
     keysT: 'Keyboard shortcuts', keysClose: 'Press ? or Esc to close', keysHint: 'Press ? for shortcuts',
@@ -146,6 +146,7 @@ for (const c of CITIES) { c.roleZh = c.role; c.blurbZh = c.blurb; [c.roleEn, c.b
 function setLangData() { for (const c of CITIES) { c.role = LANG === 'zh' ? c.roleZh : c.roleEn; c.blurb = LANG === 'zh' ? c.blurbZh : c.blurbEn; for (const it of c.items) it.desc = LANG === 'zh' ? it.descZh : it.descEn; } }
 setLangData();
 const L = () => T[LANG];
+const EXT_ICON = '<svg class="ext" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M5.5 3.5h7v7M12.5 3.5 4 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
 document.getElementById('site').textContent = DOMAIN; document.getElementById('site').href = 'https://' + DOMAIN.toLowerCase();
 document.getElementById('year').textContent = new Date().getFullYear();
@@ -1331,7 +1332,7 @@ function renderPanel() {
   eyebrow.textContent = `${DOMAIN} · ${c.role}`;
   const d = state.sel && districts[state.sel], it = d && d.it;
   panel.innerHTML = `<h2>${c.en}<small>${LANG === 'zh' ? c.name + ' · ' : ''}${c.role} · ${t.plots(c.items.length)}</small></h2><p>${esc(c.blurb)}</p>
-    ${it ? `<div class="card"><div class="row"><h3>${esc(it.name)}</h3><span class="eyebrow">${t.plot} ${it.code}</span></div><p>${esc(it.desc)}</p><div class="url">${esc(it.url.replace(/^https:\/\//, ''))}</div><a class="go" href="${it.url}" target="_blank" rel="noopener">${t.open}</a></div>` : ''}
+    ${it ? `<div class="card"><div class="row"><h3>${esc(it.name)}</h3><span class="eyebrow">${t.plot} ${it.code}</span></div><p>${esc(it.desc)}</p><div class="url">${esc(it.url.replace(/^https:\/\//, ''))}</div><a class="go" href="${it.url}" target="_blank" rel="noopener">${t.open}${EXT_ICON}</a></div>` : ''}
     <ul class="list">${c.items.map((x, i) => `<li><button type="button" data-sel="${c.id}-${i}" aria-current="${state.sel === c.id + '-' + i}"><span class="swatch" style="--c: var(${TOK[x.roof] || '--kraft'})" aria-hidden="true"></span><span class="nm">${esc(x.name)}<em>${esc(x.desc)}</em></span><span class="grid-ref">${x.code}</span></button></li>`).join('')}</ul>`;
 }
 function applyLang() {
