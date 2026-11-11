@@ -1340,10 +1340,18 @@ function viewFor(id, az) {
   const theta = az ?? (controls ? controls.getAzimuthalAngle() : WORLD.view.az);
   return { pos: target.clone().add(new THREE.Vector3().setFromSphericalCoords(dist, phi, theta)), target };
 }
-function flyTo(v, dur = 1200) {
+// camera flights orbit the moving target instead of cutting a straight line: distance blends
+// on a log scale, the bearing turns the short way round, and long hops rise a little mid-way
+const sph = (pos, target) => new THREE.Spherical().setFromVector3(pos.clone().sub(target));
+function flyTo(v, dur) {
   if (!controls) return;
   if (reduce || dur === 0) { camera.position.copy(v.pos); controls.target.copy(v.target); controls.update(); return; }
-  tween = { p0: camera.position.clone(), t0: controls.target.clone(), v, start: performance.now(), dur };
+  const t0 = controls.target.clone(), a = sph(camera.position, t0), b = sph(v.pos, v.target);
+  let dth = b.theta - a.theta; dth = Math.atan2(Math.sin(dth), Math.cos(dth));
+  const hop = t0.distanceTo(v.target), zoom = Math.abs(Math.log(b.radius / a.radius));
+  dur = dur ?? THREE.MathUtils.clamp(850 + hop * 22 + zoom * 380 + Math.abs(dth) * 260, 900, 1800);
+  const lift = hop > 10 ? Math.min(.45, hop / 60) : 0; // zoom out a bit on long hops, like a map app
+  tween = { t0, v, a, b, dth, lift, start: performance.now(), dur };
 }
 
 // ---------------- state + panel ----------------
@@ -1364,13 +1372,16 @@ function refresh() {
   for (const id of painted) if (!want.has(id)) paint(id, false);
   for (const id of want) if (!painted.has(id)) paint(id, true);
   painted = want;
+  // labels that appear fade in near the end of the flight instead of popping up at its start
+  const showAt = tween ? tween.dur * .55 : 0;
+  const reveal = (lab, on) => { if (on && !lab.visible) { lab.element.classList.add('fade'); clearTimeout(lab.userData.fadeT); lab.userData.fadeT = setTimeout(() => lab.element.classList.remove('fade'), showAt); } lab.visible = on; };
   for (const [id, d] of Object.entries(cityData)) {
     for (const m of d.pave) m.material = (!state.city && state.hoverCity === id) ? M.hot : M.road;
     d.el.classList.toggle('hot', state.hoverCity === id);
-    d.lab.visible = !state.city;
+    reveal(d.lab, !state.city);
   }
   for (const d of Object.values(districts)) {
-    d.lab.visible = state.city === d.city;
+    reveal(d.lab, state.city === d.city);
     d.el.classList.toggle('sel', d.id === state.sel); d.el.classList.toggle('hot', d.id === state.hover);
   }
   mapEl.classList.toggle('in-city', !!state.city);
@@ -1434,7 +1445,7 @@ const TOUR = [...CITIES.map(c => c.id), null];
 function stopTour() { if (tourTimer) { clearTimeout(tourTimer); tourTimer = null; tourBtn.setAttribute('aria-pressed', 'false'); } }
 function tourStep(i) {
   const id = TOUR[i % TOUR.length];
-  go(id, null, false); flyTo(viewFor(id), 2400);
+  flyTo(viewFor(id), 2400); go(id, null, false);
   tourTimer = setTimeout(() => tourStep(i + 1), id ? 5200 : 4200);
 }
 tourBtn.addEventListener('click', () => { if (tourTimer) return stopTour(); tourBtn.setAttribute('aria-pressed', 'true'); tourStep(0); });
@@ -1482,7 +1493,7 @@ function resetView() {
   stopTour();
   if (controls?.autoRotate) { controls.autoRotate = false; spinBtn.setAttribute('aria-pressed', 'false'); }
   if (topDown) { topDown = false; topBtn.setAttribute('aria-pressed', 'false'); }
-  go(null, null, false); flyTo(viewFor(null, WORLD.view.az));
+  flyTo(viewFor(null, WORLD.view.az)); go(null, null, false);
 }
 document.getElementById('b-home').addEventListener('click', resetView);
 const spinBtn = document.getElementById('b-spin');
@@ -1647,7 +1658,12 @@ function frame() {
   if (!reduce && UI.motion) { t += dt; for (const a of anims) a(t, dt); }
   if (tween) {
     const p = Math.min(1, (performance.now() - tween.start) / tween.dur), e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-    camera.position.lerpVectors(tween.p0, tween.v.pos, e); controls.target.lerpVectors(tween.t0, tween.v.target, e);
+    const { a, b } = tween, et = 1 - Math.pow(1 - p, 3); // target leads slightly so the view settles on it
+    controls.target.lerpVectors(tween.t0, tween.v.target, Math.min(1, et * .35 + e * .65));
+    const r = Math.exp(lerp(Math.log(a.radius), Math.log(b.radius), e)) * (1 + tween.lift * Math.sin(Math.PI * p));
+    const phi = lerp(a.phi, b.phi, e) - tween.lift * .25 * Math.sin(Math.PI * p);
+    camera.position.copy(controls.target).add(new THREE.Vector3().setFromSphericalCoords(r, Math.max(.05, phi), a.theta + tween.dth * e));
+    if (p >= 1) { camera.position.copy(tween.v.pos); controls.target.copy(tween.v.target); }
     if (p >= 1) tween = null;
   }
   controls.update();

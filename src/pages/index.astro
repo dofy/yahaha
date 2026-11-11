@@ -256,6 +256,8 @@ body { transition: background-color .8s; background: var(--sky); color: var(--ui
 .d-tag { pointer-events: auto; cursor: pointer; font-family: var(--font-mono); font-size: 11.5px; color: var(--ui-ink);
   background: color-mix(in srgb, var(--ui-card) 90%, transparent); border: 1px solid var(--ui-line); border-radius: 6px;
   padding: 1px 6px; white-space: nowrap; transform: translateY(-60%); }
+.d-tag { transition: opacity .35s ease, border-color .15s; }
+.c-tag.fade, .d-tag.fade { opacity: 0 !important; pointer-events: none; }
 .d-tag b { font-weight: 400; color: var(--ui-faint); margin-right: 5px; }
 .d-tag:hover, .d-tag.hot { border-color: var(--ui-ink); }
 .d-tag.sel { background: var(--coral); border-color: var(--ui-ink); color: #171614; }
