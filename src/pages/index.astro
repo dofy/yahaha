@@ -292,14 +292,14 @@ body { transition: background-color .8s; background: var(--sky); color: var(--ui
 .fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--ui-soft); }
 
 /* 3D labels */
-.c-tag { pointer-events: auto; cursor: pointer; color: var(--ui-ink); background: var(--ui-card); border: 1px solid var(--ui-ink);
+.c-tag { pointer-events: none; cursor: pointer; color: var(--ui-ink); background: var(--ui-card); border: 1px solid var(--ui-ink);
   border-radius: 8px; padding: 2px 10px 4px; white-space: nowrap; display: grid; justify-items: center; line-height: 1.15;
   transform: translateY(-50%); transition: background .15s; font: inherit; }
 .c-tag .en { font-family: var(--font-map); font-style: italic; font-weight: 600; font-size: 19px; letter-spacing: .01em; }
 .c-tag .zh { font-family: var(--font-mono); font-size: 10.5px; color: var(--ui-faint); }
 .c-tag:hover, .c-tag.hot { background: var(--ui-hot); }
 .c-tag::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 1px; height: 8px; background: var(--ui-ink); }
-.d-tag { pointer-events: auto; cursor: pointer; font-family: var(--font-mono); font-size: 11.5px; color: var(--ui-ink);
+.d-tag { pointer-events: none; cursor: pointer; font-family: var(--font-mono); font-size: 11.5px; color: var(--ui-ink);
   background: color-mix(in srgb, var(--ui-card) 90%, transparent); border: 1px solid var(--ui-line); border-radius: 6px;
   padding: 1px 6px; white-space: nowrap; transform: translateY(-60%); }
 .d-tag { transition: opacity .35s ease, border-color .15s; }
@@ -341,13 +341,11 @@ body { transition: background-color .8s; background: var(--sky); color: var(--ui
   visibility: hidden; text-decoration: none; font-size: 12px; font-weight: 600; white-space: nowrap;
   color: #171614; background: var(--coral); border: 1px solid var(--ui-ink); border-radius: 8px; padding: 5px 8px; }
 .list li:hover .go, .list li:focus-within .go { visibility: visible; }
-.list li:hover:has(.go) button, .list li:focus-within:has(.go) button { padding-right: 78px; }
-.list li:hover:has(.go) .grid-ref, .list li:focus-within:has(.go) .grid-ref { display: none; }
+.list li:hover:has(.go) .grid-ref, .list li:focus-within:has(.go) .grid-ref { visibility: hidden; }
 .go:hover { filter: brightness(1.05); }
 @media (hover: none) {
   .list li:has(button[aria-current="true"]) .go { visibility: visible; }
-  .list li:has(button[aria-current="true"]) button { padding-right: 78px; }
-  .list li:has(button[aria-current="true"]) .grid-ref { display: none; }
+  .list li:has(button[aria-current="true"]) .grid-ref { visibility: hidden; }
 }
 :focus-visible { outline: 2px solid var(--coral-deep); outline-offset: 2px; }
 .ui, .c-tag, .d-tag, .place, .panel, .list button { transition: background-color 1.5s, color 1.5s, border-color 1.5s; }

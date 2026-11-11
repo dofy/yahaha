@@ -12,6 +12,48 @@ const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t
 const angDiff = (a, b) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
 
 export function strSeed(s) { let h = 2166136261; for (const ch of String(s)) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+// Silhouettes group landmarks by what is visible from the overview camera. They are
+// separate from semantic kind: two different kinds can still look like the same house.
+export const LANDMARK_SILHOUETTES = {
+  quad: 'tower', spire: 'tower', dome: 'round', kiosk: 'house', radio: 'mast', grid: 'tower',
+  face: 'round', vault: 'object', twin: 'tower', silo: 'round', library: 'house', crane: 'open',
+  tanks: 'object', shed: 'house', chimney: 'house', pagoda: 'tiered', booth: 'round', theater: 'low',
+  inn: 'house', teahouse: 'tiered', cattower: 'tower', dovecote: 'mast', camera: 'object', pavilion: 'open',
+  elfhall: 'house', stupa: 'round', tent: 'low', school: 'house', smithy: 'house', scriptorium: 'tower',
+  warehouse: 'house', watermill: 'house', kiln: 'round', mansion: 'house', hobbit: 'low', mine: 'low', still: 'object',
+};
+// Fill only unspecified kinds. Automatic choices balance silhouettes and reserve all
+// explicit kinds, but do not infer an item's meaning or rewrite an owner's choices.
+export function assignLandmarkKinds(items, cityId, propKinds) {
+  const buildings = ['quad', 'spire', 'dome', 'kiosk', 'radio', 'grid', 'vault', 'twin', 'library', 'crane', 'chimney', 'pavilion', 'school', 'scriptorium', 'watermill', 'mansion', 'hobbit', 'theater', 'inn', 'teahouse'];
+  const props = ['signpost', 'oak', 'flowerbed', 'rock', 'birch', 'bench', 'lamp', 'stall'];
+  const explicit = items.map(item => item.kind).filter(kind => kind && !propKinds.has(kind));
+  const used = new Set(explicit), silhouettes = new Map();
+  for (const kind of explicit) {
+    const family = LANDMARK_SILHOUETTES[kind];
+    if (family) silhouettes.set(family, (silhouettes.get(family) || 0) + 1);
+  }
+  let buildingCount = 0, offset = strSeed(cityId) % buildings.length, extra = 0;
+  return items.map(item => {
+    const copy = { ...item };
+    if (!copy.kind) {
+      if (buildingCount < 9) {
+        let chosen = -1, least = Infinity;
+        for (let i = 0; i < buildings.length; i++) {
+          const index = (offset + i) % buildings.length, kind = buildings[index];
+          const count = silhouettes.get(LANDMARK_SILHOUETTES[kind]) || 0;
+          if (!used.has(kind) && count < least) { chosen = index; least = count; }
+        }
+        if (chosen >= 0) {
+          copy.kind = buildings[chosen]; used.add(copy.kind); offset = (chosen + 1) % buildings.length;
+          const family = LANDMARK_SILHOUETTES[copy.kind]; silhouettes.set(family, (silhouettes.get(family) || 0) + 1);
+        }
+      } else copy.kind = props[extra++ % props.length];
+    }
+    if (!propKinds.has(copy.kind)) buildingCount++;
+    return copy;
+  });
+}
 export function mulberry(a) {
   return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 }
@@ -23,6 +65,67 @@ function segDist(pts, x, z) {
     best = Math.min(best, Math.hypot(ex, ez));
   }
   return best;
+}
+
+// Route a river around the entire town footprint, not only its control points.
+// A visibility graph of padded circles provides safe detours; rounded corners are
+// accepted only after checking every resulting segment against the same footprints.
+export function routeRiverAroundTowns(points, towns, width) {
+  const circles = towns.map(t => ({ x: t.cx, z: t.cz, r: Math.max(t.rx, t.rz) * 1.25 + width + 1.2 }));
+  const distanceToSegment = (a, b, c) => {
+    const dx = b[0] - a[0], dz = b[1] - a[1], len = dx * dx + dz * dz;
+    const t = len ? clamp01(((c.x - a[0]) * dx + (c.z - a[1]) * dz) / len) : 0;
+    return Math.hypot(a[0] + dx * t - c.x, a[1] + dz * t - c.z);
+  };
+  const outside = p => circles.every(c => Math.hypot(p[0] - c.x, p[1] - c.z) >= c.r + .02);
+  const clear = (a, b) => circles.every(c => distanceToSegment(a, b, c) >= c.r + .01);
+  const safePath = path => path.every((p, i) => !i || clear(path[i - 1], p));
+  function moveEndpoint(point) {
+    let p = point.slice();
+    for (let pass = 0; pass < 48 && !outside(p); pass++) for (const c of circles) {
+      let dx = p[0] - c.x, dz = p[1] - c.z, d = Math.hypot(dx, dz);
+      if (d < c.r + .25) { if (d < 1e-8) { dx = 1; dz = 0; d = 1; } const scale = (c.r + .3) / d; p = [c.x + dx * scale, c.z + dz * scale]; }
+    }
+    if (outside(p)) return p;
+    for (let radius = 1; radius <= 120; radius++) for (let i = 0; i < 48; i++) {
+      const angle = i * Math.PI / 24, q = [point[0] + radius * Math.cos(angle), point[1] + radius * Math.sin(angle)];
+      if (outside(q)) return q;
+    }
+    throw new Error('Could not place river endpoint outside towns');
+  }
+  const start = moveEndpoint(points[0]), end = moveEndpoint(points.at(-1));
+  let path = [start, ...points.slice(1, -1).map(p => p.slice()), end];
+  if (!safePath(path)) {
+    const nodes = [start, end];
+    for (const c of circles) for (let i = 0; i < 24; i++) {
+      const a = i * Math.PI / 12, r = c.r + 1;
+      const point = [c.x + Math.cos(a) * r, c.z + Math.sin(a) * r];
+      if (outside(point)) nodes.push(point);
+    }
+    const distances = nodes.map(() => Infinity), prev = nodes.map(() => -1), visited = nodes.map(() => false);
+    distances[0] = 0;
+    for (let step = 0; step < nodes.length; step++) {
+      let current = -1;
+      for (let i = 0; i < nodes.length; i++) if (!visited[i] && (current < 0 || distances[i] < distances[current])) current = i;
+      if (current < 0 || !Number.isFinite(distances[current]) || current === 1) break;
+      visited[current] = true;
+      for (let j = 0; j < nodes.length; j++) if (!visited[j] && clear(nodes[current], nodes[j])) {
+        const candidate = distances[current] + Math.hypot(nodes[current][0] - nodes[j][0], nodes[current][1] - nodes[j][1]);
+        if (candidate < distances[j]) { distances[j] = candidate; prev[j] = current; }
+      }
+    }
+    if (!Number.isFinite(distances[1])) throw new Error('Could not route river around towns');
+    path = []; for (let i = 1; i >= 0; i = prev[i]) { path.push(nodes[i]); if (i === 0) break; } path.reverse();
+  }
+  const rounded = [path[0]];
+  for (let i = 1; i < path.length - 1; i++) {
+    const a = path[i - 1], b = path[i], c = path[i + 1];
+    const enter = [b[0] * .8 + a[0] * .2, b[1] * .8 + a[1] * .2], exit = [b[0] * .8 + c[0] * .2, b[1] * .8 + c[1] * .2];
+    rounded.push(enter);
+    for (let j = 1; j <= 6; j++) { const t = j / 6, u = 1 - t; rounded.push([u * u * enter[0] + 2 * u * t * b[0] + t * t * exit[0], u * u * enter[1] + 2 * u * t * b[1] + t * t * exit[1]]); }
+  }
+  rounded.push(path.at(-1));
+  return safePath(rounded) ? rounded : path;
 }
 
 export const WORLD_TYPES = ['coast', 'twoCoasts', 'island', 'gulf', 'lakeland'];
@@ -250,12 +353,9 @@ function autoWorld(cfg, towns, { vnoise, fbm, ridge }) {
     const dx = mouth[0] - src[0], dz = mouth[1] - src[1], L = Math.hypot(dx, dz), nx = -dz / L, nz = dx / L;
     let pts = [];
     for (let i = 0; i < n; i++) { const t = i / (n - 1), m = Math.sin(t * Math.PI * freq + ph) * amp * Math.sin(t * Math.PI); pts.push([src[0] + dx * t + nx * m, src[1] + dz * t + nz * m]); }
-    for (let pass = 0; pass < 3; pass++) pts = pts.map(([x, z], i) => {
-      if (i === 0 || i === n - 1) return [x, z];
-      for (let j = 0; j < pos.length; j++) { const p = pos[j], need = Math.max(towns[j].rx, towns[j].rz) + 2.4, d = Math.hypot(x - p.cx, z - p.cz); if (d < need) { const s = need / (d || 1); x = p.cx + (x - p.cx) * s; z = p.cz + (z - p.cz) * s; } }
-      return [x, z];
-    });
-    rivers.push({ w: k ? .55 : .8, pts });
+    const width = k ? .55 : .8;
+    pts = routeRiverAroundTowns(pts, pos.map((p, i) => ({ ...p, rx: towns[i].rx, rz: towns[i].rz })), width);
+    rivers.push({ w: width, pts });
   }
 
   // roads: a spanning tree between towns, one extra link, and a lane leaving the map

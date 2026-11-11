@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { makeWorld, strSeed } from './world-gen.js';
+import { assignLandmarkKinds, makeWorld, strSeed } from './world-gen.js';
 import './daylight.js'; // also loaded in <head>; sets window.SiteMapDaylight
 
 export async function mountMap(SITE) {
@@ -25,7 +25,7 @@ const CITIES = [];
   const free = SLOT_ORDER.filter(s => !taken.has(s));
   for (const src of (SITE.cities || []).slice(0, 9)) {
     const slot = SLOTS[src.slot] ? src.slot : free.shift() || 'town';
-    const all = (src.items || []).map(it => ({ ...it }));
+    const all = assignLandmarkKinds(src.items || [], src.id, PROP_KINDS);
     const builds = all.filter(it => !PROP_KINDS.has(it.kind)).slice(0, 9);
     const props = all.filter(it => !builds.includes(it));
     const n = builds.length, [cols, rows] = n <= 2 ? [2, 1] : n <= 4 ? [2, 2] : n <= 6 ? [3, 2] : [3, 3];
@@ -76,9 +76,9 @@ function blobPt(c, th, k = 1) { const r = blobR(c, th) * k; return [Math.cos(th)
 const RIVERS = WORLD.rivers.map(r => ({ ...r, pts: r.pts.map(p => p.slice()) }));
 // classic roads come as fixed polylines; generated ones as town-to-town links shaped here
 const ROADS = (WORLD.snapRoads ? WORLD.roads : WORLD.roadsSpec.map(r => {
-  const A = CITIES[r.i], [ax, az] = blobPt(A, r.th1, .96), a = [A.cx + ax, A.cz + az];
+  const A = CITIES[r.i], [ax, az] = blobPt(A, r.th1, .88), a = [A.cx + ax, A.cz + az];
   let b;
-  if (r.j >= 0) { const B = CITIES[r.j], [bx, bz] = blobPt(B, r.th2, .96); b = [B.cx + bx, B.cz + bz]; } else b = r.end;
+  if (r.j >= 0) { const B = CITIES[r.j], [bx, bz] = blobPt(B, r.th2, .88); b = [B.cx + bx, B.cz + bz]; } else b = r.end;
   const dx = b[0] - a[0], dz = b[1] - a[1], m = [(a[0] + b[0]) / 2 - dz * r.bend, (a[1] + b[1]) / 2 + dx * r.bend];
   return [a, m, b];
 })).map(pts => {
@@ -425,8 +425,8 @@ function annex(kind, ROOF, WALL, seed) {
 }
 function makeBuilding(it, c, seed, k = 0) {
   const S = c.style, wl = S.walls.length, rl = S.roofs.length;
-  const WALL = M[S.walls[k % wl]], WALL2 = M[S.walls[(k + 2) % wl]], ROOF = M[S.roofs[(k * 2 + 1) % rl]], ROOF2 = M[S.roofs[(k * 2 + 3) % rl]];
-  it.roof = S.roofs[(k * 2 + 1) % rl];
+  const WALL = M[S.walls[k % wl]], WALL2 = M[S.walls[(k + 1) % wl]], ROOF = M[S.roofs[k % rl]], ROOF2 = M[S.roofs[(k + 1) % rl]];
+  it.roof = S.roofs[k % rl];
   const root = new THREE.Group(), g = new THREE.Group(); root.add(g);
   const add = (geo, mat, x = 0, y = 0, z = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); g.add(m); return m; };
   const box = (w, h, d, x = 0, y = 0, z = 0, mat = WALL) => add(new THREE.BoxGeometry(w, h, d), mat, x, y + h / 2, z);
@@ -723,7 +723,7 @@ function smoke(parent, x, y, z) {
 
 // ---------------- terrain model ----------------
 const sampleCurve = (pts, n) => new THREE.CatmullRomCurve3(pts.map(([x, z]) => V(x, 0, z))).getPoints(n);
-for (const r of RIVERS) r.path = sampleCurve(r.pts, 90);
+for (const r of RIVERS) r.path = WORLD.snapRoads ? sampleCurve(r.pts, 90) : r.pts.map(([x, z]) => V(x, 0, z));
 const roadPaths = ROADS.map(p => sampleCurve(p, Math.max(12, Math.round(p.reduce((s, q, i) => i ? s + Math.hypot(q[0] - p[i - 1][0], q[1] - p[i - 1][1]) : 0, 0) * 3))));
 function distPath(path, x, z, pad = 3) {
   const bb = path.bb || (path.bb = path.reduce((b, p) => [Math.min(b[0], p.x), Math.max(b[1], p.x), Math.min(b[2], p.z), Math.max(b[3], p.z)], [1e9, -1e9, 1e9, -1e9]));
@@ -782,7 +782,7 @@ const tClass = [], tJit = [];
     else if (cy < WL + .2) k = 'sand';
     else if (slope > .3 && farness(cx, cz) < .5) k = 'cut';
     else if (slope > .3) k = cy > 3 ? 'slate' : 'stone';
-    else if (cy > 5.2) k = 'snow';
+    else if (cy > 5.2) k = vnoise(cx * .07 + 19, cz * .07 - 10) > .6 ? 'snow' : slope > .15 ? 'slate' : 'stone';
     else if (cy > 3.6) k = slope > .12 ? 'slate' : 'stone';
     else if (cy > 2.6) k = 'stone';
     else { const v = vnoise(cx * .32 + 40, cz * .32); k = v > .64 ? 'meadow' : v < .26 ? 'olivegrass' : 'grass'; }
@@ -812,22 +812,26 @@ function mountain(x, z, r, h, seed) {
     p.setY(i, y + (hash(i, seed + 2) - .5) * h * .08);
   }
   const ng = g.toNonIndexed(); ng.computeVertexNormals(); ng.translate(x, h / 2 - .6, z);
-  return { geo: ng, h, base: -.6 };
+  return { geo: ng, h, base: -.6, seed };
 }
 const peaks = WORLD.peaks.map(([x, z, r, h, sd]) => mountain(x, z, r, h, sd));
 const mgeo = mergeGeometries(peaks.map(p => p.geo));
 const mClass = [];
 {
-  const p = mgeo.attributes.position, n = mgeo.attributes.normal;
-  for (let f = 0; f < p.count / 3; f++) {
-    const i = f * 3, cy = Math.max(p.getY(i), p.getY(i + 1), p.getY(i + 2));
-    mClass.push(cy > 4.4 ? 'snow' : cy > 3.0 ? (n.getX(i) > 0 ? 'snow' : 'slate') : cy > 1.6 ? 'slate' : 'stone');
+  for (const peak of peaks) {
+    const p = peak.geo.attributes.position, n = peak.geo.attributes.normal;
+    const snowy = peak.h > 5 && hash(peak.seed, 851) > .42;
+    const snowline = Math.max(3.4, peak.h * .68);
+    for (let f = 0; f < p.count / 3; f++) {
+      const i = f * 3, cy = Math.max(p.getY(i), p.getY(i + 1), p.getY(i + 2));
+      mClass.push(snowy && cy > snowline ? 'snow' : cy > 2.7 ? 'slate' : cy > 1.3 ? (n.getY(i) > .45 ? 'olive' : 'stone') : 'grass');
+    }
   }
 }
 mgeo.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(mgeo.attributes.position.count * 3), 3));
 const mountains = new THREE.Mesh(mgeo, vcol); mountains.castShadow = mountains.receiveShadow = true; world.add(mountains);
 recolorers.push(() => {
-  const pal = { snow: C.snow, slate: C.slate, stone: C.stone }, col = mgeo.attributes.color;
+  const pal = { snow: C.snow, slate: C.slate, stone: C.stone, olive: C.olive, grass: C.grass }, col = mgeo.attributes.color;
   for (let f = 0; f < mClass.length; f++) { const c = pal[mClass[f]], j = .9 + hash(f, 13) * .16; for (let v = 0; v < 3; v++) col.setXYZ(f * 3 + v, Math.min(1, c.r * j), Math.min(1, c.g * j), Math.min(1, c.b * j)); }
   col.needsUpdate = true;
 });
@@ -839,6 +843,19 @@ const walkPaths = [];
 for (const path of roadPaths) {
   const pts = path.map(p => V(p.x, smoothH(p.x, p.z) + .07, p.z));
   for (let k = 0; k < 3; k++) for (let i = 1; i < pts.length - 1; i++) pts[i].y = (pts[i - 1].y + pts[i].y * 2 + pts[i + 1].y) / 4;
+  // Ease the road surface into the matching town street instead of ending as a raised slab.
+  for (const reverse of [false, true]) {
+    const end = reverse ? pts.at(-1) : pts[0];
+    const city = CITIES.filter(c => blobSd(c, end.x, end.z) < 1.4).sort((a, b) => Math.hypot(a.cx - end.x, a.cz - end.z) - Math.hypot(b.cx - end.x, b.cz - end.z))[0];
+    if (!city) continue;
+    let distance = 0;
+    for (let j = 0; j < pts.length; j++) {
+      const i = reverse ? pts.length - 1 - j : j;
+      if (j) distance += pts[i].distanceTo(pts[reverse ? i + 1 : i - 1]);
+      if (distance > 1.4) break;
+      pts[i].y = lerp(city.y - .02, pts[i].y, sstep(0, 1.4, distance));
+    }
+  }
   const top = [], side = [], half = .42;
   const edgeL = [], edgeR = [];
   for (let i = 0; i < pts.length; i++) {
@@ -853,6 +870,11 @@ for (const path of roadPaths) {
   }
   const mk = (arr, mat) => { const g = new THREE.BufferGeometry().setFromPoints(arr); g.computeVertexNormals(); const m = new THREE.Mesh(g, mat); m.receiveShadow = true; m.material.side = THREE.DoubleSide; world.add(m); return m; };
   mk(top, M.road); mk(side, M.kraft);
+  // Rounded ends overlap the city streets, hiding sharp cutoffs at the joins.
+  for (const end of [pts[0], pts.at(-1)]) {
+    const cap = new THREE.Mesh(new THREE.CircleGeometry(half, 24).rotateX(-Math.PI / 2), M.road);
+    cap.position.copy(end); cap.position.y += .005; cap.receiveShadow = true; world.add(cap);
+  }
   // bridges where the carved ground drops under water
   let span = [];
   const flush = () => {
@@ -980,7 +1002,7 @@ function ribbon(pts, w, mat, y) {
   const g = new THREE.BufferGeometry().setFromPoints(tri); g.computeVertexNormals();
   const m = new THREE.Mesh(g, mat); m.receiveShadow = true; return m;
 }
-const bend = (a, b, s) => { const m = a.clone().lerp(b, .5), d = b.clone().sub(a), n = V(-d.z, 0, d.x).normalize().multiplyScalar((hash(s, 4) - .5) * d.length() * .35); return new THREE.CatmullRomCurve3([a, m.add(n), b]).getPoints(10); };
+const bend = (a, b, s) => { const m = a.clone().lerp(b, .5), d = b.clone().sub(a), n = V(-d.z, 0, d.x).normalize().multiplyScalar((hash(s, 4) - .5) * d.length() * .22); return new THREE.CatmullRomCurve3([a, m.add(n), b]).getPoints(18); };
 function irregular(n, r0, r1, seed) { const s = new THREE.Shape(); for (let i = 0; i <= n; i++) { const a = i / n * Math.PI * 2, r = r0 + hash(i % n, seed) * (r1 - r0); if (i) s.lineTo(Math.cos(a) * r, Math.sin(a) * r); else s.moveTo(Math.cos(a) * r, Math.sin(a) * r); } return s; }
 const flatShape = (shape, depth) => { const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false }); g.rotateX(-Math.PI / 2); return g; };
 
@@ -1003,6 +1025,10 @@ for (const c of CITIES) {
     streets.push({ pts: bend(center, b.clone().multiplyScalar((d - .7) / d), k + c.oy), w: .4 }); });
   entries.forEach((e, i) => streets.push({ pts: bend(center, e, i * 7 + c.ox), w: .56 }));
   streets.forEach((s, i) => { const m = ribbon(s.pts, s.w, M.road, Gy + .02 + i * .0015); grp.add(m); pave.push(m);
+    for (const end of [s.pts[0], s.pts.at(-1)]) {
+      const cap = new THREE.Mesh(new THREE.CircleGeometry(s.w / 2, 24).rotateX(-Math.PI / 2), M.road);
+      cap.position.set(end.x, Gy + .025 + i * .0015, end.z); cap.receiveShadow = true; grp.add(cap); pave.push(cap);
+    }
     const wp = s.pts.map(p => toWorld(p.x, Gy + .03, p.z)); streetPaths.push(wp); walkPaths.push(wp);
     if (c.lamps && i % 2 === 0) { const p = s.pts[5], q = s.pts[6], n = V(-(q.z - p.z), 0, q.x - p.x).normalize().multiplyScalar(s.w / 2 + .1);
       const pole = new THREE.Mesh(new THREE.CylinderGeometry(.025, .03, .7, 5), M.ink); pole.position.set(p.x + n.x, Gy + .35, p.z + n.z); grp.add(pole);
@@ -1154,11 +1180,17 @@ function treeGeo(kind) {
     for (let i = 0; i < 3; i++) { const g = new THREE.ConeGeometry(.36 - i * .09, .5, 6); g.translate(0, .32 + i * .26, 0); parts.push(g); }
   } else if (kind === 'poplar') {
     for (let i = 0; i < 4; i++) { const g = new THREE.ConeGeometry(.2 - i * .025, .42, 5); g.rotateY(i * .6); g.translate(0, .3 + i * .24, 0); parts.push(g); }
+  } else if (kind === 'cedar') {
+    const g = new THREE.ConeGeometry(.31, .85, 7, 2); g.translate(0, .62, 0); parts.push(g);
+  } else if (kind === 'broadleaf') {
+    for (const [x, y, z, radius] of [[0, .55, 0, .31], [-.19, .47, .02, .23], [.19, .49, -.04, .24]]) {
+      const g = new THREE.IcosahedronGeometry(radius, 0); g.scale(1, .82, 1); g.translate(x, y, z); parts.push(g);
+    }
   } else { const g = new THREE.IcosahedronGeometry(.3, 0); g.scale(1, 1.15, 1); g.translate(0, .45, 0); parts.push(g); }
   return mergeGeometries(parts.map(p => p.index ? p.toNonIndexed() : p));
 }
 const trunkGeo = new THREE.CylinderGeometry(.03, .045, .3, 5); trunkGeo.translate(0, .15, 0);
-const treeKinds = { pine: [], poplar: [], round: [] };
+const treeKinds = { pine: [], cedar: [], poplar: [], round: [], broadleaf: [] };
 const blocked = (x, z) => {
   if (fieldFlats.some(f => f.sd(x, z) < .5)) return true;
   if (cityOcc.some(([ox, oz, or]) => Math.hypot(ox - x, oz - z) < or)) return true;
@@ -1180,7 +1212,7 @@ for (let gx2 = NX0; gx2 < NX1; gx2 += .55) for (let gz2 = NZ0; gz2 < NZ1; gz2 +=
   if (inMountain(x, z) && h < 1) continue;
   if (blocked(x, z)) continue;
   const r = hash(Math.round(x * 71), Math.round(z * 13));
-  const kind = WORLD.pineZone(x, z, h) ? (r < .8 ? 'pine' : 'poplar') : r < .42 ? 'pine' : r < .72 ? 'poplar' : 'round';
+  const kind = WORLD.pineZone(x, z, h) ? (r < .55 ? 'pine' : r < .75 ? 'cedar' : r < .9 ? 'poplar' : 'round') : r < .25 ? 'pine' : r < .4 ? 'cedar' : r < .6 ? 'poplar' : r < .8 ? 'round' : 'broadleaf';
   treeKinds[kind].push({ x, y: h, z, s: .75 + hash(Math.round(x * 13), Math.round(z * 7)) * .6, rot: r * 6.28, tone: hash(Math.round(x * 5), Math.round(z * 91)) });
 }
 for (let gx2 = -75; gx2 < 70; gx2 += 1.25) for (let gz2 = -70; gz2 < 65; gz2 += 1.25) {
@@ -1188,7 +1220,7 @@ for (let gx2 = -75; gx2 < 70; gx2 += 1.25) for (let gz2 = -70; gz2 < 65; gz2 += 
   const x = gx2 + (hash(gx2 * 10 | 0, gz2 * 10 | 0) - .5) * 1.1, z = gz2 + (hash(gz2 * 10 | 0, gx2 * 10 | 0) - .5) * 1.1, h = H(x, z);
   if (h < WL + .3 || h > 3.4) continue;
   if (fbm(x * .07 + 30, z * .07) < .5 || hash(Math.round(x * 17), Math.round(z * 29)) > .7) continue;
-  const r = hash(Math.round(x * 71), Math.round(z * 13)), kind = h > 1.8 ? 'pine' : r < .45 ? 'pine' : r < .75 ? 'poplar' : 'round';
+  const r = hash(Math.round(x * 71), Math.round(z * 13)), kind = h > 1.8 ? (r < .7 ? 'pine' : 'cedar') : r < .25 ? 'pine' : r < .4 ? 'cedar' : r < .6 ? 'poplar' : r < .8 ? 'round' : 'broadleaf';
   treeKinds[kind].push({ x, y: h, z, s: 1 + hash(Math.round(x * 13), Math.round(z * 7)) * .8, rot: r * 6.28, tone: hash(Math.round(x * 5), Math.round(z * 91)) });
 }
 const treeMeshes = [];
@@ -1203,7 +1235,7 @@ for (const [kind, list] of Object.entries(treeKinds)) {
 }
 recolorers.push(() => {
   for (const { kind, list, crowns } of treeMeshes) list.forEach((t, i) => {
-    const c = kind === 'pine' ? (t.tone < .55 ? C.pine : C.olive) : kind === 'poplar' ? (t.tone < .62 ? C.mustard : t.tone < .85 ? mixC(C.mustard, C.terra, .35) : C.olive) : (t.tone < .5 ? C.olive : C.grass);
+    const c = kind === 'pine' || kind === 'cedar' ? (t.tone < .55 ? C.pine : C.olive) : kind === 'poplar' ? (t.tone < .62 ? C.mustard : t.tone < .85 ? mixC(C.mustard, C.terra, .35) : C.olive) : kind === 'broadleaf' ? (t.tone < .4 ? C.mustard : t.tone < .7 ? C.olive : C.grass) : (t.tone < .5 ? C.olive : C.grass);
     crowns.setColorAt(i, c.clone().multiplyScalar(.94 + t.tone * .12));
   });
   for (const { crowns } of treeMeshes) if (crowns.instanceColor) crowns.instanceColor.needsUpdate = true;
@@ -1281,13 +1313,29 @@ const birds = [];
 for (let i = 0; i < 9; i++) {
   const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(9), 3));
   const l = onLines(new THREE.Line(geo, strokeHard)); world.add(l);
-  birds.push({ l, cx: -6 + hash(i, 1) * 14, cz: -6 + hash(i, 2) * 14, r: 2 + hash(i, 3) * 4, y: 4 + hash(i, 4) * 2.5, sp: .2 + hash(i, 5) * .2, ph: hash(i, 6) * 6 });
+  const town = CITIES[i % CITIES.length];
+  birds.push({ l, cx: town.cx + (hash(i, 1) - .5) * 4, cz: town.cz + (hash(i, 2) - .5) * 4, r: 2 + hash(i, 3) * 3, y: 5.5 + hash(i, 4) * 2.5, sp: .2 + hash(i, 5) * .2, ph: hash(i, 6) * 6 });
 }
-anims.push(t => birds.forEach(b => {
-  const a = t * b.sp + b.ph, x = b.cx + Math.cos(a) * b.r, z = b.cz + Math.sin(a) * b.r, f = Math.sin(t * 8 + b.ph) * .08;
-  const tx = -Math.sin(a), tz = Math.cos(a), nx = -tz * .16, nz = tx * .16, p = b.l.geometry.attributes.position;
-  p.setXYZ(0, x + nx - tx * .06, b.y + f, z + nz - tz * .06); p.setXYZ(1, x, b.y, z); p.setXYZ(2, x - nx - tx * .06, b.y + f, z - nz - tz * .06); p.needsUpdate = true;
-}));
+const moveBirds = t => birds.forEach(b => {
+  const a = t * b.sp + b.ph, x = b.cx + Math.cos(a) * b.r, z = b.cz + Math.sin(a) * b.r, f = Math.sin(t * 8 + b.ph) * .1;
+  const tx = -Math.sin(a), tz = Math.cos(a), nx = -tz * .24, nz = tx * .24, p = b.l.geometry.attributes.position;
+  p.setXYZ(0, x + nx - tx * .08, b.y + f, z + nz - tz * .08); p.setXYZ(1, x, b.y, z); p.setXYZ(2, x - nx - tx * .08, b.y + f, z - nz - tz * .08); p.needsUpdate = true;
+});
+moveBirds(0); anims.push(moveBirds);
+// Small schools near open water add life without placing animals on land or in roads.
+const schools = [];
+for (let attempt = 0; attempt < 160 && schools.length < 6; attempt++) {
+  const x = NX0 + hash(attempt, 610) * (NX1 - NX0), z = NZ0 + hash(attempt, 611) * (NZ1 - NZ0);
+  if (WORLD.sea(x, z) > -2.5 || H(x, z) > WL - .25 || schools.some(s => Math.hypot(s.x - x, s.z - z) < 4)) continue;
+  const fish = [];
+  for (let j = 0; j < 3; j++) {
+    const fx = (j - 1) * .48, fz = (j % 2) * .28;
+    fish.push(V(fx - .2, 0, fz), V(fx + .16, 0, fz + .1), V(fx + .16, 0, fz + .1), V(fx + .16, 0, fz - .1), V(fx + .16, 0, fz - .1), V(fx - .2, 0, fz), V(fx - .2, 0, fz), V(fx - .3, 0, fz + .1));
+  }
+  const school = lineSeg(fish, strokeHard); school.position.set(x, WL + .04, z); school.rotation.y = hash(attempt, 612) * Math.PI * 2;
+  world.add(school); schools.push({ x, z });
+  const base = school.rotation.y; anims.push(t => { school.rotation.y = base + Math.sin(t * .5 + attempt) * .12; });
+}
 const clouds = [];
 for (let i = 0; i < 14; i++) {
   const cl = new THREE.Group();
@@ -1371,9 +1419,10 @@ const esc = s => String(s).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;',
 function paint(id, on) {
   const d = districts[id]; if (!d) return;
   d.g.traverse(o => { if (!o.isMesh || o.layers.mask !== 1) return;
-    if (on) { if (!o.userData.base) o.userData.base = o.material; if (o.material !== M.coral && o.material !== M.ink) o.material = M.hot; }
+    if (on) { if (!o.userData.base) o.userData.base = o.material; o.material = M.hot; }
     else if (o.userData.base) { o.material = o.userData.base; delete o.userData.base; } });
-  d.plot.material = on ? M.hot : M.paper;
+  if (on) { d.plot.userData.base = d.plot.material; d.plot.material = M.hot; }
+  else if (d.plot.userData.base) { d.plot.material = d.plot.userData.base; delete d.plot.userData.base; }
 }
 let painted = new Set();
 function refresh() {
@@ -1477,20 +1526,43 @@ function pick(e) {
   if (o.userData.district) return { district: o.userData.district, city: districts[o.userData.district].city };
   return { city: o.userData.city };
 }
+// Labels remain HTML for sharp, accessible text, but pointer events pass through
+// to OrbitControls. Resolve a click or hover against the visible label rectangles.
+function labelAt(x, y) {
+  const entries = state.city ? Object.values(districts).filter(d => d.city === state.city) : Object.values(cityData);
+  let result = null, top = -Infinity;
+  for (const d of entries) {
+    const el = d.el;
+    if (!d.lab.visible || el.classList.contains('fade') || el.style.display === 'none' || el.style.opacity === '0') continue;
+    const r = el.getBoundingClientRect(), z = Number(el.style.zIndex) || 0;
+    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom && z >= top) {
+      top = z;
+      result = state.city ? { city: d.city, district: d.id } : { city: d.c.id };
+    }
+  }
+  return result;
+}
 if (renderer) {
   const cv = renderer.domElement; let down = null;
-  cv.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+  cv.addEventListener('pointerdown', e => {
+    if (!e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0)) { down = null; return; }
+    down = { id: e.pointerId, x: e.clientX, y: e.clientY, label: labelAt(e.clientX, e.clientY), moved: false };
+  });
   cv.addEventListener('pointermove', e => {
+    if (down && e.pointerId === down.id && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 5) down.moved = true;
     if (e.buttons) return;
-    const h = pick(e);
+    const h = labelAt(e.clientX, e.clientY) || pick(e);
     const hover = state.city && h.city === state.city ? h.district || null : null;
     const hc = h.city && h.city !== state.city ? h.city : null;
     if (hover !== state.hover || hc !== state.hoverCity) { state.hover = hover; state.hoverCity = hc; refresh(); }
   });
   cv.addEventListener('pointerleave', () => { state.hover = state.hoverCity = null; refresh(); });
+  cv.addEventListener('pointercancel', () => { down = null; });
   cv.addEventListener('pointerup', e => {
-    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
-    const h = pick(e); if (!h.city) return;
+    if (!down || down.id !== e.pointerId) return;
+    const start = down; down = null;
+    if (start.moved || Math.hypot(e.clientX - start.x, e.clientY - start.y) > 5) return;
+    const h = start.label || pick(e); if (!h.city) return;
     stopTour();
     if (h.city !== state.city) go(h.city); else if (h.district) go(state.city, h.district);
   });
