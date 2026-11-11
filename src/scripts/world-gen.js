@@ -56,7 +56,7 @@ function scaleWorld(w, S) {
     boats: w.boats.map(b => ({ ...b, cx: b.cx * S, cz: b.cz * S, a: b.a * S, b: b.b * S })),
     anchors: Object.fromEntries(Object.entries(w.anchors).map(([k, v]) => [k, v && [v[0] * S, v[1], v[2] * S]])),
     pan: { x0: w.pan.x0 * S, x1: w.pan.x1 * S, z0: w.pan.z0 * S, z1: w.pan.z1 * S },
-    view: { x: w.view.x * S, z: w.view.z * S, dist: w.view.dist * S },
+    view: { ...w.view, x: w.view.x * S, z: w.view.z * S, dist: w.view.dist * S },
   };
 }
 
@@ -130,7 +130,7 @@ function classicWorld(towns, { fbm, ridge }) {
     anchors: { north: [-4, 7.8, -18], riverA: [5.9, .4, -11.5], riverB: [-7.2, .6, -12.5], forest: [-18, 2.4, -1.5], fields: [-14.6, 1.6, 5.2],
       sea: [24, .3, 2], bay: [2, .3, 21.5], west: [-42, 8.5, -4], lake: [-31, .4, 11] },
     pan: { x0: -17, x1: 16, z0: -13, z1: 12 },
-    view: { x: -1.5, z: -1.5, dist: 62 },
+    view: { x: -1.5, z: -1.5, dist: 62, az: -.55 }, // the hand-tuned yahaha.net angle
   };
 }
 
@@ -385,6 +385,27 @@ function autoWorld(cfg, towns, { vnoise, fbm, ridge }) {
   };
   for (const k of Object.keys(anchors)) if (anchors[k]) { const [x, z, y] = anchors[k]; anchors[k] = [x, y, z]; }
 
+  // camera: look in from the sea (or from opposite the main range when there is no open
+  // coast), so the shore is in front and the mountains rise behind the towns; then nudge the
+  // angle until no peak stands between the camera and any town
+  function bestAzimuth(tx, tz, dist) {
+    const PHI = .9, base = seaDirs.length ? thS : ranges[0].th + Math.PI;
+    const camY = dist * Math.cos(PHI), camR = dist * Math.sin(PHI);
+    const blocked = alpha => {
+      const gx = tx + Math.cos(alpha) * camR, gz = tz + Math.sin(alpha) * camR;
+      let s = 0;
+      pos.forEach(p => { for (let t = .08; t < .97; t += .04) {
+        const x = gx + (p.cx - gx) * t, z = gz + (p.cz - gz) * t, y = camY + (p.y + .4 - camY) * t;
+        for (const [px, pz, r, h] of peaks) { const d = Math.hypot(x - px, z - pz); if (d < r) { const ph = h * (1 - d / r) - .6; if (ph > y) s += ph - y; } }
+        if (mountK(x, z) > .5 && t > .5) s += mountK(x, z) * .2;
+      } });
+      return s;
+    };
+    let best = base, score = Infinity;
+    for (const off of [0, .3, -.3, .6, -.6, .9, -.9, 1.2, -1.2]) { const v = blocked(base + off) + Math.abs(off) * .4; if (v < score) { score = v; best = base + off; } }
+    return Math.atan2(Math.cos(best), Math.sin(best)); // three.js spherical theta (from +z toward +x), in −π…π
+  }
+
   // camera
   const cx = pos.reduce((s, p) => s + p.cx, 0) / pos.length, cz = pos.reduce((s, p) => s + p.cz, 0) / pos.length;
   const spread = Math.max(...pos.map((p, i) => Math.hypot(p.cx - cx, p.cz - cz) + Math.max(towns[i].rx, towns[i].rz)));
@@ -396,6 +417,6 @@ function autoWorld(cfg, towns, { vnoise, fbm, ridge }) {
     strokes: { x0: -70, x1: 70, z0: -70, z1: 70, n: 2600 },
     harborAngle: thS, boats, anchors,
     pan: { x0: cx - spread - 2, x1: cx + spread + 2, z0: cz - spread - 2, z1: cz + spread + 2 },
-    view: { x: cx, z: cz, dist: Math.max(50, spread * 3.4) },
+    view: { x: cx, z: cz, dist: Math.max(50, spread * 3.4), az: bestAzimuth(cx, cz, Math.max(50, spread * 3.4)) },
   };
 }
