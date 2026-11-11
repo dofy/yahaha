@@ -44,14 +44,22 @@ const CITIES = [];
 // ---------------- world: classic continent or a generated one ----------------
 const WCFG = { ...(SITE.world || {}) };
 { const q = new URLSearchParams(location.search); if (q.get('seed')) WCFG.seed = strSeed(q.get('seed')); if (q.get('world')) { WCFG.type = q.get('world'); if (WCFG.layout === 'classic') WCFG.layout = 'auto'; } if (q.get('seed') && WCFG.layout === 'classic') WCFG.layout = 'auto'; }
+// "{domain}" in the seed becomes the domain this page is served on (matched against
+// site.domains, www. stripped); hosts not in the list (localhost, preview deploys) use site.brand
+const SEED_DOMAIN = (() => { const h = location.hostname.replace(/^www\./, '').toLowerCase(), list = SITE.site?.domains || [];
+  return (list.find(d => d.toLowerCase() === h) || SITE.site?.brand || h || 'map').toLowerCase(); })();
 if (WCFG.seed == null) WCFG.seed = strSeed((SITE.site?.brand || '') + '|' + CITIES.map(c => c.id).join(','));
-else if (typeof WCFG.seed === 'string') WCFG.seed = strSeed(WCFG.seed);
-const WORLD = makeWorld(WCFG, CITIES.map(c => ({ slot: c.slot, rx: c.W / 2 + .95, rz: c.H / 2 + .95 })), { vnoise, fbm: (x, y) => fbm(x, y), ridge: (x, z) => ridge(x, z) });
+else if (typeof WCFG.seed === 'string') WCFG.seed = strSeed(WCFG.seed.replaceAll('{domain}', SEED_DOMAIN));
+// townSize "fixed" (default): lay towns out as if each held nine buildings, so adding or
+// removing buildings never moves the land; "fit": use each town's real size (tighter, but the
+// layout shifts when a town crosses 2/4/6/9 buildings). classic ignores it.
+const FIXED_SIZE = WCFG.layout !== 'classic' && WCFG.townSize !== 'fit';
+const WORLD = makeWorld(WCFG, CITIES.map(c => FIXED_SIZE ? { slot: c.slot, rx: 7 / 2 + .95, rz: 7 / 2 + .95 } : { slot: c.slot, rx: c.W / 2 + .95, rz: c.H / 2 + .95 }), { vnoise, fbm: (x, y) => fbm(x, y), ridge: (x, z) => ridge(x, z) });
 CITIES.forEach((c, i) => { const P = WORLD.townPos[i]; c.cx = P.cx; c.cz = P.cz; c.y = P.y; c.gate = !!P.gate; c.harbor = !!P.harbor;
   c.ox = c.cx + CENTER.x - c.W / 2; c.oy = c.cz + CENTER.z - c.H / 2; });
 const SP = 2.15;
 for (const c of CITIES) {
-  c.ph = hash(c.ox + 40, c.oy + 40) * 6.28; c.ang = (hash(c.oy + 9, c.ox + 9) - .5) * .7;
+  { const sx = FIXED_SIZE ? Math.round(c.cx * 10) : c.ox, sz = FIXED_SIZE ? Math.round(c.cz * 10) : c.oy; c.ph = hash(sx + 40, sz + 40) * 6.28; c.ang = (hash(sz + 9, sx + 9) - .5) * .7; }
   c.rx = c.W / 2 + .95; c.rz = c.H / 2 + .95; c.slots = [];
   const ca = Math.cos(c.ang), sa = Math.sin(c.ang);
   for (let k = 0; k < c.cols * c.rows; k++) {

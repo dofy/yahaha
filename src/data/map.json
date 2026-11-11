@@ -1,6 +1,6 @@
 {
   "world": {
-    "layout": "classic"
+    "seed": "{domain}"
   },
   "ui": {
     "languageSwitch": true,
