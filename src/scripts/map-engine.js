@@ -1152,7 +1152,7 @@ function treeGeo(kind) {
   } else if (kind === 'poplar') {
     for (let i = 0; i < 4; i++) { const g = new THREE.ConeGeometry(.2 - i * .025, .42, 5); g.rotateY(i * .6); g.translate(0, .3 + i * .24, 0); parts.push(g); }
   } else { const g = new THREE.IcosahedronGeometry(.3, 0); g.scale(1, 1.15, 1); g.translate(0, .45, 0); parts.push(g); }
-  return mergeGeometries(parts.map(p => p.toNonIndexed()));
+  return mergeGeometries(parts.map(p => p.index ? p.toNonIndexed() : p));
 }
 const trunkGeo = new THREE.CylinderGeometry(.03, .045, .3, 5); trunkGeo.translate(0, .15, 0);
 const treeKinds = { pine: [], poplar: [], round: [] };
