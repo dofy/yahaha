@@ -69,6 +69,7 @@ const fallback = site.cities.map((c) => ({
       </div>
       <div class="ui tools" role="toolbar" aria-label="视角">
         <button type="button" id="b-home"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4.5 6 3l4 1.5 4-1.5v8.5L10 13l-4-1.5L2 13zM6 3v8.5M10 4.5V13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="t">全图</span></button>
+        <button type="button" id="b-cities" aria-haspopup="menu" aria-controls="city-menu" aria-expanded="false" aria-label="Cities"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5h11M3.5 13V7h4v6M8.5 13V3h4v10M5 8.7h1M10 5h1M10 7.2h1M10 9.4h1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="t">Cities</span></button>
         <button type="button" id="b-tour" aria-pressed="false"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 13.5c-.2-3 4.2-2.6 4.2-5.6S3.6 4.3 5 2.6M10 2.5v6.5M10 2.5h3.6l-1 1.6 1 1.6H10M2.5 13.5h2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="t">导览</span></button>
         <button type="button" id="b-spin" aria-pressed="false"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.6A5.2 5.2 0 1 1 11.6 4.3M11.9 1.6v3h-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="t">环绕</span></button>
         <button type="button" id="b-top" aria-pressed="false"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v5M5.8 4.5 8 6.7l2.2-2.2M2.2 10.6 8 7.6l5.8 3L8 13.7z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="t">俯视</span></button>
@@ -270,6 +271,8 @@ body { transition: background-color .8s; background: var(--sky); color: var(--ui
   .bubble-open:hover, .bubble-close:hover { filter: brightness(1.05); }
 }
 
+@media (min-width: 561px) and (max-width: 760px) { .info { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } }
+
 .loader { position: absolute; inset: 0; z-index: 5; display: grid; place-content: center; justify-items: center; gap: 10px;
   background: var(--ui-card); transition: opacity .6s .2s, visibility 0s .8s, background-color .8s; }
 .loader.done { opacity: 0; visibility: hidden; }
@@ -353,13 +356,19 @@ body { transition: background-color .8s; background: var(--sky); color: var(--ui
 .foot .ver:hover { color: var(--ui-ink); text-decoration: underline; }
 .go .ext { transition: transform .2s; }
 .go:hover .ext { transform: translate(1px, -1px); }
-.tools:has(.lang-menu:not([hidden])) { z-index: 6; }
-.lang-menu { position: absolute; top: calc(100% + 6px); right: 0; display: grid; min-width: 140px; padding: 4px; gap: 2px;
+.tools:has(.lang-menu:not([hidden])), .tools:has(.city-menu:not([hidden])) { z-index: 6; }
+.lang-menu, .city-menu { position: absolute; top: calc(100% + 6px); right: 0; display: grid; min-width: 140px; padding: 4px; gap: 2px;
   background: var(--ui-card); border: 1px solid var(--ui-ink); border-radius: 10px; box-shadow: 0 12px 30px var(--ui-shadow); z-index: 5; }
 .lang-menu.up { top: auto; bottom: calc(100% + 6px); }
 @media (max-width: 560px) { .lang-menu, .lang-menu.up { top: auto; bottom: 0; right: calc(100% + 6px); } }
-.lang-menu button { text-align: left; border-radius: 6px; padding: 6px 10px; font-family: var(--font-sans); font-size: 13px; }
+.lang-menu button, .city-menu button { text-align: left; border-radius: 6px; padding: 6px 10px; font-family: var(--font-sans); font-size: 13px; }
 .lang-menu button[aria-checked="true"] { background: var(--ui-hot); font-weight: 600; }
+.city-menu { left: var(--city-menu-x, 0px); right: auto; width: 160px; max-height: min(60vh, 400px); overflow-y: auto; }
+.city-menu button { display: block; width: 100%; }
+.city-menu button[aria-current="location"] { background: var(--ui-hot); font-weight: 600; }
+#b-cities { display: none; }
+@media (max-width: 1024px), (max-width: 1366px) and (pointer: coarse) { #b-cities { display: inline-flex; } }
+@media (max-width: 560px) { .city-menu { top: 0; bottom: auto; left: auto; right: calc(100% + 6px); } }
 .tools button { display: inline-flex; align-items: center; gap: 5px; }
 #b-keys { min-width: 32px; justify-content: center; }
 .tools .ic { width: 15px; height: 15px; flex: none; }
