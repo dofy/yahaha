@@ -221,7 +221,7 @@
       "items": [
         {
           "name": "24 Points",
-          "url": "https://yahaha.net/24points",
+          "url": "/24points",
           "kind": "quad",
           "desc": {
             "en": "Every way four numbers can make 24",
@@ -232,7 +232,7 @@
         },
         {
           "name": "Tarot",
-          "url": "https://yahaha.net/tarot",
+          "url": "/tarot",
           "kind": "spire",
           "desc": {
             "en": "Browse the 22 Major Arcana, upright and reversed",
@@ -243,7 +243,7 @@
         },
         {
           "name": "Emoji",
-          "url": "https://yahaha.net/emoji",
+          "url": "/emoji",
           "kind": "dome",
           "desc": {
             "en": "Search Emoji 17.0 in Chinese or English",
@@ -254,7 +254,7 @@
         },
         {
           "name": "Emoticon",
-          "url": "https://yahaha.net/emoticon",
+          "url": "/emoticon",
           "kind": "theater",
           "desc": {
             "en": "Roll a random kaomoji",
@@ -265,7 +265,7 @@
         },
         {
           "name": "Morse Code",
-          "url": "https://yahaha.net/morse",
+          "url": "/morse",
           "kind": "radio",
           "desc": {
             "en": "Encode and decode Morse code",
@@ -276,7 +276,7 @@
         },
         {
           "name": "ASCII Art",
-          "url": "https://yahaha.net/ascii-art",
+          "url": "/ascii-art",
           "kind": "grid",
           "desc": {
             "en": "Turn text into ASCII art",
@@ -287,7 +287,7 @@
         },
         {
           "name": "Face Kit",
-          "url": "https://yahaha.net/face",
+          "url": "/face",
           "kind": "face",
           "desc": {
             "en": "Turn any name into an SVG avatar",
@@ -298,7 +298,7 @@
         },
         {
           "name": "Lock Kit",
-          "url": "https://yahaha.net/lock",
+          "url": "/lock",
           "kind": "vault",
           "desc": {
             "en": "Key bitting codes for single and double rows",
@@ -373,7 +373,7 @@
       "items": [
         {
           "name": "心经",
-          "url": "https://yahaha.net/heart/hans",
+          "url": "/heart/hans",
           "kind": "pagoda",
           "desc": {
             "en": "Simplified Chinese",
@@ -385,7 +385,7 @@
         },
         {
           "name": "心經",
-          "url": "https://yahaha.net/heart/hant",
+          "url": "/heart/hant",
           "kind": "pavilion",
           "desc": {
             "en": "Traditional Chinese",
@@ -396,7 +396,7 @@
         },
         {
           "name": "Heart",
-          "url": "https://yahaha.net/heart/en",
+          "url": "/heart/en",
           "kind": "elfhall",
           "desc": {
             "en": "English translation",
@@ -407,7 +407,7 @@
         },
         {
           "name": "प्रज्ञापारमिता",
-          "url": "https://yahaha.net/heart/original",
+          "url": "/heart/original",
           "kind": "stupa",
           "desc": {
             "en": "Sanskrit original",
