@@ -246,7 +246,7 @@ body { transition: background-color .8s; background: var(--sky); color: var(--ui
 .info.folded .info-head { padding-bottom: 10px; }
 @media (max-width: 560px) {
   .info { left: calc(10px + env(safe-area-inset-left, 0px)); right: auto; width: min(300px, calc(100% - 80px));
-    bottom: calc(78px + env(safe-area-inset-bottom, 0px)); max-height: 52%; }
+    bottom: calc(50px + env(safe-area-inset-bottom, 0px)); max-height: 52%; }
   .brand { left: calc(10px + env(safe-area-inset-left, 0px)); }
   .crumb { left: auto; right: calc(10px + env(safe-area-inset-right, 0px)); top: calc(14px + env(safe-area-inset-top, 0px)); max-width: 46%; overflow-x: auto; white-space: nowrap; }
   .map-controls { display: flex; position: absolute; z-index: 3; right: calc(10px + env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%); flex-direction: column; align-items: center; gap: 6px; }
@@ -256,7 +256,7 @@ body { transition: background-color .8s; background: var(--sky); color: var(--ui
   .map-controls .tools { flex-direction: column; gap: 2px; padding: 10px 4px; }
   .map-controls .tools .sep { width: 22px; height: 1px; margin: 2px 0; }
   .map-controls .tools button { min-width: 34px; }
-  .foot { left: calc(10px + env(safe-area-inset-left, 0px)); right: calc(10px + env(safe-area-inset-right, 0px)); bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  .foot { left: calc(10px + env(safe-area-inset-left, 0px)); bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
 }
 @media (max-width: 1024px), (max-width: 1366px) and (pointer: coarse) {
   .info { width: min(300px, calc(100% - 80px)); max-height: 52%; }
