@@ -435,10 +435,10 @@
         "ja": "オープンソース"
       },
       "blurb": {
-        "en": "The dwarven forges. Nine open-source repositories in a row of smoking workshops.",
-        "zh": "矮人的熔炉。九个开源仓库，排成一片冒烟的工坊。",
-        "zh-Hant": "矮人的熔爐。九個開源倉庫，排成一片冒煙的工坊。",
-        "ja": "ドワーフの鍛冶場。九つのオープンソースのリポジトリが、煙を上げる工房に並んでいます。"
+        "en": "The dwarven forges. Open-source repositories among smoking workshops.",
+        "zh": "矮人的熔炉。开源仓库散落在冒烟的工坊间。",
+        "zh-Hant": "矮人的熔爐。開源倉庫散落在冒煙的工坊間。",
+        "ja": "ドワーフの鍛冶場。煙を上げる工房の間にオープンソースのリポジトリが並んでいます。"
       },
       "style": {
         "walls": [
@@ -568,6 +568,17 @@
             "zh": "Homebrew 依赖图的源码",
             "zh-Hant": "Homebrew 依賴圖的原始碼",
             "ja": "Homebrew 依存グラフのソース"
+          }
+        },
+        {
+          "name": "Emoji Motion",
+          "url": "https://github.com/dofy/emoji-motion",
+          "kind": "flowerbed",
+          "desc": {
+            "en": "Expressive animations for native emoji",
+            "zh": "让原生 Emoji 动起来的动画库",
+            "zh-Hant": "讓原生 Emoji 動起來的動畫函式庫",
+            "ja": "ネイティブ絵文字に動きをつけるアニメーションライブラリ"
           }
         }
       ]
