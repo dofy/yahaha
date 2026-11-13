@@ -184,6 +184,8 @@ document.getElementById('site').textContent = DOMAIN; document.getElementById('s
 // same-site links open in this tab; other sites get a new one
 const isLocal = u => { try { return new URL(u, location.href).origin === location.origin; } catch { return false; } };
 const newTab = u => isLocal(u) ? '' : ' target="_blank" rel="noopener"';
+// the ↗ marks links that leave the site; the bubble's icon-only button gets a plain → instead
+const GO_ICON = '<svg class="ext" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const SITE_LINKS = Array.isArray(SITEINFO.links) ? SITEINFO.links.filter(l => l && l.url) : SITEINFO.about?.url ? [{ name: SITEINFO.about.label || T.en.about, url: SITEINFO.about.url, icon: SITEINFO.about.icon }] : [];
 const LINK_ICONS = {
   github: '<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z" fill="currentColor"/>',
@@ -202,7 +204,7 @@ const linkIcon = icon => !icon ? '' : LINK_ICONS[icon] ? `<svg class="ic" viewBo
 function renderLinks() {
   const nav = document.getElementById('site-links'); if (!nav) return;
   nav.innerHTML = SITE_LINKS.map(l => { const name = loc(l.name, LANG) || l.url, ext = !/^mailto:/i.test(l.url) && !isLocal(l.url);
-    return `<a href="${String(l.url).replace(/"/g, '&quot;')}"${ext ? ' target="_blank" rel="noopener"' : ''} aria-label="${name.replace(/"/g, '&quot;')}" title="${name.replace(/"/g, '&quot;')}">${linkIcon(l.icon)}<span class="t">${name.replace(/</g, '&lt;')}</span>${l.icon ? '' : EXT_SVG}</a>`; }).join('');
+    return `<a href="${String(l.url).replace(/"/g, '&quot;')}"${ext ? ' target="_blank" rel="noopener"' : ''} aria-label="${name.replace(/"/g, '&quot;')}" title="${name.replace(/"/g, '&quot;')}">${linkIcon(l.icon)}<span class="t">${name.replace(/</g, '&lt;')}</span>${l.icon || isLocal(l.url) ? '' : EXT_SVG}</a>`; }).join('');
 }
 { const cp = document.querySelector('.foot .copy'), co = SITEINFO.copyright || {}; if (cp && co.owner) cp.innerHTML = `&copy; ${co.since ? co.since + '&ndash;' : ''}<span id="year"></span> ${co.owner}`; else if (cp && !co.owner) cp.remove(); }
 if (!document.getElementById('map').dataset.version && SITEINFO.version) document.getElementById('map').dataset.version = SITEINFO.version;
@@ -1463,7 +1465,7 @@ function renderPanel() {
   if (mobileBubble) {
     const title = selected ? selected.name : c?.name;
     const description = selected ? selected.desc : c?.blurb;
-    mobileBubble.innerHTML = c ? `<div class="bubble-copy"><strong>${esc(title)}</strong>${description ? `<p>${esc(description)}</p>` : ''}</div>${selected ? `<a class="bubble-open" href="${esc(selected.url)}"${newTab(selected.url)} aria-label="${esc(t.open + ' ' + selected.name)}" title="${esc(t.open)}">${EXT_ICON}</a>` : ''}<button class="bubble-close" type="button" aria-label="${esc(t.hide)}" title="${esc(t.hide)}">×</button>` : '';
+    mobileBubble.innerHTML = c ? `<div class="bubble-copy"><strong>${esc(title)}</strong>${description ? `<p>${esc(description)}</p>` : ''}</div>${selected ? `<a class="bubble-open" href="${esc(selected.url)}"${newTab(selected.url)} aria-label="${esc(t.open + ' ' + selected.name)}" title="${esc(t.open)}">${isLocal(selected.url) ? GO_ICON : EXT_ICON}</a>` : ''}<button class="bubble-close" type="button" aria-label="${esc(t.hide)}" title="${esc(t.hide)}">×</button>` : '';
   }
   if (!c) {
     eyebrow.textContent = `${DOMAIN} · ${t.map}`;
@@ -1473,7 +1475,7 @@ function renderPanel() {
   }
   eyebrow.textContent = `${DOMAIN} · ${c.role}`;
   panel.innerHTML = `<h2>${c.en}<small>${c.name !== c.en ? c.name + ' · ' : ''}${c.role} · ${withN(t.plots, c.items.length)}</small></h2><p>${esc(c.blurb)}</p>
-    <ul class="list">${c.items.map((x, i) => `<li><button type="button" data-sel="${c.id}-${i}" aria-current="${state.sel === c.id + '-' + i}"><span class="swatch" style="--c: var(${TOK[x.roof] || '--kraft'})" aria-hidden="true"></span><span class="nm">${esc(x.name)}<em>${esc(x.desc)}</em></span><span class="grid-ref">${x.code}</span></button><a class="go" href="${esc(x.url)}"${newTab(x.url)} aria-label="${esc(t.open + ' ' + x.name)}">${t.open}${EXT_ICON}</a></li>`).join('')}</ul>`;
+    <ul class="list">${c.items.map((x, i) => `<li><button type="button" data-sel="${c.id}-${i}" aria-current="${state.sel === c.id + '-' + i}"><span class="swatch" style="--c: var(${TOK[x.roof] || '--kraft'})" aria-hidden="true"></span><span class="nm">${esc(x.name)}<em>${esc(x.desc)}</em></span><span class="grid-ref">${x.code}</span></button><a class="go" href="${esc(x.url)}"${newTab(x.url)} aria-label="${esc(t.open + ' ' + x.name)}">${t.open}${isLocal(x.url) ? '' : EXT_ICON}</a></li>`).join('')}</ul>`;
 }
 function applyLang() {
   const t = L();
