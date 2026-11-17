@@ -692,10 +692,10 @@
         "ja": "アプリ"
       },
       "blurb": {
-        "en": "Ships set sail from here. Six standalone apps, each bound for its own website.",
-        "zh": "从这里出海。六个独立应用，各自驶向自己的网站。",
-        "zh-Hant": "從這裡出海。六個獨立應用程式，各自駛向自己的網站。",
-        "ja": "ここから船出します。六つのアプリが、それぞれのサイトへ。"
+        "en": "Ships set sail from here. Eight standalone apps, each bound for its own website.",
+        "zh": "从这里出海。八个独立应用，各自驶向自己的网站。",
+        "zh-Hant": "從這裡出海。八個獨立應用程式，各自駛向自己的網站。",
+        "ja": "ここから船出します。八つのアプリが、それぞれのサイトへ。"
       },
       "style": {
         "walls": [
@@ -791,6 +791,28 @@
             "zh": "Web · 浏览 Homebrew 软件包和依赖关系",
             "zh-Hant": "Web · 瀏覽 Homebrew 套件與依賴關係",
             "ja": "Web · Homebrew のパッケージと依存関係を見る"
+          }
+        },
+        {
+          "name": "Inkflit",
+          "url": "https://inkflit.phpz.org/",
+          "kind": "scriptorium",
+          "desc": {
+            "en": "macOS · Floating Markdown notebook with optional Vim editing",
+            "zh": "macOS · 随手呼出的 Markdown 笔记，支持 Vim 模式",
+            "zh-Hant": "macOS · 隨手叫出的 Markdown 筆記，支援 Vim 模式",
+            "ja": "macOS · すぐに呼び出せる Markdown ノート、Vim モードにも対応"
+          }
+        },
+        {
+          "name": "DBDock",
+          "url": "https://dbdock.phpz.org/",
+          "kind": "vault",
+          "desc": {
+            "en": "macOS · Manage connections and query six database engines",
+            "zh": "macOS · 管理连接，查询六种数据库引擎",
+            "zh-Hant": "macOS · 管理連線，查詢六種資料庫引擎",
+            "ja": "macOS · 接続を管理し、6 種類のデータベースをクエリ"
           }
         }
       ]
