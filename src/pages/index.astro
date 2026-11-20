@@ -163,7 +163,7 @@ const fallback = site.cities.map((c) => ({
           return
         }
         renderMusic(false)
-        if (!music.hasAttribute('src') || music.error) music.src = '/audio/paper-orbit.mp3'
+        if (!music.hasAttribute('src') || music.error) music.src = '/audio/paper-orbit.mp3?v=3'
         try {
           await music.play()
         } catch (error) {
