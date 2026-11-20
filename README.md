@@ -26,6 +26,8 @@ The map uses the [site-to-map skill](https://github.com/dofy/site-to-map), which
 
 Use the number keys or ↑/↓ to fly between cities, ←/→ to switch buildings, and `?` for the full list of keyboard shortcuts.
 
+The speaker button plays or pauses *Paper Orbit*, an original instrumental loop built around pipe-organ tones. Music starts off. Hover, interaction and transition sounds are on by default and may require a click, tap or key press to unlock in the browser. The waveform button toggles sound effects and remembers your choice.
+
 ## Find your way around
 
 - **Apps and projects** — discover Seven's apps and open-source work.
